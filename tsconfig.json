@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "ES2015"],
+    "types": ["chrome-types"],
+    "plugins": [
+      {
+        "name": "ts-lit-plugin"
+      }
+    ]
+  }
+}
