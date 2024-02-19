@@ -1,0 +1,52 @@
+import { TemplateResult, html } from "lit";
+import "@shoelace-style/shoelace/dist/components/tree-item/tree-item.js";
+import { styleMap } from "lit/directives/style-map.js";
+
+export function TreeItem(props: {
+  content: TemplateResult;
+  actionButtons: TemplateResult;
+  tooltipContent: string;
+  expanded?: boolean;
+  selected?: boolean;
+  onExpand?: () => void;
+  onCollapse?: () => void;
+  onSelect?: () => void;
+}) {
+  // TODO: fix accessibility issues relating to keyboard navigation
+  return () => html`
+    <sl-tree-item
+      title=${props.tooltipContent}
+      style=${styleMap({
+        overflow: "hidden",
+        whiteSpace: "noWrap",
+        position: "relative",
+      })}
+      ?expanded=${props.expanded}
+      ?selected=${props.selected}
+      @sl-expand=${props.onExpand}
+      @sl-collapse=${props.onCollapse}
+      @click=${props.onSelect}
+    >
+      <div
+        class="actions-container"
+        style=${styleMap({
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: "100%",
+          textAlign: "right",
+        })}
+      >
+        <sl-button-group
+          label="Actions"
+          style=${styleMap({
+            padding: "0 0.4rem",
+          })}
+        >
+          ${props.actionButtons}
+        </sl-button-group>
+      </div>
+      ${props.content}
+    </sl-tree-item>
+  `;
+}

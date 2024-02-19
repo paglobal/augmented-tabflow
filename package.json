@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "Augment your tab workflow with extended tab group managment",
   "scripts": {
-    "dev": "nodemon --watch public --ext js,json,png --exec \"vite build --watch\"",
+    "dev": "nodemon --watch public --ext js,json,png --exec \"vite build --watch --sourcemap true --minify false\"",
     "build": "vite build",
     "package": "vite build && zip -r augmented-tabflow.zip dist/"
   },
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@shoelace-style/shoelace": "^2.12.0",
-    "lit": "^3.1.1",
+    "lit": "^3.1.2",
     "promethium-js": "^0.8.1"
   }
 }

@@ -4,14 +4,107 @@
   box-sizing: border-box;
 }
 
-#app {
-  width: 100vw;
-  height: 100vh;
-  background: #ffffff;
+html,
+body,
+:root,
+#app,
+* {
+  --sl-font-sans: system-ui, san-serif;
+  --sl-font-serif: system-ui, serif;
+  --sl-font-mono: system-ui, monospace;
+  font-family: system-ui;
 }
 
-@media (prefers-color-scheme: dark) {
-  #app {
-    background: #1b1b1e;
+html,
+body,
+:root,
+#app {
+  overflow-x: hidden;
+  scrollbar-color: var(--sl-color-neutral-500) var(--sl-color-neutral-0);
+}
+
+#app {
+  width: 100%;
+  min-width: 100vw;
+  height: 100%;
+  min-height: 100vh;
+  background: var(--sl-color-neutral-0);
+}
+
+@media only screen and (max-width: 350px) {
+  html,
+  body,
+  :root,
+  #app,
+  * {
+    font-size: 4.5vw;
   }
+}
+
+sl-tree-item img {
+  position: relative;
+}
+
+sl-tree-item:focus-visible > div.actions-container {
+  outline: 0.2rem solid var(--sl-color-primary-700);
+  outline-offset: -0.2rem;
+}
+
+div.actions-container sl-button-group {
+  visibility: hidden;
+}
+
+div.actions-container:hover sl-button-group {
+  visibility: visible;
+}
+
+sl-tree-item:focus-visible > div.actions-container sl-button-group {
+  visibility: visible;
+}
+
+sl-tree-item:focus-visible::part(item) {
+  outline: none;
+}
+
+sl-tree-item sl-button-group {
+  background: var(--sl-color-neutral-0);
+}
+
+sl-tree-item sl-icon-button::part(base):focus-visible {
+  outline: 0.2rem solid var(--sl-color-primary-700);
+  outline-offset: -0.2rem;
+}
+
+sl-tree-item[selected] sl-button-group {
+  background: var(--sl-color-neutral-100);
+}
+
+div.actions-container {
+  z-index: 2;
+}
+
+div.actions-container:hover sl-button-group,
+sl-tree-item::part(item):hover {
+  background: var(--sl-color-neutral-200);
+}
+
+sl-dialog::part(panel) {
+  position: absolute;
+  top: 7rem;
+}
+
+sl-dialog {
+  font-size: 1rem;
+  color: var(--sl-color-neutral-800);
+  --header-spacing: 1rem;
+  --body-spacing: 1rem 2rem;
+}
+
+sl-input::part(base) {
+  height: 2rem;
+  padding: 0;
+}
+sl-input::part(input) {
+  height: 2rem;
+  padding-bottom: 0.15rem;
 }
