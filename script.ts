@@ -1,10 +1,9 @@
 import { html } from "lit";
 import { h, renderTemplateFn, adaptState } from "promethium-js";
 import { App } from "./src/App";
+import { setThemeMode } from "./src/constants";
 
 renderTemplateFn(() => html`${h(App)}`, { renderContainer: "body" });
-
-export const [themeMode, setThemeMode] = adaptState<"light" | "dark">("light");
 
 //auto light/dark mode based on user preferences
 if (window.matchMedia) {

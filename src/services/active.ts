@@ -56,48 +56,59 @@ async function updateTabGroupTreeData() {
   }
 }
 
-chrome.tabGroups.onCreated.addListener(() => {
-  updateTabGroupTreeData();
+chrome.tabGroups.onCreated.addListener(async () => {
+  await updateTabGroupTreeData();
+  console.log("tab group created!");
 });
 
-chrome.tabGroups.onRemoved.addListener(() => {
-  updateTabGroupTreeData();
+chrome.tabGroups.onRemoved.addListener(async () => {
+  await updateTabGroupTreeData();
+  console.log("tab group removed!");
 });
 
-chrome.tabGroups.onUpdated.addListener(() => {
-  updateTabGroupTreeData();
+chrome.tabGroups.onUpdated.addListener(async () => {
+  await updateTabGroupTreeData();
+  console.log("tab group updated!");
 });
 
-chrome.tabs.onActivated.addListener(() => {
-  updateTabGroupTreeData();
+chrome.tabs.onActivated.addListener(async () => {
+  await updateTabGroupTreeData();
+  console.log("tab activated!");
 });
 
-chrome.tabs.onAttached.addListener(() => {
-  updateTabGroupTreeData();
+chrome.tabs.onAttached.addListener(async () => {
+  await updateTabGroupTreeData();
+  console.log("tab attached!");
 });
 
-chrome.tabs.onCreated.addListener(() => {
-  updateTabGroupTreeData();
+chrome.tabs.onCreated.addListener(async () => {
+  await updateTabGroupTreeData();
+  console.log("tab created!");
 });
 
-chrome.tabs.onDetached.addListener(() => {
-  updateTabGroupTreeData();
+chrome.tabs.onDetached.addListener(async () => {
+  await updateTabGroupTreeData();
+  console.log("tab detached!");
 });
 
 // `chrome.tabGroups.onMoved` for tab groups is not necessary because of this. do not add it, it drastically reduces performance!
 // TODO: optimize this using some sort of queue or something
-chrome.tabs.onMoved.addListener(() => {
-  updateTabGroupTreeData();
+chrome.tabs.onMoved.addListener(async () => {
+  await updateTabGroupTreeData();
+  console.log("tab moved!");
 });
 
 chrome.tabs.onRemoved.addListener(async () => {
-  updateTabGroupTreeData();
+  await updateTabGroupTreeData();
+  console.log("tab removed!");
 });
 
 chrome.tabs.onReplaced.addListener(async () => {
-  updateTabGroupTreeData();
+  await updateTabGroupTreeData();
+  console.log("tab replaced!");
 });
 
 chrome.tabs.onUpdated.addListener(async () => {
-  updateTabGroupTreeData();
+  await updateTabGroupTreeData();
+  console.log("tab updated!");
 });

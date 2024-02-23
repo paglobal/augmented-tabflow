@@ -93,18 +93,20 @@ sl-dialog::part(panel) {
   top: 7rem;
 }
 
-sl-dialog {
-  font-size: 1rem;
-  color: var(--sl-color-neutral-800);
-  --header-spacing: 1rem;
-  --body-spacing: 1rem 2rem;
+sl-dialog::part(title) {
+  font-size: 1.1rem;
 }
 
-sl-input::part(base) {
-  height: 2rem;
-  padding: 0;
+form.add-button-dialog-content sl-input,
+form.add-button-dialog-content sl-select {
+  margin-bottom: 1rem;
 }
-sl-input::part(input) {
-  height: 2rem;
-  padding-bottom: 0.15rem;
+
+form.add-button-dialog-content sl-input:last-child,
+form.add-button-dialog-content sl-select:last-child {
+  margin-bottom: 0;
+}
+
+sl-button::part(label) {
+  font-size: 1rem;
 }

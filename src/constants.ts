@@ -1,4 +1,6 @@
-import { themeMode } from "../script";
+import { adaptState } from "promethium-js";
+
+export const [themeMode, setThemeMode] = adaptState<"light" | "dark">("light");
 
 export const tabGroupColors = () => ({
   grey: themeMode() === "dark" ? "#DADBE0" : "#5E6268",
