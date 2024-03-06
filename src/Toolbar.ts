@@ -7,7 +7,7 @@ import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialo
 import { Dialog } from "./Dialog";
 
 export function Toolbar(props: {
-  addButtonDialogProps: Omit<Parameters<typeof Dialog>[0], "ref">;
+  addButtonDialogProps?: Omit<Parameters<typeof Dialog>[0], "ref">;
 }) {
   const addDialogRef = createRef<SlDialog>();
   const helpDialogRef = createRef<SlDialog>();
@@ -22,23 +22,17 @@ export function Toolbar(props: {
       })}
     >
       <sl-button-group label="Tools">
-        <sl-icon-button
-          name="plus-circle"
-          style=${styleMap({ fontSize: "1rem" })}
-          title=${props.addButtonDialogProps.label}
-          @click=${() => addDialogRef.value?.show()}
-        ></sl-icon-button>
-        ${h(Dialog, { ...props.addButtonDialogProps, ref: addDialogRef })}
-        <sl-icon-button
-          name="sort-alpha-up"
-          style=${styleMap({ fontSize: "1rem" })}
-          title="Sort Up"
-        ></sl-icon-button>
-        <sl-icon-button
-          name="sort-alpha-down"
-          style=${styleMap({ fontSize: "1rem" })}
-          title="Sort Down"
-        ></sl-icon-button>
+        ${props.addButtonDialogProps
+          ? html`
+              <sl-icon-button
+                name="plus-circle"
+                style=${styleMap({ fontSize: "1rem" })}
+                title=${props.addButtonDialogProps.label}
+                @click=${() => addDialogRef.value?.show()}
+              ></sl-icon-button>
+              ${h(Dialog, { ...props.addButtonDialogProps, ref: addDialogRef })}
+            `
+          : undefined}
         <sl-icon-button
           name="question-circle"
           style=${styleMap({ fontSize: "1rem" })}

@@ -2,7 +2,7 @@ import { html } from "lit";
 import { Tree } from "./Tree";
 import { h } from "promethium-js";
 
-export function Captured() {
+export function Captures() {
   return () => html`
     ${h(Tree, {
       contentFn: () => html`heyy!!`,

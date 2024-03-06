@@ -4,15 +4,15 @@ import { styleMap } from "lit/directives/style-map.js";
 
 export function TreeItem(props: {
   content: TemplateResult;
-  actionButtons: TemplateResult;
   tooltipContent: string;
+  actionButtons?: TemplateResult;
   expanded?: boolean;
   selected?: boolean;
-  onExpand?: () => void;
-  onCollapse?: () => void;
-  onSelect?: () => void;
+  onExpand?: (e: Event) => void;
+  onCollapse?: (e: Event) => void;
+  onSelect?: (e: Event) => void;
 }) {
-  // TODO: fix accessibility issues relating to keyboard navigation
+  // TODO: fix accessibility issues relating to keyboard navigation (enter should cause element click)
   return () => html`
     <sl-tree-item
       title=${props.tooltipContent}
@@ -36,6 +36,10 @@ export function TreeItem(props: {
           width: "100%",
           textAlign: "right",
         })}
+        @mouseleave=${(e: Event) =>
+          (e.target as HTMLElement).parentElement.blur()}
+        @mouseout=${(e: Event) =>
+          (e.target as HTMLElement).parentElement.blur()}
       >
         <sl-button-group
           label="Actions"

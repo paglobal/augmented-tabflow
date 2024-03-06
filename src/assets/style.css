@@ -45,25 +45,36 @@ sl-tree-item img {
   position: relative;
 }
 
+/* remove default outline to make way for our outline */
+sl-tree-item:focus-visible::part(item) {
+  outline: none;
+}
+
 sl-tree-item:focus-visible > div.actions-container {
   outline: 0.2rem solid var(--sl-color-primary-700);
   outline-offset: -0.2rem;
 }
 
+/* TODO: implement this in JavaScript to prevent flickering in ui */
+div.actions-container:hover sl-button-group,
+sl-tree-item::part(item):hover {
+  background: var(--sl-color-neutral-200);
+}
+
 div.actions-container sl-button-group {
-  visibility: hidden;
+  opacity: 0;
 }
 
 div.actions-container:hover sl-button-group {
-  visibility: visible;
+  opacity: 1;
 }
 
 sl-tree-item:focus-visible > div.actions-container sl-button-group {
-  visibility: visible;
+  opacity: 1;
 }
 
-sl-tree-item:focus-visible::part(item) {
-  outline: none;
+sl-tree-item:focus-within > div.actions-container sl-button-group {
+  opacity: 1;
 }
 
 sl-tree-item sl-button-group {
@@ -81,11 +92,6 @@ sl-tree-item[selected] sl-button-group {
 
 div.actions-container {
   z-index: 2;
-}
-
-div.actions-container:hover sl-button-group,
-sl-tree-item::part(item):hover {
-  background: var(--sl-color-neutral-200);
 }
 
 sl-dialog::part(panel) {

@@ -14,7 +14,11 @@ import { Active } from "./Active";
 import { TabPanelPair } from "./TabPanelPair";
 import { tabGroupColors } from "./constants";
 import { Saved } from "./Saved";
-import { Captured } from "./Captured";
+import { Captures } from "./Captures";
+import { setDefaultAnimation } from "@shoelace-style/shoelace/dist/utilities/animation-registry.js";
+
+setDefaultAnimation("tree-item.expand", null);
+setDefaultAnimation("tree-item.collapse", null);
 
 export function App() {
   function randomTabGroupColorValue() {
@@ -71,41 +75,6 @@ export function App() {
     `;
   }
 
-  function saveTabGroupDialogContent(ref: Ref<SlDialog>) {
-    return html`
-      <form class="add-button-dialog-content">
-        <sl-select
-          name="groupId"
-          placeholder="Group"
-          value=${randomTabGroupColorValue()}
-          hoist
-        >
-          ${Object.entries(tabGroupColors()).map(
-            ([colorName, colorValue]) => html`
-              <sl-option value=${colorValue}
-                ><div></div>
-                <span
-                  slot="prefix"
-                  style=${styleMap({
-                    background: colorValue,
-                    width: "0.8rem",
-                    height: "0.8rem",
-                    marginRight: "1rem",
-                    borderRadius: "50%",
-                    outline: "0.15rem solid var(--sl-color-neutral-1000)",
-                    outlineOffset: "0.15rem",
-                  })}
-                ></span
-                >${colorName}</sl-option
-              >
-            `,
-          )}
-        </sl-select>
-        ${submitButton("Add")}
-      </form>
-    `;
-  }
-
   function addCaptureGroupDialogContent(ref: Ref<SlDialog>) {
     return html`
       <form class="add-button-dialog-content">
@@ -135,14 +104,10 @@ export function App() {
         ${h(TabPanelPair, {
           name: "saved",
           panelContent: Saved,
-          addButtonDialogProps: {
-            label: "Add Tab Group",
-            contentFn: saveTabGroupDialogContent,
-          },
         })}
         ${h(TabPanelPair, {
-          name: "captured",
-          panelContent: Captured,
+          name: "captures",
+          panelContent: Captures,
           addButtonDialogProps: {
             label: "Add Capture Group",
             contentFn: addCaptureGroupDialogContent,

@@ -9,7 +9,7 @@ import { Divider } from "./Divider";
 export function TabPanelPair(props: {
   name: string;
   panelContent: Component;
-  addButtonDialogProps: Parameters<typeof Toolbar>[0]["addButtonDialogProps"];
+  addButtonDialogProps?: Parameters<typeof Toolbar>[0]["addButtonDialogProps"];
 }) {
   return () => html`
     <sl-tab

@@ -19,7 +19,8 @@
     "128": "assets/icons/icon-3-128.png"
   },
   "background": {
-    "service_worker": "service-worker.js"
+    "service_worker": "service-worker.js",
+    "type": "module"
   },
   "action": {
     "default_title": "Augmented Tabflow"
@@ -27,7 +28,9 @@
   "side_panel": {
     "default_path": "index.html"
   },
-  "chrome_url_overrides": {
-    "newtab": "index.html"
+  "commands": {
+    "_execute_action": {
+      "suggested_key": "Alt+T"
+    }
   }
 }

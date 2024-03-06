@@ -1,10 +1,10 @@
 import { adaptState } from "promethium-js";
 
-type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
+export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
   tabs: chrome.tabs.Tab[];
 })[];
 
-export async function getTabGroupTreeData() {
+async function getTabGroupTreeData() {
   const tabGroups = await chrome.tabGroups.query({
     windowId: chrome.windows.WINDOW_ID_CURRENT,
   });
@@ -16,13 +16,13 @@ export async function getTabGroupTreeData() {
     (tabGroupTreeDataAccumulator, currentTab) => {
       const currentTabGroupIndex = tabGroupTreeDataAccumulator.findIndex(
         (tabGroupTreeDataAccumulatorEntry) =>
-          tabGroupTreeDataAccumulatorEntry.id === currentTab.groupId,
+          tabGroupTreeDataAccumulatorEntry.id === currentTab.groupId
       );
       if (currentTabGroupIndex !== -1) {
         tabGroupTreeDataAccumulator[currentTabGroupIndex].tabs.push(currentTab);
       } else {
         const currentTabGroup = tabGroups.find(
-          (tabGroup) => tabGroup.id === currentTab.groupId,
+          (tabGroup) => tabGroup.id === currentTab.groupId
         );
         if (currentTabGroup) {
           tabGroupTreeDataAccumulator.push({
@@ -34,7 +34,7 @@ export async function getTabGroupTreeData() {
 
       return tabGroupTreeDataAccumulator;
     },
-    [],
+    []
   );
 
   return tabGroupTreeData;
@@ -56,6 +56,7 @@ async function updateTabGroupTreeData() {
   }
 }
 
+// TODO: optimize event listeners to only account for current window
 chrome.tabGroups.onCreated.addListener(async () => {
   await updateTabGroupTreeData();
   console.log("tab group created!");
@@ -92,7 +93,7 @@ chrome.tabs.onDetached.addListener(async () => {
 });
 
 // `chrome.tabGroups.onMoved` for tab groups is not necessary because of this. do not add it, it drastically reduces performance!
-// TODO: optimize this using some sort of queue or something
+// TODO: optimize this using some sort of queue or debouncing or something
 chrome.tabs.onMoved.addListener(async () => {
   await updateTabGroupTreeData();
   console.log("tab moved!");

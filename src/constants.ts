@@ -14,6 +14,11 @@ export const tabGroupColors = () => ({
   orange: "#FFAA6F",
 });
 
+// copied into `service-worker.ts` because of some issues with directly importing
+export const rootBookmarkNodeTitle =
+  "___augmented-tabflow-root-bookmark-node___";
+
+// copied into `service-worker.ts` because of some issues with directly importing
 export const syncStorageKeys = {
   rootBookmarkNodeId: "1",
 } as const;
