@@ -6,10 +6,7 @@ import { Help } from "./Help";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import { Dialog } from "./Dialog";
 
-export function Toolbar(props: {
-  addButtonDialogProps?: Omit<Parameters<typeof Dialog>[0], "ref">;
-}) {
-  const addDialogRef = createRef<SlDialog>();
+export function Toolbar() {
   const helpDialogRef = createRef<SlDialog>();
 
   return () =>
@@ -18,23 +15,61 @@ export function Toolbar(props: {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        gap: "1rem",
+        gap: "0.5rem",
       })}
     >
       <sl-button-group label="Tools">
-        ${props.addButtonDialogProps
-          ? html`
-              <sl-icon-button
-                name="plus-circle"
-                style=${styleMap({ fontSize: "1rem" })}
-                title=${props.addButtonDialogProps.label}
-                @click=${() => addDialogRef.value?.show()}
-              ></sl-icon-button>
-              ${h(Dialog, { ...props.addButtonDialogProps, ref: addDialogRef })}
-            `
-          : undefined}
+        <sl-icon-button
+          name="arrow-left"
+          class="toolbar-icon-button"
+          style=${styleMap({ fontSize: "1rem" })}
+          title="Go Back One Page In Current Tab"
+        ></sl-icon-button>
+        <sl-icon-button
+          name="arrow-right"
+          class="toolbar-icon-button"
+          style=${styleMap({ fontSize: "1rem" })}
+          title="Go Forward One Page In Current Tab"
+        ></sl-icon-button>
+        <sl-icon-button
+          name="arrow-clockwise"
+          class="toolbar-icon-button"
+          style=${styleMap({ fontSize: "1rem" })}
+          title="Reload Current Tab"
+        ></sl-icon-button>
+        <sl-icon-button
+          name="plus-circle"
+          class="toolbar-icon-button"
+          style=${styleMap({ fontSize: "1rem" })}
+          title="Add Tab Group"
+        ></sl-icon-button>
+        <sl-icon-button
+          name="stickies"
+          class="toolbar-icon-button"
+          style=${styleMap({ fontSize: "1rem" })}
+          title="Group Ungrouped Tabs In this Window"
+        ></sl-icon-button>
+        <sl-icon-button
+          name="window-plus"
+          class="toolbar-icon-button"
+          style=${styleMap({ fontSize: "1rem" })}
+          title="New Session"
+        ></sl-icon-button>
+        <sl-icon-button
+          name="pen"
+          class="toolbar-icon-button"
+          style=${styleMap({ fontSize: "1rem" })}
+          title="Edit Session"
+        ></sl-icon-button>
+        <sl-icon-button
+          name="trash"
+          class="toolbar-icon-button"
+          style=${styleMap({ fontSize: "1rem" })}
+          title="Delete Session"
+        ></sl-icon-button>
         <sl-icon-button
           name="question-circle"
+          class="toolbar-icon-button"
           style=${styleMap({ fontSize: "1rem" })}
           title="Help"
           @click=${() => helpDialogRef.value?.show()}

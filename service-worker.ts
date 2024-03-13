@@ -4,17 +4,13 @@ chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error));
 
-type TabGroupTreeData = Record<
-  chrome.tabGroups.TabGroup["id"],
-  ActiveTabGroupTreeData[number]
->;
+// copied from `src/globals.ts` because of some issues with directly importing
+// an update here should reflect there!
+export const rootBookmarkNodeTitle = "Augmented Tabflow Saved Tab Groups";
 
-// copied into `src/constants.ts` because of some issues with directly importing
-export const rootBookmarkNodeTitle =
-  "___augmented-tabflow-root-bookmark-node___";
-
-// copied from `src/constants.ts` because of some issues with directly importing
-export const syncStorageKeys = {
+// copied from `src/globals.ts` because of some issues with directly importing
+// an update here should reflect there!
+const syncStorageKeys = {
   rootBookmarkNodeId: "1",
 } as const;
 
@@ -46,12 +42,23 @@ async function initRootBookmarkNode() {
   }
 }
 
-let tabGroupTreeData: TabGroupTreeData = {};
+// TODO: implement migrations for storage using `onInstalled`
+const localStorageKeys = {
+  tabGroupTreeData: "1",
+  updatedTabGroups: "2",
+  removedTabGroups: "3",
+};
+
+type TabGroupTreeData = Record<
+  chrome.tabGroups.TabGroup["id"],
+  ActiveTabGroupTreeData[number]
+>;
+
+let updatedTabGroups: chrome.tabGroups.TabGroup[] = [];
 let tabGroupTreeDataUpdateTimeoutId: number | null = null;
-const updatedTabGroups: chrome.tabGroups.TabGroup[] = [];
-const removedTabGroups: chrome.tabGroups.TabGroup[] = [];
 
 async function handleUpdatedTabGroups(
+  tabGroupTreeData: TabGroupTreeData,
   newTabGroupTreeData: TabGroupTreeData,
   rootBookmarkNodeChildren: chrome.bookmarks.BookmarkTreeNode[],
 ) {
@@ -96,6 +103,7 @@ async function handleUpdatedTabGroups(
 }
 
 async function handleRemovedTabGroups(
+  tabGroupTreeData: TabGroupTreeData,
   newTabGroupTreeData: TabGroupTreeData,
   rootBookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"],
   rootBookmarkNodeChildren: chrome.bookmarks.BookmarkTreeNode[],
@@ -104,8 +112,19 @@ async function handleRemovedTabGroups(
     chrome.bookmarks.BookmarkTreeNode["id"],
     { title: string; tabs: chrome.tabs.Tab[][] }
   > = {};
-  newBookmarkNodeInfo;
   const arrayifiedNewTabGroupTreeData = Object.values(newTabGroupTreeData);
+  const removedTabGroups = Object.entries(
+    tabGroupTreeData,
+  ).reduce<ActiveTabGroupTreeData>(
+    (tabGroupTreeData, [tabGroupId, tabGroup]) => {
+      if (!newTabGroupTreeData[tabGroupId]) {
+        tabGroupTreeData.push(tabGroup);
+      }
+
+      return tabGroupTreeData;
+    },
+    [],
+  );
   for (const removedTabGroup of removedTabGroups) {
     if (tabGroupTreeData[removedTabGroup.id]) {
       // check if this tab group qualifies as a saved tab group before proceeding
@@ -156,33 +175,40 @@ async function handleRemovedTabGroups(
       });
     }
   }
-  removedTabGroups.length = 0;
 }
 
 async function updateTabGroupTreeData() {
   clearTimeout(tabGroupTreeDataUpdateTimeoutId);
   tabGroupTreeDataUpdateTimeoutId = setTimeout(async () => {
     const tabGroups = await chrome.tabGroups.query({});
-    const newTabGroupTreeData: Record<
-      chrome.tabGroups.TabGroup["id"],
-      TabGroupTreeData[number]
-    > = {};
+    const newTabGroupTreeData = {};
     for await (const tabGroup of tabGroups) {
       const tabs = await chrome.tabs.query({ groupId: tabGroup.id });
       newTabGroupTreeData[tabGroup.id] = { ...tabGroup, tabs };
     }
+    const tabGroupTreeData: TabGroupTreeData =
+      (await chrome.storage.local.get(localStorageKeys.tabGroupTreeData))[
+        localStorageKeys.tabGroupTreeData
+      ] ?? {};
     const rootBookmarkNodeId = (
       await chrome.storage.sync.get(syncStorageKeys.rootBookmarkNodeId)
     )[syncStorageKeys.rootBookmarkNodeId];
     const rootBookmarkNodeChildren =
       await chrome.bookmarks.getChildren(rootBookmarkNodeId);
-    handleUpdatedTabGroups(newTabGroupTreeData, rootBookmarkNodeChildren);
+    handleUpdatedTabGroups(
+      tabGroupTreeData,
+      newTabGroupTreeData,
+      rootBookmarkNodeChildren,
+    );
     handleRemovedTabGroups(
+      tabGroupTreeData,
       newTabGroupTreeData,
       rootBookmarkNodeId,
       rootBookmarkNodeChildren,
     );
-    tabGroupTreeData = newTabGroupTreeData;
+    await chrome.storage.local.set({
+      [localStorageKeys.tabGroupTreeData]: newTabGroupTreeData,
+    });
   }, 200);
 }
 
@@ -207,8 +233,7 @@ chrome.tabGroups.onUpdated.addListener((tabGroup) => {
   updateTabGroupTreeData();
 });
 
-chrome.tabGroups.onRemoved.addListener((tabGroup) => {
-  removedTabGroups.push(tabGroup);
+chrome.tabGroups.onRemoved.addListener(() => {
   updateTabGroupTreeData();
 });
 

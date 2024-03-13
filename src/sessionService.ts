@@ -13,28 +13,27 @@ async function getTabGroupTreeData() {
   });
 
   const tabGroupTreeData = tabs.reduce<TabGroupTreeData>(
-    (tabGroupTreeDataAccumulator, currentTab) => {
-      const currentTabGroupIndex = tabGroupTreeDataAccumulator.findIndex(
-        (tabGroupTreeDataAccumulatorEntry) =>
-          tabGroupTreeDataAccumulatorEntry.id === currentTab.groupId
+    (tabGroupTreeData, currentTab) => {
+      const currentTabGroupIndex = tabGroupTreeData.findIndex(
+        (tabGroup) => tabGroup.id === currentTab.groupId,
       );
       if (currentTabGroupIndex !== -1) {
-        tabGroupTreeDataAccumulator[currentTabGroupIndex].tabs.push(currentTab);
+        tabGroupTreeData[currentTabGroupIndex].tabs.push(currentTab);
       } else {
         const currentTabGroup = tabGroups.find(
-          (tabGroup) => tabGroup.id === currentTab.groupId
+          (tabGroup) => tabGroup.id === currentTab.groupId,
         );
         if (currentTabGroup) {
-          tabGroupTreeDataAccumulator.push({
+          tabGroupTreeData.push({
             ...currentTabGroup,
             tabs: [currentTab],
           });
         }
       }
 
-      return tabGroupTreeDataAccumulator;
+      return tabGroupTreeData;
     },
-    []
+    [],
   );
 
   return tabGroupTreeData;
@@ -44,16 +43,9 @@ export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
   Promise<TabGroupTreeData> | TabGroupTreeData
 >(getTabGroupTreeData);
 
-export const [tabGroupTreeAlreadyUpdated, setTabGroupTreeAlreadyUpdated] =
-  adaptState(false);
-
 async function updateTabGroupTreeData() {
   const tabGroupTreeData = await getTabGroupTreeData();
-  if (!tabGroupTreeAlreadyUpdated()) {
-    setTabGroupTreeData(tabGroupTreeData);
-  } else {
-    setTabGroupTreeAlreadyUpdated(false);
-  }
+  setTabGroupTreeData(tabGroupTreeData);
 }
 
 // TODO: optimize event listeners to only account for current window

@@ -4,13 +4,10 @@ import { until } from "lit/directives/until.js";
 import { Tree } from "./Tree";
 import { TreeItem } from "./TreeItem";
 import { TabGroupColorPatchOrTabIcon } from "./TabGroupColorPatchOrTabIcon";
-import {
-  setTabGroupTreeAlreadyUpdated,
-  tabGroupTreeData,
-} from "./services/active";
-import { syncStorageKeys } from "./constants";
+import { tabGroupTreeData } from "./sessionService";
+import { syncStorageKeys } from "./globals";
 
-export function Active() {
+export function SessionView() {
   async function tabGroupTree() {
     // TODO: handle possible error with fallback content and functional alert
     return (await tabGroupTreeData()).map((tabGroup) => {
@@ -18,14 +15,14 @@ export function Active() {
         ${h(TreeItem, {
           tooltipContent: tabGroup.title,
           expanded: !tabGroup.collapsed,
-          async onExpand() {
-            setTabGroupTreeAlreadyUpdated(true);
+          async onExpand(e: Event) {
+            e.stopPropagation();
             await chrome.tabGroups.update(tabGroup.id, {
               collapsed: false,
             });
           },
-          async onCollapse() {
-            setTabGroupTreeAlreadyUpdated(true);
+          async onCollapse(e: Event) {
+            e.stopPropagation();
             await chrome.tabGroups.update(tabGroup.id, {
               collapsed: true,
             });
@@ -98,8 +95,8 @@ export function Active() {
                 ${h(TreeItem, {
                   tooltipContent: tab.title,
                   selected: tab.active,
-                  onSelect() {
-                    setTabGroupTreeAlreadyUpdated(true);
+                  onSelect(e: Event) {
+                    e.stopPropagation();
                     chrome.tabs.update(tab.id, { active: true });
                   },
                   actionButtons: html`
@@ -114,7 +111,9 @@ export function Active() {
                   `,
                   content: html`
                     ${h(TabGroupColorPatchOrTabIcon, {
-                      pageUrl: tab.status === "loading" ? undefined : tab.url,
+                      pageUrl: tab.url,
+                      // TODO: handle infinitely loading new tab pages
+                      showSpinner: tab.status === "loading" ? true : false,
                     })}
                     ${tab.title}
                   `,

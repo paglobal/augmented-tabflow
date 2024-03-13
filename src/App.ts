@@ -7,18 +7,15 @@ import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/select/select.js";
 import "@shoelace-style/shoelace/dist/components/option/option.js";
+import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
+import "@shoelace-style/shoelace/dist/components/divider/divider.js";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import { h } from "promethium-js";
 import { type Ref } from "lit/directives/ref";
-import { Active } from "./Active";
-import { TabPanelPair } from "./TabPanelPair";
-import { tabGroupColors } from "./constants";
-import { Saved } from "./Saved";
-import { Captures } from "./Captures";
-import { setDefaultAnimation } from "@shoelace-style/shoelace/dist/utilities/animation-registry.js";
-
-setDefaultAnimation("tree-item.expand", null);
-setDefaultAnimation("tree-item.collapse", null);
+import { SessionView } from "./SessionView";
+import { tabGroupColors } from "./globals";
+import { Toolbar } from "./Toolbar";
+import { ProfileToolbar } from "./ProfileToolbar";
 
 export function App() {
   function randomTabGroupColorValue() {
@@ -89,30 +86,28 @@ export function App() {
 
   return () =>
     html`<div id="app">
-      <sl-tab-group
-        style=${styleMap({ width: "min(800px, 95%)", margin: "auto" })}
-        no-scroll-controls
-      >
-        ${h(TabPanelPair, {
-          name: "active",
-          panelContent: Active,
-          addButtonDialogProps: {
-            label: "Add Tab Group",
-            contentFn: addTabGroupDialogContent,
-          },
-        })}
-        ${h(TabPanelPair, {
-          name: "saved",
-          panelContent: Saved,
-        })}
-        ${h(TabPanelPair, {
-          name: "captures",
-          panelContent: Captures,
-          addButtonDialogProps: {
-            label: "Add Capture Group",
-            contentFn: addCaptureGroupDialogContent,
-          },
-        })}
-      </sl-tab-group>
+      <div style=${styleMap({ width: "min(800px, 95%)", margin: "auto" })}>
+        <div
+          style=${styleMap({
+            fontSize: "--sl-font-size-small",
+            width: "100%",
+          })}
+        >
+          <div
+            style=${styleMap({
+              display: "flex",
+              flexDirection: "column",
+            })}
+          >
+            ${h(ProfileToolbar)} ${h(Toolbar)}
+            <sl-divider
+              style=${styleMap({
+                margin: "0.5rem 0",
+              })}
+            ></sl-divider>
+            ${h(SessionView)}
+          </div>
+        </div>
+      </div>
     </div>`;
 }
