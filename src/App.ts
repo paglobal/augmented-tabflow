@@ -86,7 +86,7 @@ export function App() {
 
   return () =>
     html`<div id="app">
-      <div style=${styleMap({ width: "min(800px, 95%)", margin: "auto" })}>
+      <div style=${styleMap({ width: "min(800px, 90%)", margin: "auto" })}>
         <div
           style=${styleMap({
             fontSize: "--sl-font-size-small",
@@ -102,7 +102,8 @@ export function App() {
             ${h(ProfileToolbar)} ${h(Toolbar)}
             <sl-divider
               style=${styleMap({
-                margin: "0.5rem 0",
+                marginTop: "0.5rem",
+                marginBottom: "1.5rem",
               })}
             ></sl-divider>
             ${h(SessionView)}

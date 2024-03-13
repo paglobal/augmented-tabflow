@@ -13,7 +13,9 @@ export function ProfileToolbar() {
         <sl-icon
           name="window"
           slot="prefix"
-          style=${styleMap({ marginRight: "1rem" })}
+          style=${styleMap({
+            marginRight: "1rem",
+          })}
         ></sl-icon>
         <sl-option value="1">Graduate School</sl-option>
         <sl-option value="2">Augmented Tabflow</sl-option>
