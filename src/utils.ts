@@ -14,16 +14,5 @@ export const tabGroupColors = () => ({
   orange: "#FFAA6F",
 });
 
-// copied into `../service-worker.ts` because of some issues with directly importing
-// an update here should reflect there!up
-export const rootBookmarkNodeTitle = "Augmented Tabflow Saved Tab Groups";
-
-// copied into `../service-worker.ts` because of some issues with directly importing
-// an update here should reflect there!
-export const syncStorageKeys = {
-  rootBookmarkNodeId: "1",
-} as const;
-
 // TODO: implement internationalization
-// TODO: (maybe) implement moving tab groups to and from windows
 // TODO: add tsc type-checking to dev workflow

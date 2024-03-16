@@ -8,6 +8,10 @@ export function Tree(props: { contentFn: () => TemplateResult }) {
     <sl-tree
       style=${styleMap({
         "--indent-guide-width": "1px",
+        // calculate the space occupied by everything above the tree plus additional `1.5rem` padding
+        // please recalculate accordingly if you change the space occupied by anything above the tree
+        height: "calc(100vh - 7.75rem - 1.5rem)",
+        overflowY: "auto",
       })}
       selection="leaf"
       @sl-selection-change=${(e: SlSelectionChangeEvent) => {

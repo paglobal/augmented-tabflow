@@ -1,7 +1,7 @@
 import { html } from "lit";
 import { h, renderTemplateFn, adaptState } from "promethium-js";
 import { App } from "./src/App";
-import { setThemeMode } from "./src/globals";
+import { setThemeMode } from "./src/utils";
 
 renderTemplateFn(() => html`${h(App)}`, { renderContainer: "body" });
 

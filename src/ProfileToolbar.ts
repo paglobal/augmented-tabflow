@@ -9,7 +9,16 @@ export function ProfileToolbar() {
         paddingBottom: "0.5rem",
       })}
     >
-      <sl-select name="session" placeholder="Session" hoist clearable>
+      <sl-select
+        name="session"
+        placeholder="Session"
+        hoist
+        clearable
+        style=${styleMap({
+          border: "0.1rem solid var(--sl-color-neutral-600)",
+          borderRadius: "var(--sl-input-border-radius-medium)",
+        })}
+      >
         <sl-icon
           name="window"
           slot="prefix"

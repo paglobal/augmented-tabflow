@@ -1,107 +1,120 @@
 import { adaptState } from "promethium-js";
+import { areaNames, localStorageKeys } from "./constants";
 
 export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
   tabs: chrome.tabs.Tab[];
 })[];
 
-async function getTabGroupTreeData() {
-  const tabGroups = await chrome.tabGroups.query({
-    windowId: chrome.windows.WINDOW_ID_CURRENT,
-  });
-  const tabs = await chrome.tabs.query({
-    windowId: chrome.windows.WINDOW_ID_CURRENT,
-  });
-
-  const tabGroupTreeData = tabs.reduce<TabGroupTreeData>(
-    (tabGroupTreeData, currentTab) => {
-      const currentTabGroupIndex = tabGroupTreeData.findIndex(
-        (tabGroup) => tabGroup.id === currentTab.groupId,
-      );
-      if (currentTabGroupIndex !== -1) {
-        tabGroupTreeData[currentTabGroupIndex].tabs.push(currentTab);
-      } else {
-        const currentTabGroup = tabGroups.find(
-          (tabGroup) => tabGroup.id === currentTab.groupId,
-        );
-        if (currentTabGroup) {
-          tabGroupTreeData.push({
-            ...currentTabGroup,
-            tabs: [currentTab],
-          });
-        }
-      }
-
-      return tabGroupTreeData;
-    },
-    [],
-  );
-
-  return tabGroupTreeData;
-}
-
 export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
   Promise<TabGroupTreeData> | TabGroupTreeData
->(getTabGroupTreeData);
+>(async () => {
+  const tabGroupTreeData: TabGroupTreeData = (
+    await chrome.storage.local.get(localStorageKeys.tabGroupTreeData)
+  )[localStorageKeys.tabGroupTreeData];
 
-async function updateTabGroupTreeData() {
-  const tabGroupTreeData = await getTabGroupTreeData();
-  setTabGroupTreeData(tabGroupTreeData);
+  return tabGroupTreeData;
+});
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === areaNames.local) {
+    const newTabGroupTreeData: TabGroupTreeData =
+      changes[localStorageKeys.tabGroupTreeData]?.newValue;
+    if (newTabGroupTreeData) {
+      setTabGroupTreeData(newTabGroupTreeData);
+    }
+  }
+});
+
+export function expandTabGroup(tabGroup: chrome.tabGroups.TabGroup) {
+  chrome.tabGroups.update(tabGroup.id, {
+    collapsed: false,
+  });
 }
 
-// TODO: optimize event listeners to only account for current window
-chrome.tabGroups.onCreated.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab group created!");
-});
+export function collapseTabGroup(tabGroup: chrome.tabGroups.TabGroup) {
+  chrome.tabGroups.update(tabGroup.id, {
+    collapsed: true,
+  });
+}
 
-chrome.tabGroups.onRemoved.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab group removed!");
-});
+export async function addTabToTabGroup(tabGroup: chrome.tabGroups.TabGroup) {
+  const tab = await chrome.tabs.create({});
+  chrome.tabs.group({
+    groupId: tabGroup.id,
+    tabIds: [tab.id],
+  });
+}
 
-chrome.tabGroups.onUpdated.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab group updated!");
-});
+export async function closeTabGroup(tabGroup: TabGroupTreeData[number]) {
+  const tabIds = tabGroup.tabs.map((tab) => tab.id) as [number, ...number[]];
+  await chrome.tabs.ungroup(tabIds);
+  tabGroup.tabs.forEach(async (tab) => {
+    await chrome.tabs.remove(tab.id);
+  });
+}
 
-chrome.tabs.onActivated.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab activated!");
-});
+export function activateTab(tab: chrome.tabs.Tab) {
+  // focus tab window first if it's not already in focus
+  if (tab.windowId !== chrome.windows.WINDOW_ID_CURRENT) {
+    chrome.windows.update(tab.windowId, { focused: true });
+  }
+  chrome.tabs.update(tab.id, { active: true });
+}
 
-chrome.tabs.onAttached.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab attached!");
-});
+export async function groupUngroupedTabsInWindow() {
+  const ungroupedTabs = await chrome.tabs.query({
+    groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
+    currentWindow: true,
+  });
+  if (ungroupedTabs.length > 0) {
+    const tabIds = ungroupedTabs.map((tab) => tab.id) as [number, ...number[]];
+    chrome.tabs.group({ tabIds });
+  } else {
+    // TODO: display warning modal here
+  }
+}
 
-chrome.tabs.onCreated.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab created!");
-});
+export async function createTabGroup(options: {
+  title: chrome.tabGroups.TabGroup["title"];
+  color: chrome.tabGroups.Color;
+}) {
+  const tab = await chrome.tabs.create({
+    active: true,
+  });
+  const groupId = await chrome.tabs.group({ tabIds: tab.id });
+  chrome.tabGroups.update(groupId, options);
+}
 
-chrome.tabs.onDetached.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab detached!");
-});
+export function updateTabGroup(options: {
+  id: chrome.tabGroups.TabGroup["id"];
+  title: chrome.tabGroups.TabGroup["title"];
+  color: chrome.tabGroups.Color;
+}) {
+  chrome.tabGroups.update(options.id, {
+    title: options.title,
+    color: options.color,
+  });
+}
 
-// `chrome.tabGroups.onMoved` for tab groups is not necessary because of this. do not add it, it drastically reduces performance!
-// TODO: optimize this using some sort of queue or debouncing or something
-chrome.tabs.onMoved.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab moved!");
-});
+export async function createSession(title: string) {
+  // check if session exists and show error alert if it does
+  if() {
 
-chrome.tabs.onRemoved.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab removed!");
-});
+  // show success alert if successful 
+  } else {
 
-chrome.tabs.onReplaced.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab replaced!");
-});
+  }
+}
 
-chrome.tabs.onUpdated.addListener(async () => {
-  await updateTabGroupTreeData();
-  console.log("tab updated!");
-});
+export async function updateCurrentSession(title: string) {
+  // check if session exists and show error alert if it does
+  if() {
+
+  } else {
+
+  }
+}
+
+export async function deleteCurrentSession() {
+  // show success alert if successful 
+}

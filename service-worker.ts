@@ -1,23 +1,14 @@
+import {
+  syncStorageKeys,
+  rootBookmarkNodeTitle,
+  localStorageKeys,
+} from "./src/constants";
+
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error));
 
-// copied from `src/globals.ts` because of some issues with directly importing
-// an update here should reflect there!
-export const rootBookmarkNodeTitle = "Augmented Tabflow Saved Tab Groups";
-
-// TODO: implement migrations for storage using `onInstalled`
-// copied from `src/globals.ts` because of some issues with directly importing
-// an update here should reflect there!
-const syncStorageKeys = {
-  rootBookmarkNodeId: "1",
-} as const;
-
-const localStorageKeys = {
-  tabGroupTreeData: "1",
-} as const;
-
-// TODO: we'll handle errors later with async communication between sidepanel page and this worker
+// TODO: handle errors with async communication between sidepanel page and this worker
 async function initRootBookmarkNode() {
   const result = await chrome.storage.sync.get(
     syncStorageKeys.rootBookmarkNodeId,
@@ -45,11 +36,67 @@ async function initRootBookmarkNode() {
   }
 }
 
+export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
+  tabs: chrome.tabs.Tab[];
+})[];
+
+async function getTabGroupTreeData() {
+  const tabGroups = await chrome.tabGroups.query({});
+  const tabs = await chrome.tabs.query({});
+
+  const tabGroupTreeData = tabs.reduce<TabGroupTreeData>(
+    (tabGroupTreeData, currentTab) => {
+      const currentTabGroupIndex = tabGroupTreeData.findIndex(
+        (tabGroup) => tabGroup.id === currentTab.groupId,
+      );
+      if (currentTabGroupIndex !== -1) {
+        tabGroupTreeData[currentTabGroupIndex].tabs.push(currentTab);
+      } else {
+        const currentTabGroup = tabGroups.find(
+          (tabGroup) => tabGroup.id === currentTab.groupId,
+        );
+        if (currentTabGroup) {
+          tabGroupTreeData.push({
+            ...currentTabGroup,
+            tabs: [currentTab],
+          });
+        }
+      }
+
+      return tabGroupTreeData;
+    },
+    [],
+  );
+
+  return tabGroupTreeData;
+}
+
+let debounceTabGroupTreeDataUpdates = false;
 let tabGroupTreeDataUpdateTimeoutId: number | null = null;
 
+async function applyUpdates() {
+  const tabGroupTreeData = await getTabGroupTreeData();
+  chrome.storage.local.set({
+    [localStorageKeys.tabGroupTreeData]: tabGroupTreeData,
+  });
+}
+
+// TODO: implement saving of sessions (on startup and on session switch)
 async function updateTabGroupTreeData() {
-  clearTimeout(tabGroupTreeDataUpdateTimeoutId);
-  tabGroupTreeDataUpdateTimeoutId = setTimeout(async () => {}, 200);
+  if (!debounceTabGroupTreeDataUpdates) {
+    applyUpdates();
+    debounceTabGroupTreeDataUpdates = true;
+    clearTimeout(tabGroupTreeDataUpdateTimeoutId);
+    tabGroupTreeDataUpdateTimeoutId = setTimeout(() => {
+      debounceTabGroupTreeDataUpdates = false;
+    }, 1000);
+  } else {
+    clearTimeout(tabGroupTreeDataUpdateTimeoutId);
+    tabGroupTreeDataUpdateTimeoutId = setTimeout(() => {
+      debounceTabGroupTreeDataUpdates = false;
+      applyUpdates();
+    }, 1000);
+  }
 }
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -68,11 +115,15 @@ chrome.tabGroups.onCreated.addListener(() => {
   updateTabGroupTreeData();
 });
 
+chrome.tabGroups.onRemoved.addListener(() => {
+  updateTabGroupTreeData();
+});
+
 chrome.tabGroups.onUpdated.addListener(() => {
   updateTabGroupTreeData();
 });
 
-chrome.tabGroups.onRemoved.addListener(() => {
+chrome.tabs.onActivated.addListener(() => {
   updateTabGroupTreeData();
 });
 
@@ -89,7 +140,6 @@ chrome.tabs.onDetached.addListener(() => {
 });
 
 // `chrome.tabGroups.onMoved` for tab groups is not necessary because of this. do not add it, it drastically reduces performance!
-// TODO: optimize this using some sort of queue or debouncing or something
 chrome.tabs.onMoved.addListener(() => {
   updateTabGroupTreeData();
 });

@@ -1,5 +1,5 @@
 import { html } from "lit";
-import { tabGroupColors } from "./globals";
+import { tabGroupColors } from "./utils";
 import { styleMap } from "lit/directives/style-map.js";
 
 function faviconUrl(pageUrl: string) {

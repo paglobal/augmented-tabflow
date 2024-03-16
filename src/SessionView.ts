@@ -1,72 +1,65 @@
 import { html } from "lit";
 import { h } from "promethium-js";
 import { until } from "lit/directives/until.js";
+import { type Ref } from "lit/directives/ref.js";
+import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import { Tree } from "./Tree";
 import { TreeItem } from "./TreeItem";
 import { TabGroupColorPatchOrTabIcon } from "./TabGroupColorPatchOrTabIcon";
-import { tabGroupTreeData } from "./sessionService";
-import { syncStorageKeys } from "./globals";
+import {
+  activateTab,
+  addTabToTabGroup,
+  closeTabGroup,
+  collapseTabGroup,
+  expandTabGroup,
+  tabGroupTreeData,
+} from "./sessionService";
+import { editTabGroupDialogRefs, setCurrentlyEditedTabGroupId } from "./App";
 
-export function SessionView() {
+export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
+  const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
+
   async function tabGroupTree() {
     // TODO: handle possible error with fallback content and functional alert
+    // TODO: indicate if audio is playing in tab
+    // TODO: implement drag-and-drop for tabs and tab groups
+    // TODO: implement recently closed tab groups feature
     return (await tabGroupTreeData()).map((tabGroup) => {
       return html`
         ${h(TreeItem, {
           tooltipContent: tabGroup.title,
           expanded: !tabGroup.collapsed,
-          async onExpand(e: Event) {
+          onExpand(e: Event) {
             e.stopPropagation();
-            await chrome.tabGroups.update(tabGroup.id, {
-              collapsed: false,
-            });
+            expandTabGroup(tabGroup);
           },
-          async onCollapse(e: Event) {
+          onCollapse(e: Event) {
             e.stopPropagation();
-            await chrome.tabGroups.update(tabGroup.id, {
-              collapsed: true,
-            });
+            collapseTabGroup(tabGroup);
           },
           actionButtons: html`
             <sl-icon-button
               name="plus-lg"
               title="Add Tab"
-              @click=${async (e: Event) => {
+              @click=${(e: Event) => {
                 e.stopPropagation();
-                const tab = await chrome.tabs.create({});
-                chrome.tabs.group({
-                  groupId: tabGroup.id,
-                  tabIds: [tab.id],
-                });
+                addTabToTabGroup(tabGroup);
               }}
             ></sl-icon-button>
-            <sl-icon-button name="pen" title="Edit"></sl-icon-button>
             <sl-icon-button
-              name="save"
-              title="Save"
-              @click=${async (e: Event) => {
+              name="pen"
+              title="Edit"
+              @click=${(e: Event) => {
                 e.stopPropagation();
-                const bookmarkNodeTitle = `${tabGroup.color}-${tabGroup.title}`;
-                const rootBookmarkNodeId = (
-                  await chrome.storage.sync.get(
-                    syncStorageKeys.rootBookmarkNodeId,
-                  )
-                )[syncStorageKeys.rootBookmarkNodeId];
-                if (rootBookmarkNodeId === undefined) {
-                  // TODO: handle this error
-                } else {
-                  const rootBookmarkNodeChildren =
-                    await chrome.bookmarks.getChildren(rootBookmarkNodeId);
-                  for (const bookmarkNode of rootBookmarkNodeChildren) {
-                    if (bookmarkNode.title === bookmarkNodeTitle) {
-                      return;
-                    }
-                  }
+                setCurrentlyEditedTabGroupId(tabGroup.id);
+                if (
+                  editTabGroupDialogRefs.input.value &&
+                  editTabGroupDialogRefs.select.value
+                ) {
+                  editTabGroupDialogRefs.input.value.value = tabGroup.title;
+                  editTabGroupDialogRefs.select.value.value = tabGroup.color;
                 }
-                chrome.bookmarks.create({
-                  parentId: rootBookmarkNodeId,
-                  title: bookmarkNodeTitle,
-                });
+                props.editTabGroupDialogRef.value?.show();
               }}
             ></sl-icon-button>
             <sl-icon-button
@@ -74,14 +67,7 @@ export function SessionView() {
               title="Close"
               @click=${async (e: Event) => {
                 e.stopPropagation();
-                const tabIds = tabGroup.tabs.map((tab) => tab.id) as [
-                  number,
-                  ...number[],
-                ];
-                await chrome.tabs.ungroup(tabIds);
-                tabGroup.tabs.forEach(async (tab) => {
-                  await chrome.tabs.remove(tab.id);
-                });
+                closeTabGroup(tabGroup);
               }}
             ></sl-icon-button>
           `,
@@ -97,7 +83,7 @@ export function SessionView() {
                   selected: tab.active,
                   onSelect(e: Event) {
                     e.stopPropagation();
-                    chrome.tabs.update(tab.id, { active: true });
+                    activateTab(tab);
                   },
                   actionButtons: html`
                     <sl-icon-button
@@ -112,8 +98,11 @@ export function SessionView() {
                   content: html`
                     ${h(TabGroupColorPatchOrTabIcon, {
                       pageUrl: tab.url,
-                      // TODO: handle infinitely loading new tab pages
-                      showSpinner: tab.status === "loading" ? true : false,
+                      showSpinner:
+                        tab.status === "loading" &&
+                        !newTabUrls.includes(tab.url)
+                          ? true
+                          : false,
                     })}
                     ${tab.title}
                   `,

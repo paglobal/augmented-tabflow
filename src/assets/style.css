@@ -54,7 +54,6 @@ sl-tree-item:focus-visible > div.actions-container {
   outline-offset: -0.2rem;
 }
 
-/* TODO: implement this in JavaScript to prevent flickering in ui */
 div.actions-container:hover sl-button-group,
 sl-tree-item::part(item):hover {
   background: var(--sl-color-neutral-200);
@@ -102,13 +101,13 @@ sl-dialog::part(title) {
   font-size: 1.1rem;
 }
 
-form.add-button-dialog-content sl-input,
-form.add-button-dialog-content sl-select {
+form.dialog-form sl-input,
+form.dialog-form sl-select {
   margin-bottom: 1rem;
 }
 
-form.add-button-dialog-content sl-input:last-child,
-form.add-button-dialog-content sl-select:last-child {
+form.dialog-form sl-input:last-child,
+form.dialog-form sl-select:last-child {
   margin-bottom: 0;
 }
 

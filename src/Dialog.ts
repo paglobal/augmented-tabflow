@@ -6,7 +6,7 @@ import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialo
 
 export function Dialog(props: {
   label: string;
-  contentFn: (ref: Ref<SlDialog>) => TemplateResult;
+  content: TemplateResult;
   ref: Ref<SlDialog>;
 }) {
   return () => html`
@@ -25,7 +25,7 @@ export function Dialog(props: {
           paddingBottom: "0.8rem",
         })}
       >
-        ${props.contentFn(props.ref)}
+        ${props.content}
       </div>
     </sl-dialog>
   `;
