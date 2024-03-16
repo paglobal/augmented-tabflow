@@ -13,23 +13,27 @@ import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/select/select.js";
 import "@shoelace-style/shoelace/dist/components/option/option.js";
 import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
+import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { SessionView } from "./SessionView";
 import { Toolbar } from "./Toolbar";
-import { ProfileToolbar } from "./ProfileToolbar";
+import { SessionToolbar } from "./SessionToolbar";
 import { tabGroupColors } from "./utils";
 import { DialogForm } from "./DialogForm";
 import { updateTabGroup } from "./sessionService";
+import { createRootBookmarkNode } from "../sharedUtils";
 
 export const editTabGroupDialogRefs = {
   input: createRef<SlInput>(),
   select: createRef<SlSelect>(),
 };
 
-export const [currentEditedTabGroupId, setCurrentlyEditedTabGroupId] =
+export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
 
 export function App() {
   const editTabGroupDialogRef = createRef<SlDialog>();
+
+  createRootBookmarkNode();
 
   return () =>
     html`<div
@@ -58,7 +62,7 @@ export function App() {
               paddingBottom: "1.5rem",
             })}
           >
-            ${h(ProfileToolbar)} ${h(Toolbar)}
+            ${h(SessionToolbar)} ${h(Toolbar)}
             ${h(SessionView, { editTabGroupDialogRef })}
             <!--Dialog form is here because of layout issues when put in the \`SessionView\` component-->
             ${h(DialogForm, {
@@ -105,7 +109,7 @@ export function App() {
                 title: chrome.tabGroups.TabGroup["title"];
                 color: chrome.tabGroups.Color;
               }) {
-                updateTabGroup({ id: currentEditedTabGroupId(), ...data });
+                updateTabGroup({ id: currentlyEditedTabGroupId(), ...data });
               },
             })}
           </div>

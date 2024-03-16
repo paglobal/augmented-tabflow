@@ -114,3 +114,8 @@ form.dialog-form sl-select:last-child {
 sl-button::part(label) {
   font-size: 1rem;
 }
+
+.sl-toast-stack {
+  top: auto;
+  bottom: 0;
+}

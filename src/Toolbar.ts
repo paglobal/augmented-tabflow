@@ -15,6 +15,8 @@ import {
 } from "./sessionService";
 import { DialogForm } from "./DialogForm";
 import { tabGroupColors } from "./utils";
+import { getStorageData } from "../sharedUtils";
+import { areaNames, sessionStorageKeys } from "../constants";
 
 export function Toolbar() {
   const helpDialogRef = createRef<SlDialog>();
@@ -137,10 +139,14 @@ export function Toolbar() {
         <sl-icon-button
           name="pen"
           title="Edit Session"
-          @click=${() => {
+          @click=${async () => {
             editSessionDialogRef.value?.show();
             if (editSessionInputRef.value) {
-              editSessionInputRef.value.value = "";
+              const currentSession = await getStorageData(
+                areaNames.session,
+                sessionStorageKeys.currentSession,
+              );
+              editSessionInputRef.value.value = currentSession;
             }
           }}
         ></sl-icon-button>

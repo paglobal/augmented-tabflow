@@ -1,5 +1,5 @@
 import { html } from "lit";
-import { h, renderTemplateFn, adaptState } from "promethium-js";
+import { h, renderTemplateFn } from "promethium-js";
 import { App } from "./src/App";
 import { setThemeMode } from "./src/utils";
 

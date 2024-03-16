@@ -1,40 +1,9 @@
-import {
-  syncStorageKeys,
-  rootBookmarkNodeTitle,
-  localStorageKeys,
-} from "./src/constants";
+import { localStorageKeys } from "./constants";
+import { createRootBookmarkNode } from "./sharedUtils";
 
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error));
-
-// TODO: handle errors with async communication between sidepanel page and this worker
-async function initRootBookmarkNode() {
-  const result = await chrome.storage.sync.get(
-    syncStorageKeys.rootBookmarkNodeId,
-  );
-  let rootBookmarkNode = null;
-  try {
-    rootBookmarkNode = (
-      await chrome.bookmarks.get(result[syncStorageKeys.rootBookmarkNodeId])
-    )[0];
-    if (rootBookmarkNode.title !== rootBookmarkNodeTitle) {
-      const rootBookmarkNodeId = (
-        await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
-      ).id;
-      chrome.storage.sync.set({
-        [syncStorageKeys.rootBookmarkNodeId]: rootBookmarkNodeId,
-      });
-    }
-  } catch (e) {
-    const rootBookmarkNodeId = (
-      await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
-    ).id;
-    chrome.storage.sync.set({
-      [syncStorageKeys.rootBookmarkNodeId]: rootBookmarkNodeId,
-    });
-  }
-}
 
 export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
   tabs: chrome.tabs.Tab[];
@@ -89,23 +58,23 @@ async function updateTabGroupTreeData() {
     clearTimeout(tabGroupTreeDataUpdateTimeoutId);
     tabGroupTreeDataUpdateTimeoutId = setTimeout(() => {
       debounceTabGroupTreeDataUpdates = false;
-    }, 1000);
+    }, 200);
   } else {
     clearTimeout(tabGroupTreeDataUpdateTimeoutId);
     tabGroupTreeDataUpdateTimeoutId = setTimeout(() => {
       debounceTabGroupTreeDataUpdates = false;
       applyUpdates();
-    }, 1000);
+    }, 200);
   }
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-  initRootBookmarkNode();
+  createRootBookmarkNode();
   updateTabGroupTreeData();
 });
 
 chrome.runtime.onStartup.addListener(() => {
-  initRootBookmarkNode();
+  createRootBookmarkNode();
   updateTabGroupTreeData();
 });
 

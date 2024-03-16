@@ -1,6 +1,7 @@
 // TODO: implement migrations for storage using `onInstalled`
 export const localStorageKeys = {
   tabGroupTreeData: "1",
+  lastSession: "2",
 } as const;
 
 export const sessionStorageKeys = {
@@ -9,7 +10,6 @@ export const sessionStorageKeys = {
 
 export const syncStorageKeys = {
   rootBookmarkNodeId: "1",
-  lastSession: "2",
 } as const;
 
 export const areaNames = {

@@ -1,5 +1,12 @@
 import { adaptState } from "promethium-js";
-import { areaNames, localStorageKeys } from "./constants";
+import {
+  areaNames,
+  localStorageKeys,
+  sessionStorageKeys,
+  syncStorageKeys,
+} from "../constants";
+import { notify } from "./utils";
+import { getStorageData } from "../sharedUtils";
 
 export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
   tabs: chrome.tabs.Tab[];
@@ -8,9 +15,10 @@ export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
 export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
   Promise<TabGroupTreeData> | TabGroupTreeData
 >(async () => {
-  const tabGroupTreeData: TabGroupTreeData = (
-    await chrome.storage.local.get(localStorageKeys.tabGroupTreeData)
-  )[localStorageKeys.tabGroupTreeData];
+  const tabGroupTreeData: TabGroupTreeData = await getStorageData(
+    areaNames.local,
+    localStorageKeys.tabGroupTreeData,
+  );
 
   return tabGroupTreeData;
 });
@@ -70,7 +78,7 @@ export async function groupUngroupedTabsInWindow() {
     const tabIds = ungroupedTabs.map((tab) => tab.id) as [number, ...number[]];
     chrome.tabs.group({ tabIds });
   } else {
-    // TODO: display warning modal here
+    notify("No ungrouped tabs in this window", "warning");
   }
 }
 
@@ -97,24 +105,60 @@ export function updateTabGroup(options: {
 }
 
 export async function createSession(title: string) {
-  // check if session exists and show error alert if it does
-  if() {
-
-  // show success alert if successful 
+  const rootBookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"] =
+    await getStorageData(areaNames.sync, syncStorageKeys.rootBookmarkNodeId);
+  const sessionData = await chrome.bookmarks.getChildren(rootBookmarkNodeId);
+  // check if session with similar title already exists before proceeding
+  if (sessionData.some((session) => session.title === title)) {
+    notify("Session already exists", "warning");
   } else {
-
+    await chrome.bookmarks.create({ title });
+    notify("Session created successfully", "success");
   }
 }
 
 export async function updateCurrentSession(title: string) {
-  // check if session exists and show error alert if it does
-  if() {
-
+  const rootBookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"] =
+    await getStorageData(areaNames.sync, syncStorageKeys.rootBookmarkNodeId);
+  const sessionData = await chrome.bookmarks.getChildren(rootBookmarkNodeId);
+  // check if session with similar title already exists before proceeding
+  if (sessionData.some((session) => session.title === title)) {
+    notify("Session with similar title already exists", "warning");
   } else {
-
+    const currentSession: string = await getStorageData(
+      areaNames.session,
+      sessionStorageKeys.currentSession,
+    );
+    const rootBookmarkNodeId = await getStorageData(
+      areaNames.sync,
+      syncStorageKeys.rootBookmarkNodeId,
+    );
+    const sessionData = await chrome.bookmarks.getChildren(rootBookmarkNodeId);
+    const currentSessionData = sessionData.find(
+      (session) => session.title === currentSession,
+    );
+    await chrome.bookmarks.update(currentSessionData.id, { title });
+    await chrome.storage.session.set({
+      [sessionStorageKeys.currentSession]: title,
+    });
+    chrome.storage.local.set({ [localStorageKeys.lastSession]: title });
   }
 }
 
 export async function deleteCurrentSession() {
-  // show success alert if successful 
+  const currentSession: string = await getStorageData(
+    areaNames.session,
+    sessionStorageKeys.currentSession,
+  );
+  const rootBookmarkNodeId = await getStorageData(
+    areaNames.sync,
+    syncStorageKeys.rootBookmarkNodeId,
+  );
+  const sessionData = await chrome.bookmarks.getChildren(rootBookmarkNodeId);
+  const currentSessionData = sessionData.find(
+    (session) => session.title === currentSession,
+  );
+  await chrome.bookmarks.removeTree(currentSessionData.id);
+  await chrome.storage.session.remove(sessionStorageKeys.currentSession);
+  chrome.storage.local.remove(localStorageKeys.lastSession);
 }

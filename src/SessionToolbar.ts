@@ -1,7 +1,7 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 
-export function ProfileToolbar() {
+export function SessionToolbar() {
   return () =>
     html`<div
       style=${styleMap({
