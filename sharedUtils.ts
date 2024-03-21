@@ -1,16 +1,27 @@
-import { syncStorageKeys, rootBookmarkNodeTitle, areaNames } from "./constants";
+import {
+  type SyncStorageKey,
+  type SessionStorageKey,
+  syncStorageKeys,
+  rootBookmarkNodeTitle,
+} from "./constants";
 
-export async function getStorageData(
-  areaName: keyof typeof areaNames,
-  key: string,
-) {
+export async function getStorageData(key: SyncStorageKey | SessionStorageKey) {
+  const areaName = key.split("-")[0];
+
   return (await chrome.storage[areaName].get(key))[key];
+}
+
+export async function setStorageData(
+  key: SyncStorageKey | SessionStorageKey,
+  value: any,
+) {
+  const areaName = key.split("-")[0];
+  chrome.storage[areaName].set({ [key]: value });
 }
 
 export async function createRootBookmarkNode() {
   try {
     const rootBookmarkNodeId = await getStorageData(
-      areaNames.sync,
       syncStorageKeys.rootBookmarkNodeId,
     );
     try {
@@ -23,17 +34,13 @@ export async function createRootBookmarkNode() {
         const rootBookmarkNodeId = (
           await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
         ).id;
-        chrome.storage.sync.set({
-          [syncStorageKeys.rootBookmarkNodeId]: rootBookmarkNodeId,
-        });
+        setStorageData(syncStorageKeys.rootBookmarkNodeId, rootBookmarkNodeId);
       }
     } catch (e) {
       const rootBookmarkNodeId = (
         await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
       ).id;
-      chrome.storage.sync.set({
-        [syncStorageKeys.rootBookmarkNodeId]: rootBookmarkNodeId,
-      });
+      setStorageData(syncStorageKeys.rootBookmarkNodeId, rootBookmarkNodeId);
     }
   } catch (e) {
     // no error handling here. we'll do that later in the sidepanel ui

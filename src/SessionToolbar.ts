@@ -27,7 +27,7 @@ export function SessionToolbar() {
           })}
         ></sl-icon>
         <sl-option value="1">Graduate School</sl-option>
-        <sl-option value="2">Augmented Tabflow</sl-option>
+        <sl-option value="">Unsaved Session</sl-option>
       </sl-select>
     </div>`;
 }

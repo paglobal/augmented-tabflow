@@ -14,9 +14,9 @@ import {
   updateCurrentSession,
 } from "./sessionService";
 import { DialogForm } from "./DialogForm";
-import { tabGroupColors } from "./utils";
+import { notify, tabGroupColors } from "./utils";
 import { getStorageData } from "../sharedUtils";
-import { areaNames, sessionStorageKeys } from "../constants";
+import { sessionStorageKeys } from "../constants";
 
 export function Toolbar() {
   const helpDialogRef = createRef<SlDialog>();
@@ -126,7 +126,7 @@ export function Toolbar() {
           @click=${() => newSessionDialogRef.value?.show()}
         ></sl-icon-button>
         ${h(DialogForm, {
-          dialogLabel: "New Session",
+          dialogLabel: "New Empty Session",
           dialogRef: newSessionDialogRef,
           formContent: html`
             <sl-input name="title" placeholder="Title" autofocus></sl-input>
@@ -138,15 +138,18 @@ export function Toolbar() {
         })}
         <sl-icon-button
           name="pen"
-          title="Edit Session"
+          title="Edit Current Session"
           @click=${async () => {
-            editSessionDialogRef.value?.show();
             if (editSessionInputRef.value) {
               const currentSession = await getStorageData(
-                areaNames.session,
                 sessionStorageKeys.currentSession,
               );
-              editSessionInputRef.value.value = currentSession;
+              if (currentSession) {
+                editSessionInputRef.value.value = currentSession;
+                editSessionDialogRef.value?.show();
+              } else {
+                notify("Current session is unsaved", "warning");
+              }
             }
           }}
         ></sl-icon-button>
@@ -168,7 +171,7 @@ export function Toolbar() {
         })}
         <sl-icon-button
           name="trash"
-          title="Delete Session"
+          title="Delete Current Session"
           @click=${deleteCurrentSession}
         ></sl-icon-button>
         <sl-icon-button

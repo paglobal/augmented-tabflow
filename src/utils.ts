@@ -43,3 +43,5 @@ export function notify(
 // TODO: implement internationalization
 // TODO: add tsc type-checking to dev workflow
 // TODO: try removing unused icons from assets without breaking anything, or dont! either way, GOOD LUCK!
+// TODO: promethium-js: allow promises in `adaptEffect`
+// TODO: promethium-js: fix type for `h` directive

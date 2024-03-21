@@ -2,6 +2,7 @@ import { adaptState, h } from "promethium-js";
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { createRef, ref } from "lit/directives/ref.js";
+import { setDefaultAnimation } from "@shoelace-style/shoelace/dist/utilities/animation-registry.js";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import type SlInput from "@shoelace-style/shoelace/dist/components/input/input.js";
 import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.js";
@@ -21,6 +22,10 @@ import { tabGroupColors } from "./utils";
 import { DialogForm } from "./DialogForm";
 import { updateTabGroup } from "./sessionService";
 import { createRootBookmarkNode } from "../sharedUtils";
+
+// Change the default animation for all tree items
+setDefaultAnimation("tree-item.expand", null);
+setDefaultAnimation("tree-item.collapse", null);
 
 export const editTabGroupDialogRefs = {
   input: createRef<SlInput>(),

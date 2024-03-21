@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "Augment your tab workflow with extended tab group managment",
   "scripts": {
-    "dev": "nodemon --watch public --ext js,json,png --exec \"vite build --watch --sourcemap true --minify false\"",
+    "dev": "concurrently \"nodemon --watch public --ext js,json,png --exec 'vite build --watch --sourcemap true --minify false'\" \"tsc --watch\"",
     "build": "vite build",
     "package": "vite build && zip -r augmented-tabflow.zip dist/"
   },
@@ -12,6 +12,7 @@
   "license": "MIT",
   "devDependencies": {
     "chrome-types": "^0.1.250",
+    "concurrently": "^8.2.2",
     "nodemon": "^3.0.2",
     "ts-lit-plugin": "^2.0.2",
     "typescript": "^5.3.3",

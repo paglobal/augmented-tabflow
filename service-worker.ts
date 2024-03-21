@@ -1,13 +1,10 @@
-import { localStorageKeys } from "./constants";
-import { createRootBookmarkNode } from "./sharedUtils";
+import { sessionStorageKeys } from "./constants";
+import { createRootBookmarkNode, setStorageData } from "./sharedUtils";
+import { type TabGroupTreeData } from "./src/sessionService";
 
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error));
-
-export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
-  tabs: chrome.tabs.Tab[];
-})[];
 
 async function getTabGroupTreeData() {
   const tabGroups = await chrome.tabGroups.query({});
@@ -45,9 +42,7 @@ let tabGroupTreeDataUpdateTimeoutId: number | null = null;
 
 async function applyUpdates() {
   const tabGroupTreeData = await getTabGroupTreeData();
-  chrome.storage.local.set({
-    [localStorageKeys.tabGroupTreeData]: tabGroupTreeData,
-  });
+  setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
 }
 
 // TODO: implement saving of sessions (on startup and on session switch)

@@ -116,10 +116,11 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
   }
 
   function fallbackContent(errorOccurred?: boolean) {
-    let message = "Loading active tab groups...";
+    let message = "Loading...";
     if (errorOccurred) {
-      message = "Error occurred while loading active tab groups...";
+      message = "Error occurred while loading...";
     }
+
     return html`${h(TreeItem, {
       content: html`${message}`,
       tooltipContent: message,
