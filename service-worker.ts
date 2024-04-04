@@ -38,7 +38,7 @@ async function getTabGroupTreeData() {
 }
 
 let debounceTabGroupTreeDataUpdates = false;
-let tabGroupTreeDataUpdateTimeoutId: number | null = null;
+let tabGroupTreeDataUpdateTimeoutId: number | undefined = undefined;
 
 async function applyUpdates() {
   const tabGroupTreeData = await getTabGroupTreeData();

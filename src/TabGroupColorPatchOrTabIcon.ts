@@ -12,7 +12,7 @@ function faviconUrl(pageUrl: string) {
 
 // TODO: resolve unloaded tab status thingy
 export function TabGroupColorPatchOrTabIcon(props: {
-  color?: string;
+  color?: chrome.tabGroups.TabGroup["color"];
   pageUrl?: string;
   showSpinner?: boolean;
 }) {
@@ -46,7 +46,7 @@ export function TabGroupColorPatchOrTabIcon(props: {
                   })}
                 ></sl-spinner>`
               : html`<img
-                  src=${faviconUrl(props.pageUrl)}
+                  src=${faviconUrl(props.pageUrl as string)}
                   style=${styleMap({
                     width: "1.3rem",
                     padding: "0.2rem",

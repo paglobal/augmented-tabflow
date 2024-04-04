@@ -3,10 +3,11 @@ import {
   type SessionStorageKey,
   syncStorageKeys,
   rootBookmarkNodeTitle,
+  areaNames,
 } from "./constants";
 
 export async function getStorageData(key: SyncStorageKey | SessionStorageKey) {
-  const areaName = key.split("-")[0];
+  const areaName = key.split("-")[0] as keyof typeof areaNames;
 
   return (await chrome.storage[areaName].get(key))[key];
 }
@@ -15,7 +16,7 @@ export async function setStorageData(
   key: SyncStorageKey | SessionStorageKey,
   value: any,
 ) {
-  const areaName = key.split("-")[0];
+  const areaName = key.split("-")[0] as keyof typeof areaNames;
   chrome.storage[areaName].set({ [key]: value });
 }
 

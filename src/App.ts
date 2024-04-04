@@ -114,7 +114,7 @@ export function App() {
                 title: chrome.tabGroups.TabGroup["title"];
                 color: chrome.tabGroups.Color;
               }) {
-                updateTabGroup({ id: currentlyEditedTabGroupId(), ...data });
+                updateTabGroup(currentlyEditedTabGroupId(), data);
               },
             })}
           </div>

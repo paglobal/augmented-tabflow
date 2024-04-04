@@ -11,7 +11,7 @@ export function DialogForm(props: {
   dialogRef: Ref<SlDialog>;
   formContent: TemplateResult;
   submitButtonText: string;
-  formAction: (data: unknown) => void;
+  formAction: (data: any) => void;
 }) {
   const formRef = createRef<HTMLFormElement>();
 
@@ -24,10 +24,13 @@ export function DialogForm(props: {
           class="dialog-form"
           @submit=${(e: Event) => {
             e.preventDefault();
-            const data = serialize(formRef.value);
+            if (formRef.value) {
+              const data = serialize(formRef.value);
+              props.formAction(data);
+            }
             props.dialogRef.value?.hide();
             formRef.value?.reset();
-            props.formAction(data);
+            (document.activeElement as HTMLElement)?.blur();
           }}
         >
           ${props.formContent}

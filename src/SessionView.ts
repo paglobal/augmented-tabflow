@@ -24,10 +24,11 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
     // TODO: indicate if audio is playing in tab
     // TODO: implement drag-and-drop for tabs and tab groups
     // TODO: implement recently closed tab groups feature
+    // TODO: implement "copy tab group to session" feature
     return (await tabGroupTreeData()).map((tabGroup) => {
       return html`
         ${h(TreeItem, {
-          tooltipContent: tabGroup.title,
+          tooltipContent: tabGroup.title as string,
           expanded: !tabGroup.collapsed,
           onExpand(e: Event) {
             e.stopPropagation();
@@ -56,7 +57,8 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
                   editTabGroupDialogRefs.input.value &&
                   editTabGroupDialogRefs.select.value
                 ) {
-                  editTabGroupDialogRefs.input.value.value = tabGroup.title;
+                  editTabGroupDialogRefs.input.value.value =
+                    tabGroup.title as string;
                   editTabGroupDialogRefs.select.value.value = tabGroup.color;
                 }
                 props.editTabGroupDialogRef.value?.show();
@@ -79,7 +81,7 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
             ${tabGroup.tabs.map(
               (tab) => html`
                 ${h(TreeItem, {
-                  tooltipContent: tab.title,
+                  tooltipContent: tab.title as string,
                   selected: tab.active,
                   onSelect(e: Event) {
                     e.stopPropagation();
@@ -91,7 +93,7 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
                       title="Close"
                       @click=${(e: Event) => {
                         e.stopPropagation();
-                        chrome.tabs.remove(tab.id);
+                        chrome.tabs.remove(tab.id as number);
                       }}
                     ></sl-icon-button>
                   `,
@@ -100,7 +102,7 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
                       pageUrl: tab.url,
                       showSpinner:
                         tab.status === "loading" &&
-                        !newTabUrls.includes(tab.url)
+                        !newTabUrls.includes(tab.url as string)
                           ? true
                           : false,
                     })}

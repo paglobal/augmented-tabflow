@@ -18,7 +18,7 @@ export const tabGroupColors = () => ({
 // copied from "https://shoelace.style/components/alert" and slightly modified
 export function notify(
   message: string,
-  variant: SlAlert["variant"] = "danger",
+  variant: Exclude<SlAlert["variant"], "primary" | "neutral"> = "danger",
 ) {
   const icon = {
     danger: "exclamation-octagon",
@@ -45,3 +45,5 @@ export function notify(
 // TODO: try removing unused icons from assets without breaking anything, or dont! either way, GOOD LUCK!
 // TODO: promethium-js: allow promises in `adaptEffect`
 // TODO: promethium-js: fix type for `h` directive
+// TODO: promethium-js: fix type for adaptState
+// TODO: try altering tsconfig first

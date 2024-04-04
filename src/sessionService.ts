@@ -27,6 +27,10 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 });
 
+export const [currentSession, setCurrentSession] = adaptState<string | null>(
+  null,
+);
+
 export function expandTabGroup(tabGroup: chrome.tabGroups.TabGroup) {
   chrome.tabGroups.update(tabGroup.id, {
     collapsed: false,
@@ -43,7 +47,7 @@ export async function addTabToTabGroup(tabGroup: chrome.tabGroups.TabGroup) {
   const tab = await chrome.tabs.create({});
   chrome.tabs.group({
     groupId: tabGroup.id,
-    tabIds: [tab.id],
+    tabIds: tab.id as number,
   });
 }
 
@@ -51,7 +55,7 @@ export async function closeTabGroup(tabGroup: TabGroupTreeData[number]) {
   const tabIds = tabGroup.tabs.map((tab) => tab.id) as [number, ...number[]];
   await chrome.tabs.ungroup(tabIds);
   tabGroup.tabs.forEach(async (tab) => {
-    await chrome.tabs.remove(tab.id);
+    await chrome.tabs.remove(tab.id as number);
   });
 }
 
@@ -60,7 +64,7 @@ export function activateTab(tab: chrome.tabs.Tab) {
   if (tab.windowId !== chrome.windows.WINDOW_ID_CURRENT) {
     chrome.windows.update(tab.windowId, { focused: true });
   }
-  chrome.tabs.update(tab.id, { active: true });
+  chrome.tabs.update(tab.id as number, { active: true });
 }
 
 export async function groupUngroupedTabsInWindow() {
@@ -83,19 +87,23 @@ export async function createTabGroup(options: {
   const tab = await chrome.tabs.create({
     active: true,
   });
-  const groupId = await chrome.tabs.group({ tabIds: tab.id });
+  const groupId = await chrome.tabs.group({ tabIds: tab.id as number });
   chrome.tabGroups.update(groupId, options);
 }
 
-export function updateTabGroup(options: {
-  id: chrome.tabGroups.TabGroup["id"];
-  title: chrome.tabGroups.TabGroup["title"];
-  color: chrome.tabGroups.Color;
-}) {
-  chrome.tabGroups.update(options.id, {
-    title: options.title,
-    color: options.color,
-  });
+export function updateTabGroup(
+  id: chrome.tabGroups.TabGroup["id"] | null,
+  options: {
+    title: chrome.tabGroups.TabGroup["title"];
+    color: chrome.tabGroups.Color;
+  },
+) {
+  if (id) {
+    chrome.tabGroups.update(id, {
+      title: options.title,
+      color: options.color,
+    });
+  }
 }
 
 export async function createSession(title: string) {
@@ -129,8 +137,10 @@ export async function updateCurrentSession(title: string) {
     const currentSessionData = sessionData.find(
       (session) => session.title === currentSession,
     );
-    await chrome.bookmarks.update(currentSessionData.id, { title });
-    setStorageData(sessionStorageKeys.currentSession, title);
+    if (currentSessionData) {
+      await chrome.bookmarks.update(currentSessionData.id, { title });
+      setStorageData(sessionStorageKeys.currentSession, title);
+    }
   }
 }
 
@@ -146,8 +156,10 @@ export async function deleteCurrentSession() {
     const currentSessionData = sessionData.find(
       (session) => session.title === currentSession,
     );
-    await chrome.bookmarks.removeTree(currentSessionData.id);
-    await chrome.storage.session.remove(sessionStorageKeys.currentSession);
+    if (currentSessionData) {
+      await chrome.bookmarks.removeTree(currentSessionData.id);
+      await chrome.storage.session.remove(sessionStorageKeys.currentSession);
+    }
   } else {
     notify("Current session is unsaved", "warning");
   }

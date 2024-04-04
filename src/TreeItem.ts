@@ -37,9 +37,9 @@ export function TreeItem(props: {
           textAlign: "right",
         })}
         @mouseleave=${(e: Event) =>
-          (e.target as HTMLElement).parentElement.blur()}
+          (e.target as HTMLElement)?.parentElement?.blur()}
         @mouseout=${(e: Event) =>
-          (e.target as HTMLElement).parentElement.blur()}
+          (e.target as HTMLElement)?.parentElement?.blur()}
       >
         <sl-button-group
           label="Actions"
