@@ -45,7 +45,6 @@ async function applyUpdates() {
   setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
 }
 
-// TODO: implement saving of sessions (on startup and on session switch)
 async function updateTabGroupTreeData() {
   if (!debounceTabGroupTreeDataUpdates) {
     applyUpdates();

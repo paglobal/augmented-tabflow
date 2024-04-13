@@ -17,27 +17,40 @@ import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { SessionView } from "./SessionView";
 import { Toolbar } from "./Toolbar";
+import { Help } from "./Help";
+import { Dialog } from "./Dialog";
 import { SessionToolbar } from "./SessionToolbar";
-import { tabGroupColors } from "./utils";
+import { tabGroupColors, randomTabGroupColorValue } from "./utils";
 import { DialogForm } from "./DialogForm";
-import { updateTabGroup } from "./sessionService";
+import {
+  createSession,
+  updateTabGroup,
+  updateCurrentSessionTitle,
+  createTabGroup,
+} from "./sessionService";
 import { createRootBookmarkNode } from "../sharedUtils";
 
-// Change the default animation for all tree items
+// Disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
 setDefaultAnimation("tree-item.collapse", null);
 
 export const editTabGroupDialogRefs = {
+  dialog: createRef<SlDialog>(),
   input: createRef<SlInput>(),
   select: createRef<SlSelect>(),
 };
+
+export const helpDialogRef = createRef<SlDialog>();
+export const saveCurrentSessionDialogRef = createRef<SlDialog>();
+export const addTabGroupDialogRef = createRef<SlDialog>();
+export const newSessionDialogRef = createRef<SlDialog>();
+export const editSessionDialogRef = createRef<SlDialog>();
+export const editSessionInputRef = createRef<SlInput>();
 
 export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
 
 export function App() {
-  const editTabGroupDialogRef = createRef<SlDialog>();
-
   createRootBookmarkNode();
 
   return () =>
@@ -67,12 +80,10 @@ export function App() {
               paddingBottom: "1.5rem",
             })}
           >
-            ${h(SessionToolbar)} ${h(Toolbar)}
-            ${h(SessionView, { editTabGroupDialogRef })}
-            <!--Dialog form is here because of layout issues when put in the \`SessionView\` component-->
+            ${h(SessionToolbar)} ${h(Toolbar)} ${h(SessionView)}
             ${h(DialogForm, {
               dialogLabel: "Edit Tab Group",
-              dialogRef: editTabGroupDialogRef,
+              dialogRef: editTabGroupDialogRefs.dialog,
               submitButtonText: "Save",
               formContent: html`
                 <sl-input
@@ -115,6 +126,89 @@ export function App() {
                 color: chrome.tabGroups.Color;
               }) {
                 updateTabGroup(currentlyEditedTabGroupId(), data);
+              },
+            })}
+            ${h(Dialog, {
+              label: "Help",
+              content: html`${h(Help)}`,
+              ref: helpDialogRef,
+            })}
+            ${h(DialogForm, {
+              dialogLabel: "Save Current Session",
+              dialogRef: saveCurrentSessionDialogRef,
+              formContent: html`
+                <sl-input name="title" placeholder="Title" autofocus></sl-input>
+              `,
+              submitButtonText: "Save",
+              formAction({ title }: { title: string }) {
+                createSession(title, true);
+              },
+            })}
+            ${h(DialogForm, {
+              dialogLabel: "Add Tab Group",
+              dialogRef: addTabGroupDialogRef,
+              formContent: html`
+                <sl-input name="title" placeholder="Title" autofocus></sl-input>
+                <sl-select name="color" placeholder="Color" hoist>
+                  ${Object.entries(tabGroupColors()).map(
+                    ([colorName, colorValue]) => html`
+                      <sl-option value=${colorName}
+                        ><div></div>
+                        <span
+                          slot="prefix"
+                          style=${styleMap({
+                            background: colorValue,
+                            width: "0.8rem",
+                            height: "0.8rem",
+                            marginRight: "1rem",
+                            borderRadius: "50%",
+                            outline:
+                              "0.15rem solid var(--sl-color-neutral-1000)",
+                            outlineOffset: "0.15rem",
+                          })}
+                        ></span
+                        >${colorName}</sl-option
+                      >
+                    `,
+                  )}
+                </sl-select>
+              `,
+              submitButtonText: "Save",
+              async formAction(data: {
+                title: chrome.tabGroups.TabGroup["title"];
+                color: chrome.tabGroups.Color;
+              }) {
+                if (!data.color) {
+                  data.color = randomTabGroupColorValue();
+                }
+                createTabGroup(data);
+              },
+            })}
+            ${h(DialogForm, {
+              dialogLabel: "Create Empty Session",
+              dialogRef: newSessionDialogRef,
+              formContent: html`
+                <sl-input name="title" placeholder="Title" autofocus></sl-input>
+              `,
+              submitButtonText: "Save",
+              formAction({ title }: { title: string }) {
+                createSession(title);
+              },
+            })}
+            ${h(DialogForm, {
+              dialogLabel: "Edit Current Session Title",
+              dialogRef: editSessionDialogRef,
+              formContent: html`
+                <sl-input
+                  ${ref(editSessionInputRef)}
+                  name="title"
+                  placeholder="Title"
+                  autofocus
+                ></sl-input>
+              `,
+              submitButtonText: "Save",
+              formAction({ title }: { title: string }) {
+                updateCurrentSessionTitle(title);
               },
             })}
           </div>

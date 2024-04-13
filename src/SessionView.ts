@@ -1,22 +1,28 @@
 import { html } from "lit";
 import { h } from "promethium-js";
 import { until } from "lit/directives/until.js";
-import { type Ref } from "lit/directives/ref.js";
-import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
+import { choose } from "lit/directives/choose.js";
 import { Tree } from "./Tree";
 import { TreeItem } from "./TreeItem";
-import { TabGroupColorPatchOrTabIcon } from "./TabGroupColorPatchOrTabIcon";
+import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import {
   activateTab,
   addTabToTabGroup,
   closeTabGroup,
   collapseTabGroup,
+  currentSession,
   expandTabGroup,
+  sessionTreeData,
   tabGroupTreeData,
 } from "./sessionService";
-import { editTabGroupDialogRefs, setCurrentlyEditedTabGroupId } from "./App";
+import {
+  editTabGroupDialogRefs,
+  helpDialogRef,
+  saveCurrentSessionDialogRef,
+  setCurrentlyEditedTabGroupId,
+} from "./App";
 
-export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
+export function SessionView() {
   const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
 
   async function tabGroupTree() {
@@ -25,6 +31,8 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
     // TODO: implement drag-and-drop for tabs and tab groups
     // TODO: implement recently closed tab groups feature
     // TODO: implement "copy tab group to session" feature
+    // TODO: implement "copy tab to session" feature
+    // TODO: implement "move tab group to new window" feature
     return (await tabGroupTreeData()).map((tabGroup) => {
       return html`
         ${h(TreeItem, {
@@ -57,11 +65,11 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
                   editTabGroupDialogRefs.input.value &&
                   editTabGroupDialogRefs.select.value
                 ) {
+                  editTabGroupDialogRefs.dialog.value?.show();
                   editTabGroupDialogRefs.input.value.value =
                     tabGroup.title as string;
                   editTabGroupDialogRefs.select.value.value = tabGroup.color;
                 }
-                props.editTabGroupDialogRef.value?.show();
               }}
             ></sl-icon-button>
             <sl-icon-button
@@ -74,7 +82,7 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
             ></sl-icon-button>
           `,
           content: html`
-            ${h(TabGroupColorPatchOrTabIcon, {
+            ${h(TreeItemColorPatchOrIcon, {
               color: tabGroup.color,
             })}
             ${tabGroup.title}
@@ -98,7 +106,7 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
                     ></sl-icon-button>
                   `,
                   content: html`
-                    ${h(TabGroupColorPatchOrTabIcon, {
+                    ${h(TreeItemColorPatchOrIcon, {
                       pageUrl: tab.url,
                       showSpinner:
                         tab.status === "loading" &&
@@ -117,6 +125,49 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
     });
   }
 
+  async function sessionTree() {
+    const sessionTree = (await sessionTreeData()).map((session) => {
+      return html`
+        ${h(TreeItem, {
+          content: html`${h(TreeItemColorPatchOrIcon, {
+            icon: "window",
+          })}${session.title}`,
+          tooltipContent: session.title,
+          onSelect(e: Event) {
+            e.stopPropagation();
+          },
+        })}
+      `;
+    });
+
+    sessionTree?.unshift(
+      html`${h(TreeItem, {
+        content: html`${h(TreeItemColorPatchOrIcon, {
+          icon: "question-circle",
+        })}
+        Help`,
+        tooltipContent: "Help",
+        onSelect(e: Event) {
+          e.stopPropagation();
+          helpDialogRef.value?.show();
+        },
+      })}`,
+      html`${h(TreeItem, {
+        content: html`${h(TreeItemColorPatchOrIcon, {
+          icon: "window-plus",
+        })}
+        Save Current Session`,
+        tooltipContent: "Save Current Session",
+        onSelect(e: Event) {
+          e.stopPropagation();
+          saveCurrentSessionDialogRef.value?.show();
+        },
+      })}`,
+    );
+
+    return sessionTree;
+  }
+
   function fallbackContent(errorOccurred?: boolean) {
     let message = "Loading...";
     if (errorOccurred) {
@@ -130,8 +181,28 @@ export function SessionView(props: { editTabGroupDialogRef: Ref<SlDialog> }) {
   }
 
   return () => html`
-    ${h(Tree, {
-      contentFn: () => html`${until(tabGroupTree(), fallbackContent())}`,
-    })}
+    ${choose(
+      currentSession(),
+      [
+        [
+          null,
+          () =>
+            html`${h(Tree, {
+              contentFn: () => html`${fallbackContent()}`,
+            })}`,
+        ],
+        [
+          undefined,
+          () =>
+            html`${h(Tree, {
+              contentFn: () => html`${until(sessionTree(), fallbackContent())}`,
+            })}`,
+        ],
+      ],
+      () =>
+        html`${h(Tree, {
+          contentFn: () => html`${until(tabGroupTree(), fallbackContent())}`,
+        })}`,
+    )}
   `;
 }

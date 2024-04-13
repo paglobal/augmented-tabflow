@@ -15,6 +15,14 @@ export const tabGroupColors = () => ({
   orange: "#FFAA6F",
 });
 
+export function randomTabGroupColorValue() {
+  const tabGroupColorNames = Object.keys(tabGroupColors());
+
+  return tabGroupColorNames[
+    Math.floor(Math.random() * tabGroupColorNames.length)
+  ] as chrome.tabGroups.Color;
+}
+
 // copied from "https://shoelace.style/components/alert" and slightly modified
 export function notify(
   message: string,
@@ -38,12 +46,10 @@ export function notify(
   alert.toast();
 }
 
-// TODO: implement proper error handling. please!!!
-// look for keywords `async` and `chrome`
+// TODO: implement proper error handling. look for keywords `async` and `chrome`
 // TODO: implement internationalization
-// TODO: add tsc type-checking to dev workflow
 // TODO: try removing unused icons from assets without breaking anything, or dont! either way, GOOD LUCK!
 // TODO: promethium-js: allow promises in `adaptEffect`
-// TODO: promethium-js: fix type for `h` directive
-// TODO: promethium-js: fix type for adaptState
-// TODO: try altering tsconfig first
+// TODO: fix focus after submitting dialog forms
+// TODO: fix inconsistency with save button roundedness in forms
+// TODO: always put cursor in front on text in forms

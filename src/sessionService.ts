@@ -1,7 +1,7 @@
 import { adaptState } from "promethium-js";
 import { areaNames, sessionStorageKeys, syncStorageKeys } from "../constants";
 import { notify } from "./utils";
-import { getStorageData, setStorageData } from "../sharedUtils";
+import { getStorageData } from "../sharedUtils";
 
 export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
   tabs: chrome.tabs.Tab[];
@@ -10,11 +10,11 @@ export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
 export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
   Promise<TabGroupTreeData> | TabGroupTreeData
 >(async () => {
-  const tabGroupTreeData: TabGroupTreeData = await getStorageData(
+  const tabGroupTreeData = await getStorageData<TabGroupTreeData>(
     sessionStorageKeys.tabGroupTreeData,
   );
 
-  return tabGroupTreeData;
+  return tabGroupTreeData ?? [];
 });
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
@@ -26,10 +26,6 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     }
   }
 });
-
-export const [currentSession, setCurrentSession] = adaptState<string | null>(
-  null,
-);
 
 export function expandTabGroup(tabGroup: chrome.tabGroups.TabGroup) {
   chrome.tabGroups.update(tabGroup.id, {
@@ -106,61 +102,129 @@ export function updateTabGroup(
   }
 }
 
-export async function createSession(title: string) {
-  const rootBookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"] =
-    await getStorageData(syncStorageKeys.rootBookmarkNodeId);
-  const sessionData = await chrome.bookmarks.getChildren(rootBookmarkNodeId);
-  // check if session with similar title already exists before proceeding
-  if (sessionData.some((session) => session.title === title)) {
-    notify("Session already exists", "warning");
+export const [currentSession, setCurrentSession] = adaptState<
+  chrome.bookmarks.BookmarkTreeNode["id"] | null | undefined
+>(null);
+
+async function updateCurrentSession(
+  newSession?: chrome.bookmarks.BookmarkTreeNode["id"],
+) {
+  if (newSession) {
+    setCurrentSession(newSession);
   } else {
-    await chrome.bookmarks.create({ parentId: rootBookmarkNodeId, title });
-    notify("Session created successfully", "success");
+    const currentSession = await getStorageData<
+      chrome.bookmarks.BookmarkTreeNode["id"]
+    >(sessionStorageKeys.currentSession);
+
+    setCurrentSession(currentSession);
   }
 }
 
-export async function updateCurrentSession(title: string) {
-  const rootBookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"] =
-    await getStorageData(syncStorageKeys.rootBookmarkNodeId);
-  const sessionData = await chrome.bookmarks.getChildren(rootBookmarkNodeId);
-  // check if session with similar title already exists before proceeding
-  if (sessionData.some((session) => session.title === title)) {
-    notify("Session with similar title already exists", "warning");
-  } else {
-    const currentSession: string = await getStorageData(
-      sessionStorageKeys.currentSession,
-    );
-    const rootBookmarkNodeId = await getStorageData(
-      syncStorageKeys.rootBookmarkNodeId,
-    );
-    const sessionData = await chrome.bookmarks.getChildren(rootBookmarkNodeId);
-    const currentSessionData = sessionData.find(
-      (session) => session.title === currentSession,
-    );
-    if (currentSessionData) {
-      await chrome.bookmarks.update(currentSessionData.id, { title });
-      setStorageData(sessionStorageKeys.currentSession, title);
+updateCurrentSession();
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === areaNames.session) {
+    const newCurrentSession: chrome.bookmarks.BookmarkTreeNode["id"] =
+      changes[sessionStorageKeys.currentSession]?.newValue;
+    if (newCurrentSession) {
+      setCurrentSession(newCurrentSession);
     }
   }
+});
+
+export const [sessionTreeData, setSessionTreeData] = adaptState<
+  | chrome.bookmarks.BookmarkTreeNode[]
+  | Promise<chrome.bookmarks.BookmarkTreeNode[]>
+>(async () => {
+  const rootBookmarkNodeId = await getStorageData<
+    chrome.bookmarks.BookmarkTreeNode["id"]
+  >(syncStorageKeys.rootBookmarkNodeId);
+  if (rootBookmarkNodeId) {
+    const sessionTreeData =
+      await chrome.bookmarks.getChildren(rootBookmarkNodeId);
+
+    return sessionTreeData ?? [];
+  } else {
+    return [];
+  }
+});
+
+async function updateSessionTreeData() {
+  const rootBookmarkNodeId = await getStorageData<
+    chrome.bookmarks.BookmarkTreeNode["id"]
+  >(syncStorageKeys.rootBookmarkNodeId);
+  if (rootBookmarkNodeId) {
+    const sessionTreeData =
+      await chrome.bookmarks.getChildren(rootBookmarkNodeId);
+    setSessionTreeData(sessionTreeData);
+  }
 }
 
-export async function deleteCurrentSession() {
-  const currentSession: string = await getStorageData(
-    sessionStorageKeys.currentSession,
-  );
+chrome.bookmarks.onChanged.addListener(() => {
+  updateSessionTreeData();
+});
+chrome.bookmarks.onChildrenReordered.addListener(() => {
+  updateSessionTreeData();
+});
+chrome.bookmarks.onCreated.addListener(() => {
+  updateSessionTreeData();
+});
+chrome.bookmarks.onMoved.addListener(() => {
+  updateSessionTreeData();
+});
+chrome.bookmarks.onRemoved.addListener(() => {
+  updateSessionTreeData();
+});
+
+export async function createSession(
+  title: string,
+  saveCurrentSession?: boolean,
+) {
+  const rootBookmarkNodeId = await getStorageData<
+    chrome.bookmarks.BookmarkTreeNode["id"]
+  >(syncStorageKeys.rootBookmarkNodeId);
+  const session = (
+    await chrome.bookmarks.create({ parentId: rootBookmarkNodeId, title })
+  ).id;
+  if (saveCurrentSession) {
+    const tabGroupTreeData = await getStorageData<TabGroupTreeData>(
+      sessionStorageKeys.tabGroupTreeData,
+    );
+    if (tabGroupTreeData) {
+      for await (const tabGroup of tabGroupTreeData) {
+        const tabGroupBookmarkId = (
+          await chrome.bookmarks.create({
+            parentId: session,
+            title: `${tabGroup.color}-${tabGroup.title}`,
+          })
+        ).id;
+        for await (const tab of tabGroup.tabs) {
+          await chrome.bookmarks.create({
+            parentId: tabGroupBookmarkId,
+            title: tab.title,
+            url: tab.url,
+          });
+        }
+      }
+    }
+  }
+  notify("Session created successfully", "success");
+}
+
+export async function updateCurrentSessionTitle(title: string) {
+  const currentSession = await getStorageData<
+    chrome.bookmarks.BookmarkTreeNode["id"]
+  >(sessionStorageKeys.currentSession);
   if (currentSession) {
-    const rootBookmarkNodeId = await getStorageData(
-      syncStorageKeys.rootBookmarkNodeId,
-    );
-    const sessionData = await chrome.bookmarks.getChildren(rootBookmarkNodeId);
-    const currentSessionData = sessionData.find(
-      (session) => session.title === currentSession,
-    );
-    if (currentSessionData) {
-      await chrome.bookmarks.removeTree(currentSessionData.id);
-      await chrome.storage.session.remove(sessionStorageKeys.currentSession);
-    }
+    await chrome.bookmarks.update(currentSession, { title });
   } else {
-    notify("Current session is unsaved", "warning");
+    notify("Session does not exist", "danger");
   }
+}
+
+export async function deleteSession(
+  session: chrome.bookmarks.BookmarkTreeNode["id"],
+) {
+  await chrome.bookmarks.removeTree(session);
+  await chrome.storage.session.remove(sessionStorageKeys.currentSession);
 }
