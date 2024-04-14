@@ -33,6 +33,7 @@ export function SessionView() {
     // TODO: implement "copy tab group to session" feature
     // TODO: implement "copy tab to session" feature
     // TODO: implement "move tab group to new window" feature
+    // TODO: implement "ungrouped tabs" in tab group tree
     return (await tabGroupTreeData()).map((tabGroup) => {
       return html`
         ${h(TreeItem, {
@@ -61,15 +62,18 @@ export function SessionView() {
               @click=${(e: Event) => {
                 e.stopPropagation();
                 setCurrentlyEditedTabGroupId(tabGroup.id);
-                if (
-                  editTabGroupDialogRefs.input.value &&
-                  editTabGroupDialogRefs.select.value
-                ) {
-                  editTabGroupDialogRefs.dialog.value?.show();
-                  editTabGroupDialogRefs.input.value.value =
-                    tabGroup.title as string;
-                  editTabGroupDialogRefs.select.value.value = tabGroup.color;
-                }
+                editTabGroupDialogRefs.dialog.value?.show();
+                // use `setTimeout` to ensure that the cursor gets placed in the right position in the input
+                setTimeout(() => {
+                  if (
+                    editTabGroupDialogRefs.input.value &&
+                    editTabGroupDialogRefs.select.value
+                  ) {
+                    editTabGroupDialogRefs.input.value.value =
+                      tabGroup.title as string;
+                    editTabGroupDialogRefs.select.value.value = tabGroup.color;
+                  }
+                });
               }}
             ></sl-icon-button>
             <sl-icon-button
@@ -195,7 +199,8 @@ export function SessionView() {
           undefined,
           () =>
             html`${h(Tree, {
-              contentFn: () => html`${until(sessionTree(), fallbackContent())}`,
+              contentFn: () =>
+                html`${until(tabGroupTree(), fallbackContent())}`,
             })}`,
         ],
       ],

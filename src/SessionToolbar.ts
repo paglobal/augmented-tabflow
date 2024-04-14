@@ -1,5 +1,7 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
+import { until } from "lit/directives/until.js";
+import { currentSession } from "./sessionService";
 
 export function SessionToolbar() {
   return () =>
@@ -12,6 +14,8 @@ export function SessionToolbar() {
       <sl-select
         name="session"
         placeholder="Session"
+        value=${until(currentSession(), "")}
+        defaultValue=${until(currentSession(), "")}
         hoist
         clearable
         style=${styleMap({

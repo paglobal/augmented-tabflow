@@ -30,7 +30,13 @@ export function DialogForm(props: {
             }
             props.dialogRef.value?.hide();
             formRef.value?.reset();
-            (document.activeElement as HTMLElement)?.blur();
+            document.addEventListener(
+              "focusin",
+              () => {
+                (document.activeElement as HTMLElement)?.blur();
+              },
+              { once: true },
+            );
           }}
         >
           ${props.formContent}

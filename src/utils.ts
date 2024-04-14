@@ -37,10 +37,7 @@ export function notify(
     variant,
     closable: true,
     duration: 3000,
-    innerHTML: `
-        <sl-icon name="${icon[variant]}" slot="icon"></sl-icon>
-        ${message}
-      `,
+    innerHTML: `<sl-icon name="${icon[variant]}" slot="icon"></sl-icon>${message}`,
   });
   document.body.append(alert);
   alert.toast();
@@ -50,6 +47,3 @@ export function notify(
 // TODO: implement internationalization
 // TODO: try removing unused icons from assets without breaking anything, or dont! either way, GOOD LUCK!
 // TODO: promethium-js: allow promises in `adaptEffect`
-// TODO: fix focus after submitting dialog forms
-// TODO: fix inconsistency with save button roundedness in forms
-// TODO: always put cursor in front on text in forms

@@ -75,11 +75,15 @@ export function Toolbar() {
                 chrome.bookmarks.BookmarkTreeNode["id"]
               >(sessionStorageKeys.currentSession);
               if (currentSession) {
+                editSessionDialogRef.value?.show();
                 const currentSessionData = (
                   await chrome.bookmarks.get(currentSession)
                 )[0];
-                editSessionInputRef.value.value = currentSessionData.title;
-                editSessionDialogRef.value?.show();
+                setTimeout(() => {
+                  if (editSessionInputRef.value) {
+                    editSessionInputRef.value.value = currentSessionData.title;
+                  }
+                });
               } else {
                 notify("Current session is unsaved", "warning");
               }
