@@ -1,10 +1,27 @@
-import { sessionStorageKeys } from "./constants";
-import { createRootBookmarkNode, setStorageData } from "./sharedUtils";
+import {
+  MessageType,
+  messageTypes,
+  sessionStorageKeys,
+  tabGroupTypes,
+} from "./constants";
+import {
+  createRootBookmarkNode,
+  getStorageData,
+  setStorageData,
+} from "./sharedUtils";
 import { type TabGroupTreeData } from "./src/sessionService";
 
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error));
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message === messageTypes.updateTabGroupTreeData) {
+    updateTabGroupTreeData();
+  }
+
+  return undefined;
+});
 
 async function getTabGroupTreeData() {
   const tabGroups = await chrome.tabGroups.query({});
@@ -22,6 +39,8 @@ async function getTabGroupTreeData() {
           (tabGroup) => tabGroup.id === currentTab.groupId,
         );
         if (currentTabGroup) {
+          (currentTabGroup as TabGroupTreeData[number]).type =
+            tabGroupTypes.normal;
           tabGroupTreeData.push({
             ...currentTabGroup,
             tabs: [currentTab],
@@ -34,11 +53,31 @@ async function getTabGroupTreeData() {
     [],
   );
 
+  const ungroupedTabs = await chrome.tabs.query({
+    groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
+    windowType: "normal",
+  });
+
+  const ungroupedTabGroupCollapsed = await getStorageData<boolean>(
+    sessionStorageKeys.ungroupedTabGroupCollapsed,
+  );
+
+  if (ungroupedTabs.length) {
+    console.log(ungroupedTabGroupCollapsed);
+    tabGroupTreeData.push({
+      id: null as unknown as chrome.tabGroups.TabGroup["id"],
+      type: tabGroupTypes.ungrouped,
+      color: null as unknown as chrome.tabGroups.Color,
+      windowId: null as unknown as NonNullable<chrome.windows.Window["id"]>,
+      title: "Ungrouped",
+      icon: "folder2-open",
+      collapsed: ungroupedTabGroupCollapsed ?? true,
+      tabs: ungroupedTabs,
+    });
+  }
+
   return tabGroupTreeData;
 }
-
-let debounceTabGroupTreeDataUpdates = false;
-let tabGroupTreeDataUpdateTimeoutId: number | undefined = undefined;
 
 async function applyUpdates() {
   const tabGroupTreeData = await getTabGroupTreeData();
@@ -46,19 +85,40 @@ async function applyUpdates() {
 }
 
 async function updateTabGroupTreeData() {
+  const debounceTabGroupTreeDataUpdates = await getStorageData<boolean>(
+    sessionStorageKeys.debounceTabGroupTreeDataUpdates,
+  );
+  const tabGroupTreeDataUpdateTimeoutId = await getStorageData<
+    number | undefined
+  >(sessionStorageKeys.tabGroupTreeDataUpdateTimeoutId);
   if (!debounceTabGroupTreeDataUpdates) {
     applyUpdates();
-    debounceTabGroupTreeDataUpdates = true;
+    await setStorageData(
+      sessionStorageKeys.debounceTabGroupTreeDataUpdates,
+      true,
+    );
     clearTimeout(tabGroupTreeDataUpdateTimeoutId);
-    tabGroupTreeDataUpdateTimeoutId = setTimeout(() => {
-      debounceTabGroupTreeDataUpdates = false;
-    }, 200);
+    setStorageData(
+      sessionStorageKeys.tabGroupTreeDataUpdateTimeoutId,
+      setTimeout(() => {
+        setStorageData(
+          sessionStorageKeys.debounceTabGroupTreeDataUpdates,
+          false,
+        );
+      }, 200),
+    );
   } else {
     clearTimeout(tabGroupTreeDataUpdateTimeoutId);
-    tabGroupTreeDataUpdateTimeoutId = setTimeout(() => {
-      debounceTabGroupTreeDataUpdates = false;
-      applyUpdates();
-    }, 200);
+    setStorageData(
+      sessionStorageKeys.tabGroupTreeDataUpdateTimeoutId,
+      setTimeout(() => {
+        setStorageData(
+          sessionStorageKeys.debounceTabGroupTreeDataUpdates,
+          false,
+        );
+        applyUpdates();
+      }, 200),
+    );
   }
 }
 

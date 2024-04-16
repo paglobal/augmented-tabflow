@@ -6,7 +6,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         script: resolve(__dirname, "index.html"),
-        "service-worker": resolve(__dirname, "service-worker.ts"),
+        serviceWorker: resolve(__dirname, "serviceWorker.ts"),
       },
       output: {
         entryFileNames: "[name].js",

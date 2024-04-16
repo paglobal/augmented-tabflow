@@ -21,6 +21,7 @@ import {
   saveCurrentSessionDialogRef,
   setCurrentlyEditedTabGroupId,
 } from "./App";
+import { tabGroupTypes } from "../constants";
 
 export function SessionView() {
   const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
@@ -29,10 +30,11 @@ export function SessionView() {
     // TODO: handle possible error with fallback content and functional alert
     // TODO: indicate if audio is playing in tab
     // TODO: implement drag-and-drop for tabs and tab groups
-    // TODO: implement recently closed tab groups feature
-    // TODO: implement "copy tab group to session" feature
-    // TODO: implement "copy tab to session" feature
+    // TODO: implement "recently closed" tab groups feature
+    // TODO: implement "copy tab groups to session" feature
+    // TODO: implement "copy tabs to session" feature
     // TODO: implement "move tab group to new window" feature
+    // TODO: prioritize tabs groups in current window
     // TODO: implement "ungrouped tabs" in tab group tree
     return (await tabGroupTreeData()).map((tabGroup) => {
       return html`
@@ -56,26 +58,29 @@ export function SessionView() {
                 addTabToTabGroup(tabGroup);
               }}
             ></sl-icon-button>
-            <sl-icon-button
-              name="pen"
-              title="Edit"
-              @click=${(e: Event) => {
-                e.stopPropagation();
-                setCurrentlyEditedTabGroupId(tabGroup.id);
-                editTabGroupDialogRefs.dialog.value?.show();
-                // use `setTimeout` to ensure that the cursor gets placed in the right position in the input
-                setTimeout(() => {
-                  if (
-                    editTabGroupDialogRefs.input.value &&
-                    editTabGroupDialogRefs.select.value
-                  ) {
-                    editTabGroupDialogRefs.input.value.value =
-                      tabGroup.title as string;
-                    editTabGroupDialogRefs.select.value.value = tabGroup.color;
-                  }
-                });
-              }}
-            ></sl-icon-button>
+            ${tabGroup.type !== tabGroupTypes.ungrouped
+              ? html`<sl-icon-button
+                  name="pen"
+                  title="Edit"
+                  @click=${(e: Event) => {
+                    e.stopPropagation();
+                    setCurrentlyEditedTabGroupId(tabGroup.id);
+                    editTabGroupDialogRefs.dialog.value?.show();
+                    // use `setTimeout` to ensure that the cursor gets placed in the right position in the input
+                    setTimeout(() => {
+                      if (
+                        editTabGroupDialogRefs.input.value &&
+                        editTabGroupDialogRefs.select.value
+                      ) {
+                        editTabGroupDialogRefs.input.value.value =
+                          tabGroup.title as string;
+                        editTabGroupDialogRefs.select.value.value =
+                          tabGroup.color;
+                      }
+                    });
+                  }}
+                ></sl-icon-button>`
+              : null}
             <sl-icon-button
               name="x-lg"
               title="Close"
@@ -88,6 +93,7 @@ export function SessionView() {
           content: html`
             ${h(TreeItemColorPatchOrIcon, {
               color: tabGroup.color,
+              icon: tabGroup.icon,
             })}
             ${tabGroup.title}
             ${tabGroup.tabs.map(

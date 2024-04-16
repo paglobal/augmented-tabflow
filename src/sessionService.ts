@@ -1,9 +1,18 @@
 import { adaptState } from "promethium-js";
-import { areaNames, sessionStorageKeys, syncStorageKeys } from "../constants";
+import {
+  TabGroupType,
+  areaNames,
+  messageTypes,
+  sessionStorageKeys,
+  syncStorageKeys,
+  tabGroupTypes,
+} from "../constants";
 import { notify } from "./utils";
-import { getStorageData } from "../sharedUtils";
+import { getStorageData, setStorageData } from "../sharedUtils";
 
 export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
+  type?: TabGroupType;
+  icon?: string;
   tabs: chrome.tabs.Tab[];
 })[];
 
@@ -27,24 +36,36 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 });
 
-export function expandTabGroup(tabGroup: chrome.tabGroups.TabGroup) {
-  chrome.tabGroups.update(tabGroup.id, {
-    collapsed: false,
-  });
+export function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
+  if (tabGroup.type === tabGroupTypes.ungrouped) {
+    setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, false);
+    chrome.runtime.sendMessage(messageTypes.updateTabGroupTreeData);
+  } else {
+    chrome.tabGroups.update(tabGroup.id, {
+      collapsed: false,
+    });
+  }
 }
 
-export function collapseTabGroup(tabGroup: chrome.tabGroups.TabGroup) {
-  chrome.tabGroups.update(tabGroup.id, {
-    collapsed: true,
-  });
+export function collapseTabGroup(tabGroup: TabGroupTreeData[number]) {
+  if (tabGroup.type === tabGroupTypes.ungrouped) {
+    setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, true);
+    chrome.runtime.sendMessage(messageTypes.updateTabGroupTreeData);
+  } else {
+    chrome.tabGroups.update(tabGroup.id, {
+      collapsed: true,
+    });
+  }
 }
 
-export async function addTabToTabGroup(tabGroup: chrome.tabGroups.TabGroup) {
+export async function addTabToTabGroup(tabGroup: TabGroupTreeData[number]) {
   const tab = await chrome.tabs.create({});
-  chrome.tabs.group({
-    groupId: tabGroup.id,
-    tabIds: tab.id as number,
-  });
+  if (tabGroup.type !== tabGroupTypes.ungrouped) {
+    chrome.tabs.group({
+      groupId: tabGroup.id,
+      tabIds: tab.id as number,
+    });
+  }
 }
 
 export async function closeTabGroup(tabGroup: TabGroupTreeData[number]) {
@@ -195,7 +216,9 @@ export async function createSession(
         const tabGroupBookmarkId = (
           await chrome.bookmarks.create({
             parentId: session,
-            title: `${tabGroup.color}-${tabGroup.title}`,
+            title: tabGroup.icon
+              ? tabGroup.title
+              : `${tabGroup.color}-${tabGroup.title}`,
           })
         ).id;
         for await (const tab of tabGroup.tabs) {

@@ -20,7 +20,7 @@
     "128": "assets/icons/icon-3-128.png"
   },
   "background": {
-    "service_worker": "service-worker.js",
+    "service_worker": "serviceWorker.js",
     "type": "module"
   },
   "action": {
