@@ -3,23 +3,39 @@ import {
   type SessionStorageKey,
   syncStorageKeys,
   rootBookmarkNodeTitle,
-  areaNames,
+  AreaName,
 } from "./constants";
 
-export async function getStorageData<T>(
+export async function getStorageData<T = unknown>(
   key: SyncStorageKey | SessionStorageKey,
 ) {
-  const areaName = key.split("-")[0] as keyof typeof areaNames;
+  const areaName = key.split("-")[0] as AreaName;
 
   return (await chrome.storage[areaName].get(key))[key] as T | undefined;
 }
 
-export async function setStorageData<T>(
+export async function setStorageData<T = unknown>(
   key: SyncStorageKey | SessionStorageKey,
   value: T,
 ) {
-  const areaName = key.split("-")[0] as keyof typeof areaNames;
+  const areaName = key.split("-")[0] as AreaName;
   chrome.storage[areaName].set({ [key]: value });
+}
+
+export async function subscribeToStorageData<T = unknown>(
+  key: SyncStorageKey | SessionStorageKey,
+  fn: (changes: { newValue: T; oldValue: T | undefined }) => void,
+) {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    const keyAreaName = key.split("-")[0] as AreaName;
+    if (areaName === keyAreaName) {
+      const newStorageData = changes[key]?.newValue;
+      const oldStorageData = changes[key]?.oldValue;
+      if (newStorageData) {
+        fn({ newValue: newStorageData, oldValue: oldStorageData });
+      }
+    }
+  });
 }
 
 export async function createRootBookmarkNode() {

@@ -1,4 +1,6 @@
 // TODO: implement migrations for storage using `onInstalled`
+export type AreaName = "sync" | "session";
+
 export type SessionStorageKey = `session-${number}`;
 
 export const sessionStorageKeys = {
@@ -14,11 +16,6 @@ export type SyncStorageKey = `sync-${number}`;
 export const syncStorageKeys = {
   rootBookmarkNodeId: "sync-1",
 } as const satisfies Record<string, SyncStorageKey>;
-
-export const areaNames = {
-  sync: "sync",
-  session: "session",
-} as const;
 
 export type TabGroupType = `tabGroupType-${number}`;
 

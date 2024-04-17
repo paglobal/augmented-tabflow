@@ -1,9 +1,4 @@
-import {
-  MessageType,
-  messageTypes,
-  sessionStorageKeys,
-  tabGroupTypes,
-} from "./constants";
+import { messageTypes, sessionStorageKeys, tabGroupTypes } from "./constants";
 import {
   createRootBookmarkNode,
   getStorageData,
@@ -63,7 +58,6 @@ async function getTabGroupTreeData() {
   );
 
   if (ungroupedTabs.length) {
-    console.log(ungroupedTabGroupCollapsed);
     tabGroupTreeData.push({
       id: null as unknown as chrome.tabGroups.TabGroup["id"],
       type: tabGroupTypes.ungrouped,

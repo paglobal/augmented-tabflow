@@ -33,9 +33,9 @@ export function TreeItemColorPatchOrIcon(props: {
             <sl-icon
               name=${props.icon}
               style=${styleMap({
-                width: "1.3rem",
-                height: "1.3rem",
-                marginRight: "0.7rem",
+                width: "1.4rem",
+                height: "1.4rem",
+                marginRight: "0.8rem",
                 borderRadius: "0.3rem",
               })}
             ></sl-icon>

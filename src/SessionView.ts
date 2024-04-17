@@ -27,15 +27,11 @@ export function SessionView() {
   const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
 
   async function tabGroupTree() {
-    // TODO: handle possible error with fallback content and functional alert
+    // TODO: handle possible error with fallback content and alert
     // TODO: indicate if audio is playing in tab
-    // TODO: implement drag-and-drop for tabs and tab groups
+    // TODO: implement drag-and-drop for tabs, tab groups and session data
     // TODO: implement "recently closed" tab groups feature
-    // TODO: implement "copy tab groups to session" feature
-    // TODO: implement "copy tabs to session" feature
-    // TODO: implement "move tab group to new window" feature
-    // TODO: prioritize tabs groups in current window
-    // TODO: implement "ungrouped tabs" in tab group tree
+    // TODO: implement "move tab group to new window" feature and prioritize tabs groups in current window
     return (await tabGroupTreeData()).map((tabGroup) => {
       return html`
         ${h(TreeItem, {
@@ -58,7 +54,7 @@ export function SessionView() {
                 addTabToTabGroup(tabGroup);
               }}
             ></sl-icon-button>
-            ${tabGroup.type !== tabGroupTypes.ungrouped
+            ${tabGroup.type === tabGroupTypes.normal
               ? html`<sl-icon-button
                   name="pen"
                   title="Edit"
