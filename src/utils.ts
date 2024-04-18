@@ -45,6 +45,5 @@ export function notify(
 
 // TODO: implement proper error handling. look for keywords `async`, `await` and `chrome`
 // TODO: implement internationalization
-// TODO: add button in alerts to reset view (rerender app)
-// TODO: try removing unused icons from assets without breaking anything, or dont! either way, GOOD LUCK!
-// TODO: promethium-js: allow promises in `adaptEffect`
+// TODO: add button in alerts to reset view (rerender app or reload page)
+// TODO: delete unneeded icons (if necessary). be sure not to break anything if you attempt this!

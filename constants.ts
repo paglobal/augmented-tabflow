@@ -1,4 +1,4 @@
-// TODO: implement migrations for storage using `onInstalled`
+// TODO: implement migrations for storage using `onInstalled` if necessary
 export type AreaName = "sync" | "session";
 
 export type SessionStorageKey = `session-${number}`;
