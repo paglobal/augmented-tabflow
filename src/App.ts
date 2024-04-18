@@ -2,6 +2,7 @@ import { adaptState, h } from "promethium-js";
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { createRef, ref } from "lit/directives/ref.js";
+import { until } from "lit/directives/until.js";
 import { setDefaultAnimation } from "@shoelace-style/shoelace/dist/utilities/animation-registry.js";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import type SlInput from "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -20,8 +21,9 @@ import { Toolbar } from "./Toolbar";
 import { Help } from "./Help";
 import { Dialog } from "./Dialog";
 import { SessionToolbar } from "./SessionToolbar";
-import { tabGroupColors, randomTabGroupColorValue } from "./utils";
 import { DialogForm } from "./DialogForm";
+import { Tree } from "./Tree";
+import { tabGroupColors, randomTabGroupColorValue } from "./utils";
 import {
   createSession,
   updateTabGroup,
@@ -29,6 +31,8 @@ import {
   createTabGroup,
 } from "./sessionService";
 import { createRootBookmarkNode } from "../sharedUtils";
+import { tabGroupTreeContent } from "./tabGroupTreeContent";
+import { fallbackTreeContent } from "./fallbackTreeContent";
 
 // Disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -46,6 +50,7 @@ export const addTabGroupDialogRef = createRef<SlDialog>();
 export const newSessionDialogRef = createRef<SlDialog>();
 export const editSessionDialogRef = createRef<SlDialog>();
 export const editSessionInputRef = createRef<SlInput>();
+export const tabGroupTreeDialogRef = createRef<SlDialog>();
 
 export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
@@ -81,6 +86,20 @@ export function App() {
             })}
           >
             ${h(SessionToolbar)} ${h(Toolbar)} ${h(SessionView)}
+            ${h(Dialog, {
+              label: "Tab Group Tree",
+              content: html`${h(Tree, {
+                contentFn: () =>
+                  html`${until(tabGroupTreeContent(), fallbackTreeContent())}`,
+              })}`,
+              ref: tabGroupTreeDialogRef,
+              fullWidth: true,
+            })}
+            ${h(Dialog, {
+              label: "Help",
+              content: html`${h(Help)}`,
+              ref: helpDialogRef,
+            })}
             ${h(DialogForm, {
               dialogLabel: "Edit Tab Group",
               dialogRef: editTabGroupDialogRefs.dialog,
@@ -127,11 +146,6 @@ export function App() {
               }) {
                 updateTabGroup(currentlyEditedTabGroupId(), data);
               },
-            })}
-            ${h(Dialog, {
-              label: "Help",
-              content: html`${h(Help)}`,
-              ref: helpDialogRef,
             })}
             ${h(DialogForm, {
               dialogLabel: "Save Current Session",

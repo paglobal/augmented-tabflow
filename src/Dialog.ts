@@ -8,6 +8,7 @@ export function Dialog(props: {
   label: string;
   content: TemplateResult;
   ref: Ref<SlDialog>;
+  fullWidth?: boolean;
 }) {
   return () => html`
     <sl-dialog
@@ -17,7 +18,7 @@ export function Dialog(props: {
         fontSize: "1rem",
         color: "var(--sl-color-neutral-800)",
         "--header-spacing": "1rem",
-        "--body-spacing": "1rem 2rem",
+        "--body-spacing": props.fullWidth ? "1rem 1rem" : "1rem 2rem",
       })}
     >
       <div

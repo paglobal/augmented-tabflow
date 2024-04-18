@@ -16,10 +16,9 @@ import { tabGroupTypes } from "../constants";
 const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
 
 export async function tabGroupTreeContent() {
-  // TODO: handle possible error with fallback content and alert
-  // TODO: indicate if audio is playing in tab
   // TODO: implement drag-and-drop for tabs and tab groups
   // TODO: implement "recently closed" tab groups feature
+  // TODO: implement "copy to session / copy to tab group" feature
   return (await tabGroupTreeData()).map((tabGroup) => {
     return html`
       ${h(TreeItem, {
@@ -100,6 +99,16 @@ export async function tabGroupTreeContent() {
                   ></sl-icon-button>
                 `,
                 content: html`
+                  ${tab.mutedInfo?.muted
+                    ? h(TreeItemColorPatchOrIcon, {
+                        icon: "volume-mute",
+                      })
+                    : null}
+                  ${tab.audible && !tab.mutedInfo?.muted
+                    ? h(TreeItemColorPatchOrIcon, {
+                        icon: "volume-up",
+                      })
+                    : null}
                   ${h(TreeItemColorPatchOrIcon, {
                     pageUrl: tab.url,
                     showSpinner:

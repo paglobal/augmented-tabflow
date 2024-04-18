@@ -1,6 +1,10 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
-import { deleteSession, groupUngroupedTabsInWindow } from "./sessionService";
+import {
+  currentSession,
+  deleteSession,
+  groupUngroupedTabsInWindow,
+} from "./sessionService";
 import { notify } from "./utils";
 import { getStorageData } from "../sharedUtils";
 import { sessionStorageKeys } from "../constants";
@@ -10,6 +14,7 @@ import {
   newSessionDialogRef,
   editSessionInputRef,
   editSessionDialogRef,
+  tabGroupTreeDialogRef,
 } from "./App";
 
 export function Toolbar() {
@@ -51,6 +56,13 @@ export function Toolbar() {
             chrome.tabs.reload();
           }}
         ></sl-icon-button>
+        ${typeof currentSession() !== "string"
+          ? html`<sl-icon-button
+              name="list-ul"
+              title="Show Tab Group Tree"
+              @click=${() => tabGroupTreeDialogRef.value?.show()}
+            ></sl-icon-button>`
+          : null}
         <sl-icon-button
           name="plus-circle"
           title="Add Tab Group"

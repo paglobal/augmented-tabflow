@@ -26,6 +26,7 @@ export function SessionView() {
             html`${h(Tree, {
               contentFn: () =>
                 html`${until(sessionTreeContent(), fallbackTreeContent())}`,
+              fullHeight: true,
             })}`,
         ],
       ],
@@ -33,6 +34,7 @@ export function SessionView() {
         html`${h(Tree, {
           contentFn: () =>
             html`${until(tabGroupTreeContent(), fallbackTreeContent())}`,
+          fullHeight: true,
         })}`,
     )}
   `;

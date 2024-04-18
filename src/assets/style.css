@@ -61,6 +61,7 @@ sl-tree-item::part(item):hover {
 
 div.actions-container sl-button-group {
   opacity: 0;
+  background: var(--sl-color-neutral-50);
 }
 
 div.actions-container:hover sl-button-group {
