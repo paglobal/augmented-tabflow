@@ -1,10 +1,4 @@
-import { sessionStorageKeys } from "./constants";
-import {
-  closePreviousSession,
-  createRootBookmarkNode,
-  subscribeToStorageData,
-  updateTabGroupTreeData,
-} from "./sharedUtils";
+import { createRootBookmarkNode, updateTabGroupTreeData } from "./sharedUtils";
 
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })

@@ -2,32 +2,32 @@ import { html } from "lit";
 import { h } from "promethium-js";
 import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
-import { sessionTreeData } from "./sessionService";
+import { openNewSession, sessionsTreeData } from "./sessionService";
 import { helpDialogRef, saveCurrentSessionDialogRef } from "./App";
-import { sessionToolbarSelectRef } from "./SessionToolbar";
 import { setStorageData } from "../sharedUtils";
 import { sessionStorageKeys } from "../constants";
 
-export async function sessionTreeContent() {
-  const sessionTree = (await sessionTreeData()).map((sessionData) => {
+export async function sessionsTreeContent() {
+  const sessionTreeContent = (await sessionsTreeData()).map((sessionData) => {
     return html`
       ${h(TreeItem, {
         content: html`${h(TreeItemColorPatchOrIcon, {
           icon: "window",
         })}${sessionData.title}`,
         tooltipContent: sessionData.title,
-        onSelect(e: Event) {
+        async onSelect(e: Event) {
           e.stopPropagation();
-          if (sessionToolbarSelectRef.value) {
-            sessionToolbarSelectRef.value.value = sessionData.id;
-            setStorageData(sessionStorageKeys.currentSessionId, sessionData.id);
-          }
+          await setStorageData(
+            sessionStorageKeys.currentSessionId,
+            sessionData.id,
+          );
+          await openNewSession(sessionData.id);
         },
       })}
     `;
   });
 
-  sessionTree?.unshift(
+  sessionTreeContent?.unshift(
     html`${h(TreeItem, {
       content: html`${h(TreeItemColorPatchOrIcon, {
         icon: "question-circle",
@@ -50,7 +50,19 @@ export async function sessionTreeContent() {
         saveCurrentSessionDialogRef.value?.show();
       },
     })}`,
+    html`${h(TreeItem, {
+      content: html`${h(TreeItemColorPatchOrIcon, {
+        icon: "window-x",
+      })}
+      Exit Current Session`,
+      tooltipContent: "Exit Current Session",
+      async onSelect(e: Event) {
+        e.stopPropagation();
+        await setStorageData(sessionStorageKeys.currentSessionId, "");
+        await openNewSession();
+      },
+    })}`,
   );
 
-  return sessionTree;
+  return sessionTreeContent;
 }

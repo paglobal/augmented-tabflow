@@ -17,6 +17,7 @@ export function Tree(props: {
         overflowY: "auto",
       })}
       selection="leaf"
+      tabindex="-1"
       @sl-selection-change=${(e: SlSelectionChangeEvent) => {
         e.detail.selection.forEach((treeItem) => treeItem.click());
       }}

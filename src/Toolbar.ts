@@ -56,7 +56,7 @@ export function Toolbar() {
             chrome.tabs.reload();
           }}
         ></sl-icon-button>
-        ${typeof currentSessionId() !== "string" || currentSessionId() === ""
+        ${!currentSessionId()
           ? html`<sl-icon-button
               name="list-ul"
               title="Show Tab Group Tree"

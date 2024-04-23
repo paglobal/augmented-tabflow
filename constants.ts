@@ -16,8 +16,10 @@ export const sessionStorageKeys = {
   ungroupedTabGroupCollapsed: "session-5",
   // not a typo!
   recentlyClosedTabGroupGroupCollapsed: "session-6",
-  tabsToBeDiscarded: "session-7",
-  tabsToBePreparedForDiscarding: "session-8",
+  tabs_discardOnUpdate: "session-7",
+  tabs_discard: "session-8",
+  tabs_skipSessionDataUpdate: "session-9",
+  tabGroups_skipSessionDataUpdate: "session-10",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;
@@ -39,14 +41,4 @@ export const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
 
 export const ungroupedTabGroupTitle = "Ungrouped";
 
-export const tabGroupColorList = [
-  "grey",
-  "blue",
-  "red",
-  "yellow",
-  "green",
-  "pink",
-  "purple",
-  "cyan",
-  "orange",
-] as const;
+export const unsavedSessionTitle = "Unsaved Session";

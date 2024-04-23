@@ -20,7 +20,7 @@ import { SessionView } from "./SessionView";
 import { Toolbar } from "./Toolbar";
 import { Help } from "./Help";
 import { Dialog } from "./Dialog";
-import { SessionToolbar } from "./SessionToolbar";
+import { SessionIndicator } from "./SessionIndicator";
 import { DialogForm } from "./DialogForm";
 import { Tree } from "./Tree";
 import { tabGroupColors, randomTabGroupColorValue } from "./utils";
@@ -33,6 +33,7 @@ import {
 import { createRootBookmarkNode } from "../sharedUtils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
+import { sessionsTreeContent } from "./sessionsTreeContent";
 
 // Disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -51,6 +52,7 @@ export const newSessionDialogRef = createRef<SlDialog>();
 export const editSessionDialogRef = createRef<SlDialog>();
 export const editSessionInputRef = createRef<SlInput>();
 export const tabGroupTreeDialogRef = createRef<SlDialog>();
+export const sessionsTreeDialogRef = createRef<SlDialog>();
 
 export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
@@ -85,7 +87,17 @@ export function App() {
               paddingBottom: "1.5rem",
             })}
           >
-            ${h(SessionToolbar)} ${h(Toolbar)} ${h(SessionView)}
+            ${h(SessionIndicator)} ${h(Toolbar)} ${h(SessionView)}
+            ${h(Dialog, {
+              label: "Sessions",
+              content: html`${h(Tree, {
+                contentFn: () =>
+                  html`${until(sessionsTreeContent(), fallbackTreeContent())}`,
+              })}`,
+              ref: sessionsTreeDialogRef,
+              fullWidth: true,
+              noTopBodyMargin: true,
+            })}
             ${h(Dialog, {
               label: "Tab Group Tree",
               content: html`${h(Tree, {

@@ -60,33 +60,24 @@ sl-tree-item::part(item):hover {
 }
 
 div.actions-container sl-button-group {
-  opacity: 0;
+  background: var(--sl-color-neutral-0);
+}
+
+sl-dialog div.actions-container sl-button-group {
   background: var(--sl-color-neutral-50);
 }
 
-div.actions-container:hover sl-button-group {
-  opacity: 1;
+sl-tree-item[selected] sl-button-group {
+  background: var(--sl-color-neutral-100);
 }
 
-sl-tree-item:focus-visible > div.actions-container sl-button-group {
-  opacity: 1;
-}
-
-sl-tree-item:focus-within > div.actions-container sl-button-group {
-  opacity: 1;
-}
-
-sl-tree-item sl-button-group {
-  background: var(--sl-color-neutral-0);
+sl-dialog sl-tree-item[selected] sl-button-group {
+  background: var(--sl-color-neutral-100);
 }
 
 sl-tree-item sl-icon-button::part(base):focus-visible {
   outline: 0.2rem solid var(--sl-color-primary-700);
   outline-offset: -0.2rem;
-}
-
-sl-tree-item[selected] sl-button-group {
-  background: var(--sl-color-neutral-100);
 }
 
 div.actions-container {

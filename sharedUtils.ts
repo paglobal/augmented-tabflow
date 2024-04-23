@@ -8,7 +8,6 @@ import {
   tabGroupTypes,
   sessionStorageKeys,
   ungroupedTabGroupTitle,
-  tabGroupColorList,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -29,14 +28,14 @@ export async function setStorageData<T = unknown>(
 
 export async function subscribeToStorageData<T = unknown>(
   key: SyncStorageKey | SessionStorageKey,
-  fn: (changes: { newValue: T; oldValue: T | undefined }) => void,
+  fn: (changes: { newValue: T | undefined; oldValue: T | undefined }) => void,
 ) {
   chrome.storage.onChanged.addListener((changes, areaName) => {
     const keyAreaName = key.split("-")[0] as AreaName;
     if (areaName === keyAreaName) {
       const newStorageData = changes[key]?.newValue;
       const oldStorageData = changes[key]?.oldValue;
-      if (newStorageData !== undefined) {
+      if (newStorageData !== undefined || oldStorageData !== undefined) {
         fn({ newValue: newStorageData, oldValue: oldStorageData });
       }
     }
@@ -177,76 +176,5 @@ export async function createRootBookmarkNode() {
     }
   } catch (e) {
     // no error handling here. we'll do that in the sidepanel ui
-  }
-}
-
-export async function closePreviousSession(
-  newSessionWindowId: chrome.windows.Window["id"],
-) {
-  const normalWindows = await chrome.windows.getAll({
-    windowTypes: ["normal"],
-  });
-  normalWindows.forEach(async (window) => {
-    if (window.id !== undefined && window.id !== newSessionWindowId) {
-      await chrome.windows.remove(window.id);
-    }
-  });
-}
-
-async function initSessionTabs(
-  sessionId: chrome.bookmarks.BookmarkTreeNode["id"],
-) {
-  const sessionData = (await chrome.bookmarks.getSubTree(sessionId))[0];
-  for (const tabGroupData of sessionData.children ?? []) {
-    const tabGroupColor = tabGroupData.title.split(
-      "-",
-    )[0] as chrome.tabGroups.Color;
-    const isUngroupedTabGroupData =
-      tabGroupData.title === ungroupedTabGroupTitle;
-    if (tabGroupData.url) {
-      await chrome.bookmarks.remove(tabGroupData.id);
-
-      continue;
-    }
-    if (
-      !tabGroupColorList.includes(tabGroupColor) &&
-      !isUngroupedTabGroupData
-    ) {
-      await chrome.bookmarks.removeTree(tabGroupData.id);
-
-      continue;
-    }
-    const tabIds: chrome.tabs.Tab["id"][] = [];
-    for (const tabData of tabGroupData.children ?? []) {
-      if (tabData.children) {
-        await chrome.bookmarks.removeTree(tabData.id);
-
-        continue;
-      }
-      if (tabData.url) {
-        const tab = await chrome.tabs.create({
-          active: false,
-          url: tabData.url,
-        });
-        tabIds.push(tab.id);
-      }
-    }
-    if (!isUngroupedTabGroupData) {
-      const tabGroupTitle = tabGroupData.title.split("-").slice(1).join("-");
-      const tabGroupId = await chrome.tabs.group({
-        tabIds: tabIds as [number, ...number[]],
-      });
-      await chrome.tabGroups.update(tabGroupId, {
-        title: tabGroupTitle,
-        color: tabGroupColor,
-      });
-    }
-  }
-}
-
-export async function openNewSession(
-  sessionId?: chrome.bookmarks.BookmarkTreeNode["id"],
-) {
-  if (sessionId !== undefined) {
   }
 }
