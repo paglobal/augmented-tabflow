@@ -9,7 +9,15 @@ export function Dialog(props: {
   content: TemplateResult;
   ref: Ref<SlDialog>;
   fullWidth?: boolean;
+  noTopBodyMargin?: boolean;
 }) {
+  const bodyMargins = {
+    top: props.noTopBodyMargin ? "0" : "1rem",
+    right: props.fullWidth ? "1rem" : "2rem",
+    left: props.fullWidth ? "1rem" : "2rem",
+    bottom: "1rem",
+  };
+
   return () => html`
     <sl-dialog
       label=${props.label}
@@ -18,7 +26,7 @@ export function Dialog(props: {
         fontSize: "1rem",
         color: "var(--sl-color-neutral-800)",
         "--header-spacing": "1rem",
-        "--body-spacing": props.fullWidth ? "1rem 1rem" : "1rem 2rem",
+        "--body-spacing": `${bodyMargins.top} ${bodyMargins.right} ${bodyMargins.bottom} ${bodyMargins.left}`,
       })}
     >
       <div

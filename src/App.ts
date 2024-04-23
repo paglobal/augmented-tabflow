@@ -27,12 +27,12 @@ import { tabGroupColors, randomTabGroupColorValue } from "./utils";
 import {
   createSession,
   updateTabGroup,
-  updateCurrentSessionTitle,
+  updateSessionTitle,
   createTabGroup,
 } from "./sessionService";
 import { createRootBookmarkNode } from "../sharedUtils";
-import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { fallbackTreeContent } from "./fallbackTreeContent";
+import { tabGroupTreeContent } from "./tabGroupTreeContent";
 
 // Disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -94,11 +94,13 @@ export function App() {
               })}`,
               ref: tabGroupTreeDialogRef,
               fullWidth: true,
+              noTopBodyMargin: true,
             })}
             ${h(Dialog, {
               label: "Help",
               content: html`${h(Help)}`,
               ref: helpDialogRef,
+              noTopBodyMargin: true,
             })}
             ${h(DialogForm, {
               dialogLabel: "Edit Tab Group",
@@ -222,7 +224,7 @@ export function App() {
               `,
               submitButtonText: "Save",
               formAction({ title }: { title: string }) {
-                updateCurrentSessionTitle(title);
+                updateSessionTitle(true, title);
               },
             })}
           </div>

@@ -1,23 +1,19 @@
 import { adaptState } from "promethium-js";
 import {
-  type TabGroupType,
   sessionStorageKeys,
   syncStorageKeys,
   tabGroupTypes,
-  messageTypes,
+  ungroupedTabGroupTitle,
 } from "../constants";
-import { notify } from "./utils";
+import { notify, tabGroupColors } from "./utils";
 import {
+  type TabGroupTreeData,
   getStorageData,
   setStorageData,
   subscribeToStorageData,
+  updateTabGroupTreeData,
+  closePreviousSession,
 } from "../sharedUtils";
-
-export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
-  type?: TabGroupType;
-  icon?: string;
-  tabs: chrome.tabs.Tab[];
-})[];
 
 export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
   Promise<TabGroupTreeData> | TabGroupTreeData
@@ -39,7 +35,7 @@ subscribeToStorageData<TabGroupTreeData>(
 export function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
   if (tabGroup.type === tabGroupTypes.ungrouped) {
     setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, false);
-    chrome.runtime.sendMessage(messageTypes.updateTabGroupTreeData);
+    updateTabGroupTreeData();
   } else if (tabGroup.type === tabGroupTypes.normal) {
     chrome.tabGroups.update(tabGroup.id, {
       collapsed: false,
@@ -50,7 +46,7 @@ export function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
 export function collapseTabGroup(tabGroup: TabGroupTreeData[number]) {
   if (tabGroup.type === tabGroupTypes.ungrouped) {
     setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, true);
-    chrome.runtime.sendMessage(messageTypes.updateTabGroupTreeData);
+    updateTabGroupTreeData();
   } else if (tabGroup.type === tabGroupTypes.normal) {
     chrome.tabGroups.update(tabGroup.id, {
       collapsed: true,
@@ -109,44 +105,43 @@ export async function createTabGroup(options: {
 }
 
 export function updateTabGroup(
-  id: chrome.tabGroups.TabGroup["id"] | null,
+  tabId: chrome.tabGroups.TabGroup["id"] | null,
   options: {
     title: chrome.tabGroups.TabGroup["title"];
     color: chrome.tabGroups.Color;
   },
 ) {
-  if (id) {
-    chrome.tabGroups.update(id, {
+  if (tabId) {
+    chrome.tabGroups.update(tabId, {
       title: options.title,
       color: options.color,
     });
   }
 }
 
-export const [currentSession, setCurrentSession] = adaptState<
+export const [currentSessionId, setCurrentSessionId] = adaptState<
   chrome.bookmarks.BookmarkTreeNode["id"] | null | undefined
 >(null);
 
-async function updateCurrentSession(
-  newSession?: chrome.bookmarks.BookmarkTreeNode["id"],
+async function updateCurrentSessionId(
+  newSessionId?: chrome.bookmarks.BookmarkTreeNode["id"],
 ) {
-  if (newSession) {
-    setCurrentSession(newSession);
+  if (newSessionId) {
+    setCurrentSessionId(newSessionId);
   } else {
-    const currentSession = await getStorageData<
+    const currentSessionId = await getStorageData<
       chrome.bookmarks.BookmarkTreeNode["id"]
-    >(sessionStorageKeys.currentSession);
-
-    setCurrentSession(currentSession);
+    >(sessionStorageKeys.currentSessionId);
+    setCurrentSessionId(currentSessionId);
   }
 }
 
-updateCurrentSession();
+updateCurrentSessionId();
 
 subscribeToStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
-  sessionStorageKeys.currentSession,
+  sessionStorageKeys.currentSessionId,
   ({ newValue }) => {
-    setCurrentSession(newValue);
+    setCurrentSessionId(newValue);
   },
 );
 
@@ -158,10 +153,19 @@ export const [sessionTreeData, setSessionTreeData] = adaptState<
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(syncStorageKeys.rootBookmarkNodeId);
   if (rootBookmarkNodeId) {
-    const sessionTreeData =
-      await chrome.bookmarks.getChildren(rootBookmarkNodeId);
+    const sessionDataChildren = (
+      await chrome.bookmarks.getChildren(rootBookmarkNodeId)
+    ).filter(async (tabGroupData) => {
+      if (tabGroupData.url) {
+        await chrome.bookmarks.remove(tabGroupData.id);
 
-    return sessionTreeData ?? [];
+        return false;
+      }
+
+      return true;
+    });
+
+    return sessionDataChildren ?? [];
   } else {
     return [];
   }
@@ -172,9 +176,18 @@ async function updateSessionTreeData() {
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(syncStorageKeys.rootBookmarkNodeId);
   if (rootBookmarkNodeId) {
-    const sessionTreeData =
-      await chrome.bookmarks.getChildren(rootBookmarkNodeId);
-    setSessionTreeData(sessionTreeData);
+    const sessionDataChildren = (
+      await chrome.bookmarks.getChildren(rootBookmarkNodeId)
+    ).filter(async (tabGroupData) => {
+      if (tabGroupData.url) {
+        await chrome.bookmarks.remove(tabGroupData.id);
+
+        return false;
+      }
+
+      return true;
+    });
+    setSessionTreeData(sessionDataChildren);
   }
 }
 
@@ -209,8 +222,8 @@ export async function createSession(
       sessionStorageKeys.tabGroupTreeData,
     );
     if (tabGroupTreeData) {
-      for await (const tabGroup of tabGroupTreeData) {
-        const tabGroupBookmarkId = (
+      for (const tabGroup of tabGroupTreeData) {
+        const tabGroupDataId = (
           await chrome.bookmarks.create({
             parentId: session,
             title: tabGroup.icon
@@ -218,9 +231,9 @@ export async function createSession(
               : `${tabGroup.color}-${tabGroup.title}`,
           })
         ).id;
-        for await (const tab of tabGroup.tabs) {
+        for (const tab of tabGroup.tabs) {
           await chrome.bookmarks.create({
-            parentId: tabGroupBookmarkId,
+            parentId: tabGroupDataId,
             title: tab.title,
             url: tab.url,
           });
@@ -231,20 +244,30 @@ export async function createSession(
   notify("Session created successfully", "success");
 }
 
-export async function updateCurrentSessionTitle(title: string) {
-  const currentSession = await getStorageData<
-    chrome.bookmarks.BookmarkTreeNode["id"]
-  >(sessionStorageKeys.currentSession);
-  if (currentSession) {
-    await chrome.bookmarks.update(currentSession, { title });
-  } else {
-    notify("Session does not exist", "danger");
+export async function updateSessionTitle(
+  sesssionIdOrIsCurrentSession: chrome.bookmarks.BookmarkTreeNode["id"] | true,
+  title: string,
+) {
+  if (sesssionIdOrIsCurrentSession === true) {
+    const currentSessionId = await getStorageData<
+      chrome.bookmarks.BookmarkTreeNode["id"]
+    >(sessionStorageKeys.currentSessionId);
+    if (currentSessionId) {
+      await chrome.bookmarks.update(currentSessionId, { title });
+    } else {
+      notify("Session does not exist", "danger");
+    }
+  } else if (typeof sesssionIdOrIsCurrentSession === "string") {
+    await chrome.bookmarks.update(sesssionIdOrIsCurrentSession, { title });
   }
 }
 
 export async function deleteSession(
-  session: chrome.bookmarks.BookmarkTreeNode["id"],
+  sessionId: chrome.bookmarks.BookmarkTreeNode["id"],
+  isCurrentSession?: boolean,
 ) {
-  await chrome.bookmarks.removeTree(session);
-  await chrome.storage.session.remove(sessionStorageKeys.currentSession);
+  await chrome.bookmarks.removeTree(sessionId);
+  if (isCurrentSession) {
+    await setStorageData(sessionStorageKeys.currentSessionId, undefined);
+  }
 }

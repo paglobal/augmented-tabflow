@@ -11,9 +11,7 @@ import {
   tabGroupTreeData,
 } from "./sessionService";
 import { editTabGroupDialogRefs, setCurrentlyEditedTabGroupId } from "./App";
-import { tabGroupTypes } from "../constants";
-
-const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
+import { newTabUrls, tabGroupTypes } from "../constants";
 
 export async function tabGroupTreeContent() {
   // TODO: implement drag-and-drop for tabs and tab groups
@@ -106,7 +104,7 @@ export async function tabGroupTreeContent() {
                     : null}
                   ${tab.audible && !tab.mutedInfo?.muted
                     ? h(TreeItemColorPatchOrIcon, {
-                        icon: "volume-up",
+                        icon: "volume-down",
                       })
                     : null}
                   ${h(TreeItemColorPatchOrIcon, {

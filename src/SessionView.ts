@@ -6,36 +6,49 @@ import { Tree } from "./Tree";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { sessionTreeContent } from "./sessionTreeContent";
 import { fallbackTreeContent } from "./fallbackTreeContent";
-import { currentSession } from "./sessionService";
+import { currentSessionId } from "./sessionService";
 
 export function SessionView() {
-  return () => html`
-    ${choose(
-      currentSession(),
-      [
+  return () => {
+    console.log(currentSessionId());
+
+    return html`
+      ${choose(
+        currentSessionId(),
         [
-          null,
-          () =>
-            html`${h(Tree, {
-              contentFn: () => html`${fallbackTreeContent()}`,
-            })}`,
+          [
+            null,
+            () =>
+              html`${h(Tree, {
+                contentFn: () => html`${fallbackTreeContent()}`,
+              })}`,
+          ],
+          [
+            undefined,
+            () =>
+              html`${h(Tree, {
+                contentFn: () =>
+                  html`${until(sessionTreeContent(), fallbackTreeContent())}`,
+                fullHeight: true,
+              })}`,
+          ],
+          [
+            "",
+            () =>
+              html`${h(Tree, {
+                contentFn: () =>
+                  html`${until(sessionTreeContent(), fallbackTreeContent())}`,
+                fullHeight: true,
+              })}`,
+          ],
         ],
-        [
-          undefined,
-          () =>
-            html`${h(Tree, {
-              contentFn: () =>
-                html`${until(sessionTreeContent(), fallbackTreeContent())}`,
-              fullHeight: true,
-            })}`,
-        ],
-      ],
-      () =>
-        html`${h(Tree, {
-          contentFn: () =>
-            html`${until(tabGroupTreeContent(), fallbackTreeContent())}`,
-          fullHeight: true,
-        })}`,
-    )}
-  `;
+        () =>
+          html`${h(Tree, {
+            contentFn: () =>
+              html`${until(tabGroupTreeContent(), fallbackTreeContent())}`,
+            fullHeight: true,
+          })}`,
+      )}
+    `;
+  };
 }

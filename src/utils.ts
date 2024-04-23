@@ -48,3 +48,6 @@ export function notify(
 // TODO: implement internationalization
 // TODO: add button in alerts to reset view (rerender app or reload page)
 // TODO: delete unneeded icons (if necessary). be sure not to break anything if you attempt this!
+// TODO: type all `setStorageData` and `getStorageData` calls automatically
+// TODO: general code inspection and refactoring
+// TODO: add more entries to the `newTabUrls` array to cater for more browsers

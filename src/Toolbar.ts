@@ -1,7 +1,7 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import {
-  currentSession,
+  currentSessionId,
   deleteSession,
   groupUngroupedTabsInWindow,
 } from "./sessionService";
@@ -56,7 +56,7 @@ export function Toolbar() {
             chrome.tabs.reload();
           }}
         ></sl-icon-button>
-        ${typeof currentSession() !== "string"
+        ${typeof currentSessionId() !== "string" || currentSessionId() === ""
           ? html`<sl-icon-button
               name="list-ul"
               title="Show Tab Group Tree"
@@ -83,13 +83,13 @@ export function Toolbar() {
           title="Edit Current Session Title"
           @click=${async () => {
             if (editSessionInputRef.value) {
-              const currentSession = await getStorageData<
+              const currentSessionId = await getStorageData<
                 chrome.bookmarks.BookmarkTreeNode["id"]
-              >(sessionStorageKeys.currentSession);
-              if (currentSession) {
+              >(sessionStorageKeys.currentSessionId);
+              if (currentSessionId) {
                 editSessionDialogRef.value?.show();
                 const currentSessionData = (
-                  await chrome.bookmarks.get(currentSession)
+                  await chrome.bookmarks.get(currentSessionId)
                 )[0];
                 setTimeout(() => {
                   if (editSessionInputRef.value) {
@@ -106,11 +106,11 @@ export function Toolbar() {
           name="trash"
           title="Delete Current Session"
           @click=${async () => {
-            const currentSession = await getStorageData<
+            const currentSessionId = await getStorageData<
               chrome.bookmarks.BookmarkTreeNode["id"]
-            >(sessionStorageKeys.currentSession);
-            if (currentSession) {
-              deleteSession(currentSession);
+            >(sessionStorageKeys.currentSessionId);
+            if (currentSessionId) {
+              deleteSession(currentSessionId, true);
             } else {
               notify("Current session is unsaved", "warning");
             }
