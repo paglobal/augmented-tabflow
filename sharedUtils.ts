@@ -113,9 +113,9 @@ export async function updateTabGroupTreeData() {
   const debounceTabGroupTreeDataUpdates = await getStorageData<boolean>(
     sessionStorageKeys.debounceTabGroupTreeDataUpdates,
   );
-  const tabGroupTreeDataUpdateTimeoutId = await getStorageData<
-    number | undefined
-  >(sessionStorageKeys.tabGroupTreeDataUpdateTimeoutId);
+  const tabGroupTreeDataUpdateTimeoutId = await getStorageData<number>(
+    sessionStorageKeys.tabGroupTreeDataUpdateTimeoutId,
+  );
   if (!debounceTabGroupTreeDataUpdates) {
     applyUpdates();
     await setStorageData(

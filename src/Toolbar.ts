@@ -1,7 +1,8 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
+import { until } from "lit/directives/until.js";
 import {
-  currentSessionId,
+  currentSessionData,
   deleteSession,
   groupUngroupedTabsInWindow,
 } from "./sessionService";
@@ -18,6 +19,18 @@ import {
 } from "./App";
 
 export function Toolbar() {
+  async function tabGroupTreeButton() {
+    const _currentSessionData = await currentSessionData();
+
+    return _currentSessionData
+      ? null
+      : html`<sl-icon-button
+          name="list-ul"
+          title="Show Tab Group Tree"
+          @click=${() => tabGroupTreeDialogRef.value?.show()}
+        ></sl-icon-button>`;
+  }
+
   return () =>
     html` <div
       style=${styleMap({
@@ -56,13 +69,7 @@ export function Toolbar() {
             chrome.tabs.reload();
           }}
         ></sl-icon-button>
-        ${!currentSessionId()
-          ? html`<sl-icon-button
-              name="list-ul"
-              title="Show Tab Group Tree"
-              @click=${() => tabGroupTreeDialogRef.value?.show()}
-            ></sl-icon-button>`
-          : null}
+        ${until(tabGroupTreeButton(), null)}
         <sl-icon-button
           name="plus-circle"
           title="Add Tab Group"
@@ -83,14 +90,12 @@ export function Toolbar() {
           title="Edit Current Session Title"
           @click=${async () => {
             if (editSessionInputRef.value) {
-              const currentSessionId = await getStorageData<
-                chrome.bookmarks.BookmarkTreeNode["id"]
-              >(sessionStorageKeys.currentSessionId);
-              if (currentSessionId) {
+              const currentSessionData =
+                await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
+                  sessionStorageKeys.currentSessionData,
+                );
+              if (currentSessionData) {
                 editSessionDialogRef.value?.show();
-                const currentSessionData = (
-                  await chrome.bookmarks.get(currentSessionId)
-                )[0];
                 setTimeout(() => {
                   if (editSessionInputRef.value) {
                     editSessionInputRef.value.value = currentSessionData.title;
@@ -106,11 +111,12 @@ export function Toolbar() {
           name="trash"
           title="Delete Current Session"
           @click=${async () => {
-            const currentSessionId = await getStorageData<
-              chrome.bookmarks.BookmarkTreeNode["id"]
-            >(sessionStorageKeys.currentSessionId);
-            if (currentSessionId) {
-              deleteSession(currentSessionId, true);
+            const currentSessionData =
+              await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
+                sessionStorageKeys.currentSessionData,
+              );
+            if (currentSessionData) {
+              deleteSession(currentSessionData.id, true);
             } else {
               notify("Current session is unsaved", "warning");
             }

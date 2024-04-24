@@ -2,13 +2,17 @@ import { html } from "lit";
 import { h } from "promethium-js";
 import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
-import { openNewSession, sessionsTreeData } from "./sessionService";
+import {
+  currentSessionData,
+  openNewSession,
+  sessionsTreeData,
+} from "./sessionService";
 import { helpDialogRef, saveCurrentSessionDialogRef } from "./App";
 import { setStorageData } from "../sharedUtils";
 import { sessionStorageKeys } from "../constants";
 
 export async function sessionsTreeContent() {
-  const sessionTreeContent = (await sessionsTreeData()).map((sessionData) => {
+  const sessionsTreeContent = (await sessionsTreeData()).map((sessionData) => {
     return html`
       ${h(TreeItem, {
         content: html`${h(TreeItemColorPatchOrIcon, {
@@ -17,17 +21,31 @@ export async function sessionsTreeContent() {
         tooltipContent: sessionData.title,
         async onSelect(e: Event) {
           e.stopPropagation();
-          await setStorageData(
-            sessionStorageKeys.currentSessionId,
-            sessionData.id,
-          );
-          await openNewSession(sessionData.id);
+          await openNewSession(sessionData);
         },
       })}
     `;
   });
 
-  sessionTreeContent?.unshift(
+  const _currentSessionData = await currentSessionData();
+
+  if (_currentSessionData) {
+    sessionsTreeContent.unshift(
+      html`${h(TreeItem, {
+        content: html`${h(TreeItemColorPatchOrIcon, {
+          icon: "window-x",
+        })}
+        Exit Current Session`,
+        tooltipContent: "Exit Current Session",
+        async onSelect(e: Event) {
+          e.stopPropagation();
+          await openNewSession(null);
+        },
+      })}`,
+    );
+  }
+
+  sessionsTreeContent?.unshift(
     html`${h(TreeItem, {
       content: html`${h(TreeItemColorPatchOrIcon, {
         icon: "question-circle",
@@ -50,19 +68,7 @@ export async function sessionsTreeContent() {
         saveCurrentSessionDialogRef.value?.show();
       },
     })}`,
-    html`${h(TreeItem, {
-      content: html`${h(TreeItemColorPatchOrIcon, {
-        icon: "window-x",
-      })}
-      Exit Current Session`,
-      tooltipContent: "Exit Current Session",
-      async onSelect(e: Event) {
-        e.stopPropagation();
-        await setStorageData(sessionStorageKeys.currentSessionId, "");
-        await openNewSession();
-      },
-    })}`,
   );
 
-  return sessionTreeContent;
+  return sessionsTreeContent;
 }

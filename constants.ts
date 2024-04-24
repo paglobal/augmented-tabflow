@@ -10,7 +10,7 @@ export type SessionStorageKey = `session-${number}`;
 
 export const sessionStorageKeys = {
   tabGroupTreeData: "session-1",
-  currentSessionId: "session-2",
+  currentSessionData: "session-2",
   debounceTabGroupTreeDataUpdates: "session-3",
   tabGroupTreeDataUpdateTimeoutId: "session-4",
   ungroupedTabGroupCollapsed: "session-5",
@@ -20,6 +20,7 @@ export const sessionStorageKeys = {
   tabs_discard: "session-8",
   tabs_skipSessionDataUpdate: "session-9",
   tabGroups_skipSessionDataUpdate: "session-10",
+  previousUnsavedSessionTabGroupTreeData: "session-11",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;

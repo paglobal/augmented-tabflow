@@ -1,4 +1,10 @@
-import { createRootBookmarkNode, updateTabGroupTreeData } from "./sharedUtils";
+import { sessionStorageKeys } from "./constants";
+import {
+  createRootBookmarkNode,
+  setStorageData,
+  subscribeToStorageData,
+  updateTabGroupTreeData,
+} from "./sharedUtils";
 
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
@@ -60,3 +66,10 @@ chrome.tabs.onReplaced.addListener(() => {
 chrome.tabs.onUpdated.addListener(() => {
   updateTabGroupTreeData();
 });
+
+subscribeToStorageData<chrome.bookmarks.BookmarkTreeNode>(
+  sessionStorageKeys.currentSessionData,
+  () => {
+    setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, true);
+  },
+);

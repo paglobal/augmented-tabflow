@@ -46,8 +46,9 @@ export function notify(
 // TODO: implement proper error handling. look for keywords `async`, `await` and `chrome`
 // TODO: handle possible errors in tree content functions with fallback content and alerts
 // TODO: implement internationalization
-// TODO: add button in alerts to reset view (rerender app or reload page)
+// TODO: add button in some alerts to reset view (rerender app or reload page or reopen sidepanel)
 // TODO: delete unneeded icons (if necessary). be sure not to break anything if you attempt this!
 // TODO: type all `setStorageData` and `getStorageData` calls automatically
 // TODO: general code inspection and refactoring
 // TODO: add more entries to the `newTabUrls` array to cater for more browsers
+// TODO: restore unsaved session data on session exit

@@ -1,23 +1,23 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
-import { currentSessionId } from "./sessionService";
-import { unsavedSessionTitle } from "../constants";
 import { until } from "lit/directives/until.js";
+import { currentSessionData } from "./sessionService";
+import { unsavedSessionTitle } from "../constants";
 import { sessionsTreeDialogRef } from "./App";
 
 export function SessionIndicator() {
   async function currentSessionTitle() {
-    try {
-      const _currentSessionId = currentSessionId();
-      console.log(currentSessionId());
-      if (_currentSessionId) {
-        return (await chrome.bookmarks.get(_currentSessionId))[0].title;
-      } else {
-        return unsavedSessionTitle;
-      }
-    } catch (e) {
-      return unsavedSessionTitle;
-    }
+    const _currentSessionData = await currentSessionData();
+
+    return _currentSessionData
+      ? _currentSessionData.title
+      : unsavedSessionTitle;
+  }
+
+  async function buttonVariant() {
+    const _currentSessionData = await currentSessionData();
+
+    return _currentSessionData ? "primary" : "default";
   }
 
   return () =>
@@ -28,7 +28,7 @@ export function SessionIndicator() {
       })}
     >
       <sl-button
-        variant=${!currentSessionId() ? "default" : "primary"}
+        variant=${until(buttonVariant(), "default")}
         outline
         style=${styleMap({ width: "100%" })}
         @click=${() => {
