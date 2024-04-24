@@ -14,9 +14,6 @@ import { editTabGroupDialogRefs, setCurrentlyEditedTabGroupId } from "./App";
 import { newTabUrls, tabGroupTypes } from "../constants";
 
 export async function tabGroupTreeContent() {
-  // TODO: implement drag-and-drop for tabs and tab groups
-  // TODO: implement "recently closed" tab groups feature
-  // TODO: implement "copy to session / copy to tab group" feature
   return (await tabGroupTreeData()).map((tabGroup) => {
     return html`
       ${h(TreeItem, {

@@ -10,7 +10,6 @@ function faviconUrl(pageUrl: string) {
   return url.toString();
 }
 
-// TODO: resolve unloaded tab status thingy
 export function TreeItemColorPatchOrIcon(props: {
   color?: chrome.tabGroups.TabGroup["color"];
   icon?: string;

@@ -12,7 +12,6 @@ export function TreeItem(props: {
   onCollapse?: (e: Event) => void;
   onSelect?: (e: Event) => void;
 }) {
-  // TODO: fix accessibility issues relating to keyboard navigation (enter should cause element click)
   return () => html`
     <sl-tree-item
       title=${props.tooltipContent}

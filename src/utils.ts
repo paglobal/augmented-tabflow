@@ -43,12 +43,23 @@ export function notify(
   alert.toast();
 }
 
-// TODO: implement proper error handling. look for keywords `async`, `await` and `chrome`
-// TODO: handle possible errors in tree content functions with fallback content and alerts
-// TODO: implement internationalization
+// --- Later ---
+// TODO: fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click)
+// TODO: add more entries to the `newTabUrls` array to cater for more browsers
+// TODO: resolve unloaded tab status thingy with `TreeItemColorPatchOrIcon` component
 // TODO: add button in some alerts to reset view (rerender app or reload page or reopen sidepanel)
 // TODO: delete unneeded icons (if necessary). be sure not to break anything if you attempt this!
-// TODO: type all `setStorageData` and `getStorageData` calls automatically
+// TODO: implement internationalization
+//
+// --- Urgent ---
+// TODO: implement proper error handling. look for keywords `async`, `await` and `chrome`
+// TODO: handle possible errors in async html template functions with fallback content and alerts. look for keyword `until`
 // TODO: general code inspection and refactoring
-// TODO: add more entries to the `newTabUrls` array to cater for more browsers
-// TODO: restore unsaved session data on session exit
+// TODO: type all `setStorageData` and `getStorageData` for automatic inference
+//
+// --- Super Urgent. Implement Before Release! ---
+// TODO: implement drag-and-drop for tabs and tab groups
+// TODO: implement "recently closed" tab groups feature
+// TODO: implement "copy to session / copy to tab group" feature
+// TODO: implement tab discarding
+// TODO: implement automatic session saving
