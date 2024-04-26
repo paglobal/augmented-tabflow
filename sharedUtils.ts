@@ -36,13 +36,10 @@ export async function subscribeToStorageData<T = unknown>(
 ) {
   chrome.storage.onChanged.addListener((changes, areaName) => {
     const keyAreaName = key.split("-")[0] as AreaName;
-    console.log("we bok!", key);
     if (areaName === keyAreaName) {
-      console.log("qualified!", key);
       const newStorageData = changes[key]?.newValue;
       const oldStorageData = changes[key]?.oldValue;
       if (newStorageData !== undefined || oldStorageData !== undefined) {
-        console.log("and we're running!", newStorageData);
         fn({ newValue: newStorageData, oldValue: oldStorageData });
       }
     }
@@ -138,21 +135,32 @@ async function getTabGroupTreeData() {
   return tabGroupTreeData;
 }
 
-async function applyUpdates() {
-  const tabGroupTreeData = await getTabGroupTreeData();
-  await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
-  const prepareToUpdateCurrentSessionData = await getStorageData<boolean>(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+async function updateCurrentSessionData() {
+  const readyToUpdateCurrentSessionData = await getStorageData<boolean>(
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
   );
-  if (prepareToUpdateCurrentSessionData) {
-    await setStorageData(
-      sessionStorageKeys.prepareToUpdateCurrentSessionData,
-      false,
+  const currentSessionData =
+    await getStorageData<chrome.bookmarks.BookmarkTreeNode>(
+      sessionStorageKeys.currentSessionData,
     );
-    await setStorageData(sessionStorageKeys.updateCurrentSessionData, true);
-    console.log("testing...1", prepareToUpdateCurrentSessionData);
+  if (!readyToUpdateCurrentSessionData || !currentSessionData) {
+    return;
   }
-  console.log("testing...2", prepareToUpdateCurrentSessionData);
+  await chrome.bookmarks.removeTree(currentSessionData.id);
+  const newSessionData = await saveCurrentSessionData(currentSessionData);
+  await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
+  await setStorageData(
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
+    false,
+  );
+}
+
+async function applyUpdates() {
+  navigator.locks.request("applyUpdates", async () => {
+    const tabGroupTreeData = await getTabGroupTreeData();
+    await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
+    await updateCurrentSessionData();
+  });
 }
 
 export async function updateTabGroupTreeData() {
@@ -199,26 +207,24 @@ export async function createRootBookmarkNode() {
       chrome.bookmarks.BookmarkTreeNode["id"]
     >(syncStorageKeys.rootBookmarkNodeId);
     try {
-      if (rootBookmarkNodeId) {
-        const rootBookmarkNode = (
-          await chrome.bookmarks.get(rootBookmarkNodeId)
-        )[0];
-        // this isn't even necessary because `chrome.bookmarks.get` will error if our bookmark id is invalid...but just in case!
-        if (!rootBookmarkNode) {
-          const rootBookmarkNodeId = (
-            await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
-          ).id;
-          setStorageData(
-            syncStorageKeys.rootBookmarkNodeId,
-            rootBookmarkNodeId,
-          );
-        }
+      const rootBookmarkNode = (
+        await chrome.bookmarks.get(rootBookmarkNodeId!)
+      )[0];
+      // this isn't even necessary because `chrome.bookmarks.get` will error if our bookmark id is invalid...but just in case!
+      if (!rootBookmarkNode) {
+        const rootBookmarkNodeId = (
+          await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
+        ).id;
+        setStorageData(syncStorageKeys.rootBookmarkNodeId, rootBookmarkNodeId);
       }
     } catch (e) {
       const rootBookmarkNodeId = (
         await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
       ).id;
-      setStorageData(syncStorageKeys.rootBookmarkNodeId, rootBookmarkNodeId);
+      await setStorageData(
+        syncStorageKeys.rootBookmarkNodeId,
+        rootBookmarkNodeId,
+      );
     }
   } catch (e) {
     // no error handling here. we'll do that in the sidepanel ui

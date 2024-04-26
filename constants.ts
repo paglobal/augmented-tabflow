@@ -12,8 +12,7 @@ export const sessionStorageKeys = {
   recentlyClosedTabGroups: "session-8",
   recentlyClosedTabGroupsCollapsed: "session-9",
   readyToClosePreviousSession: "session-10",
-  prepareToUpdateCurrentSessionData: "session-11",
-  updateCurrentSessionData: "session-12",
+  readyToUpdateCurrentSessionData: "session-11",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;

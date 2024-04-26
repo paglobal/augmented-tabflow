@@ -29,7 +29,7 @@ export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
 subscribeToStorageData<TabGroupTreeData>(
   sessionStorageKeys.tabGroupTreeData,
   ({ newValue }) => {
-    if (newValue !== undefined) {
+    if (newValue) {
       setTabGroupTreeData(newValue);
     }
   },
@@ -207,10 +207,16 @@ export async function createSession(
   const rootBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(syncStorageKeys.rootBookmarkNodeId);
-  if (useCurrentSessionData) {
-    await saveCurrentSessionData({ title, parentId: rootBookmarkNodeId });
+  if (rootBookmarkNodeId) {
+    if (useCurrentSessionData) {
+      await saveCurrentSessionData({ title, parentId: rootBookmarkNodeId });
+    } else {
+      await chrome.bookmarks.create({ title, parentId: rootBookmarkNodeId });
+    }
+    notify("Session created successfully", "success");
+  } else {
+    // error here!
   }
-  notify("Session created successfully", "success");
 }
 
 export async function updateSessionTitle(

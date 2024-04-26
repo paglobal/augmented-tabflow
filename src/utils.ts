@@ -52,20 +52,19 @@ export function notify(
 // TODO: implement internationalization
 // TODO: come up with a way to handle storage migrations
 // TODO: theme switcher
-//
-// --- Urgent ---
-// TODO: implement proper error handling. look for keywords `async`, `await` and `chrome`
-// TODO: handle possible errors in async html template functions with fallback content and alerts. look for keyword `until`
-// TODO: add alerts for action in progress and action complete.
 // TODO: general code inspection and refactoring
 // TODO: type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 // TODO: type `sendMessage` and `subscribeToMessage` for automatic inference
+//
+// --- Urgent ---
+// TODO: implement proper error handling. look for keywords `async`, `await`, `error` and `chrome`
+// TODO: handle possible errors in async html template functions with fallback content and alerts. look for keyword `until`
+// TODO: add alerts for action in progress and action complete.
 //
 // --- Super Urgent. Implement Before Release! ---
 // TODO: implement drag-and-drop for tabs and tab groups
 // TODO: implement "recently closed" tab groups feature
 // TODO: implement "move/copy to session / move/copy to tab group" feature
-// TODO: implement automatic session saving
 // TODO: filter out current session
 //
 // --- Docs ---

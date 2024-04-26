@@ -14,7 +14,6 @@ import {
   subscribeToMessage,
   updateTabGroupTreeData,
   subscribeToStorageData,
-  saveCurrentSessionData,
 } from "./sharedUtils";
 
 chrome.sidePanel
@@ -35,7 +34,7 @@ updateTabGroupTreeData();
 
 chrome.tabGroups.onCreated.addListener(async () => {
   await setStorageData(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeData();
@@ -43,7 +42,7 @@ chrome.tabGroups.onCreated.addListener(async () => {
 
 chrome.tabGroups.onRemoved.addListener(async () => {
   await setStorageData(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeData();
@@ -51,7 +50,7 @@ chrome.tabGroups.onRemoved.addListener(async () => {
 
 chrome.tabGroups.onUpdated.addListener(async () => {
   await setStorageData(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeData();
@@ -83,16 +82,15 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 
 chrome.tabs.onAttached.addListener(async () => {
   await setStorageData(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeData();
 });
 
 chrome.tabs.onCreated.addListener(async () => {
-  console.log("created!");
   await setStorageData(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeData();
@@ -100,7 +98,7 @@ chrome.tabs.onCreated.addListener(async () => {
 
 chrome.tabs.onDetached.addListener(async () => {
   await setStorageData(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeData();
@@ -109,7 +107,7 @@ chrome.tabs.onDetached.addListener(async () => {
 // `chrome.tabGroups.onMoved` for tab groups is not necessary because of this. do not add it, it drastically reduces performance!
 chrome.tabs.onMoved.addListener(async () => {
   await setStorageData(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeData();
@@ -117,7 +115,7 @@ chrome.tabs.onMoved.addListener(async () => {
 
 chrome.tabs.onRemoved.addListener(async () => {
   await setStorageData(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeData();
@@ -125,7 +123,7 @@ chrome.tabs.onRemoved.addListener(async () => {
 
 chrome.tabs.onReplaced.addListener(async () => {
   await setStorageData(
-    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+    sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeData();
@@ -134,7 +132,7 @@ chrome.tabs.onReplaced.addListener(async () => {
 chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
   if (changeInfo.title || changeInfo.url) {
     await setStorageData(
-      sessionStorageKeys.prepareToUpdateCurrentSessionData,
+      sessionStorageKeys.readyToUpdateCurrentSessionData,
       true,
     );
   }
@@ -337,35 +335,6 @@ subscribeToStorageData<chrome.windows.Window["id"]>(
         sessionStorageKeys.readyToClosePreviousSession,
         null,
       );
-    }
-  },
-);
-
-async function updateCurrentSessionData() {
-  const updateCurrentSessionData = await getStorageData<boolean>(
-    sessionStorageKeys.updateCurrentSessionData,
-  );
-  const currentSessionData =
-    await getStorageData<chrome.bookmarks.BookmarkTreeNode>(
-      sessionStorageKeys.currentSessionData,
-    );
-  if (!updateCurrentSessionData || !currentSessionData) {
-    return;
-  }
-  console.log("here too!");
-  await chrome.bookmarks.removeTree(currentSessionData.id);
-  const newSessionData = await saveCurrentSessionData(currentSessionData);
-  await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
-  await setStorageData(sessionStorageKeys.updateCurrentSessionData, false);
-}
-
-subscribeToStorageData<boolean>(
-  sessionStorageKeys.updateCurrentSessionData,
-  ({ newValue }) => {
-    console.log("here boys!");
-    if (newValue) {
-      console.log("here again!");
-      updateCurrentSessionData();
     }
   },
 );
