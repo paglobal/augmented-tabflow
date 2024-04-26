@@ -8,6 +8,10 @@ import {
   tabGroupTypes,
   sessionStorageKeys,
   ungroupedTabGroupTitle,
+  MessageType,
+  initialTabUrlBeginning,
+  initialTabUrlSeparatingStub,
+  tabGroupTreeDataUpdateDebounceTimeout,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -20,7 +24,7 @@ export async function getStorageData<T = unknown>(
 
 export async function setStorageData<T = unknown>(
   key: SyncStorageKey | SessionStorageKey,
-  value: T | undefined,
+  value: T,
 ) {
   const areaName = key.split("-")[0] as AreaName;
   chrome.storage[areaName].set({ [key]: value });
@@ -32,10 +36,13 @@ export async function subscribeToStorageData<T = unknown>(
 ) {
   chrome.storage.onChanged.addListener((changes, areaName) => {
     const keyAreaName = key.split("-")[0] as AreaName;
+    console.log("we bok!", key);
     if (areaName === keyAreaName) {
+      console.log("qualified!", key);
       const newStorageData = changes[key]?.newValue;
       const oldStorageData = changes[key]?.oldValue;
       if (newStorageData !== undefined || oldStorageData !== undefined) {
+        console.log("and we're running!", newStorageData);
         fn({ newValue: newStorageData, oldValue: oldStorageData });
       }
     }
@@ -53,9 +60,22 @@ async function getTabGroupTreeData() {
   const tabs = await chrome.tabs.query({
     windowType: "normal",
   });
-
   const tabGroupTreeData = tabs.reduce<TabGroupTreeData>(
     (tabGroupTreeData, currentTab) => {
+      if (currentTab.url) {
+        currentTab.url = decodeURIComponent(currentTab.url);
+      }
+      if (
+        currentTab.url?.startsWith(
+          `${initialTabUrlBeginning}${initialTabUrlSeparatingStub}`,
+        )
+      ) {
+        const currentTabInitialUrlSegments = currentTab.url.split(
+          `${initialTabUrlSeparatingStub}`,
+        );
+        currentTab.title = currentTabInitialUrlSegments[1];
+        currentTab.url = currentTabInitialUrlSegments[2];
+      }
       const currentTabGroupIndex = tabGroupTreeData.findIndex(
         (tabGroup) => tabGroup.id === currentTab.groupId,
       );
@@ -79,15 +99,29 @@ async function getTabGroupTreeData() {
     },
     [],
   );
-
   const ungroupedTabs = await chrome.tabs.query({
     groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
     windowType: "normal",
   });
+  ungroupedTabs.forEach((tab) => {
+    if (tab.url) {
+      tab.url = decodeURIComponent(tab.url);
+    }
+    if (
+      tab.url?.startsWith(
+        `${initialTabUrlBeginning}${initialTabUrlSeparatingStub}`,
+      )
+    ) {
+      const currentTabInitialUrlSegments = tab.url.split(
+        `${initialTabUrlSeparatingStub}`,
+      );
+      tab.title = currentTabInitialUrlSegments[1];
+      tab.url = currentTabInitialUrlSegments[2];
+    }
+  });
   const ungroupedTabGroupCollapsed = await getStorageData<boolean>(
     sessionStorageKeys.ungroupedTabGroupCollapsed,
   );
-
   if (ungroupedTabs.length) {
     tabGroupTreeData.push({
       id: chrome.tabGroups.TAB_GROUP_ID_NONE,
@@ -96,7 +130,7 @@ async function getTabGroupTreeData() {
       windowId: null as unknown as NonNullable<chrome.windows.Window["id"]>,
       title: ungroupedTabGroupTitle,
       icon: "folder2-open",
-      collapsed: ungroupedTabGroupCollapsed ?? true,
+      collapsed: !!ungroupedTabGroupCollapsed,
       tabs: ungroupedTabs,
     });
   }
@@ -106,7 +140,19 @@ async function getTabGroupTreeData() {
 
 async function applyUpdates() {
   const tabGroupTreeData = await getTabGroupTreeData();
-  setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
+  await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
+  const prepareToUpdateCurrentSessionData = await getStorageData<boolean>(
+    sessionStorageKeys.prepareToUpdateCurrentSessionData,
+  );
+  if (prepareToUpdateCurrentSessionData) {
+    await setStorageData(
+      sessionStorageKeys.prepareToUpdateCurrentSessionData,
+      false,
+    );
+    await setStorageData(sessionStorageKeys.updateCurrentSessionData, true);
+    console.log("testing...1", prepareToUpdateCurrentSessionData);
+  }
+  console.log("testing...2", prepareToUpdateCurrentSessionData);
 }
 
 export async function updateTabGroupTreeData() {
@@ -130,7 +176,7 @@ export async function updateTabGroupTreeData() {
           sessionStorageKeys.debounceTabGroupTreeDataUpdates,
           false,
         );
-      }, 200),
+      }, tabGroupTreeDataUpdateDebounceTimeout),
     );
   } else {
     clearTimeout(tabGroupTreeDataUpdateTimeoutId);
@@ -142,7 +188,7 @@ export async function updateTabGroupTreeData() {
           false,
         );
         applyUpdates();
-      }, 200),
+      }, tabGroupTreeDataUpdateDebounceTimeout),
     );
   }
 }
@@ -177,4 +223,66 @@ export async function createRootBookmarkNode() {
   } catch (e) {
     // no error handling here. we'll do that in the sidepanel ui
   }
+}
+
+export async function sendMessage(
+  message: { type: MessageType; data?: any },
+  fn: (response: any) => void,
+) {
+  chrome.runtime.sendMessage(
+    {
+      type: message.type,
+      data: message.data,
+    },
+    // @ts-ignore. looks like `chrome.runtime.sendMessage` was typed wrongly
+    fn,
+  );
+}
+
+export function subscribeToMessage(
+  messageType: MessageType,
+  fn: (data: any, sendResponse: (response: any) => void) => void,
+) {
+  chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+    if (message?.type && message.type === messageType) {
+      fn(message.data, sendResponse);
+    }
+
+    return true;
+  });
+}
+
+export async function saveCurrentSessionData(sessionData: {
+  title?: chrome.bookmarks.BookmarkTreeNode["title"];
+  parentId?: chrome.bookmarks.BookmarkTreeNode["id"];
+  index?: chrome.bookmarks.BookmarkTreeNode["index"];
+}) {
+  const newSessionData = await chrome.bookmarks.create({
+    index: sessionData.index,
+    parentId: sessionData.parentId,
+    title: sessionData.title,
+  });
+  const tabGroupTreeData =
+    (await getStorageData<TabGroupTreeData>(
+      sessionStorageKeys.tabGroupTreeData,
+    )) ?? [];
+  for (const tabGroup of tabGroupTreeData) {
+    const tabGroupDataId = (
+      await chrome.bookmarks.create({
+        parentId: newSessionData.id,
+        title: tabGroup.icon
+          ? tabGroup.title
+          : `${tabGroup.color}-${tabGroup.title}`,
+      })
+    ).id;
+    for (const tab of tabGroup.tabs) {
+      await chrome.bookmarks.create({
+        parentId: tabGroupDataId,
+        title: tab.title,
+        url: tab.url,
+      });
+    }
+  }
+
+  return newSessionData;
 }

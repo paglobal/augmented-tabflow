@@ -5,7 +5,7 @@ import { setThemeMode } from "./src/utils";
 
 renderTemplateFn(() => html`${h(App)}`, { renderContainer: "body" });
 
-//auto light/dark mode based on user preferences
+// auto light/dark mode based on user preferences
 if (window.matchMedia) {
   if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
     setThemeMode("dark");

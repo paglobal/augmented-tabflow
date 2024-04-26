@@ -50,16 +50,25 @@ export function notify(
 // TODO: add button in some alerts to reset view (rerender app or reload page or reopen sidepanel)
 // TODO: delete unneeded icons (if necessary). be sure not to break anything if you attempt this!
 // TODO: implement internationalization
+// TODO: come up with a way to handle storage migrations
+// TODO: theme switcher
 //
 // --- Urgent ---
 // TODO: implement proper error handling. look for keywords `async`, `await` and `chrome`
 // TODO: handle possible errors in async html template functions with fallback content and alerts. look for keyword `until`
+// TODO: add alerts for action in progress and action complete.
 // TODO: general code inspection and refactoring
-// TODO: type all `setStorageData` and `getStorageData` for automatic inference
+// TODO: type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
+// TODO: type `sendMessage` and `subscribeToMessage` for automatic inference
 //
 // --- Super Urgent. Implement Before Release! ---
 // TODO: implement drag-and-drop for tabs and tab groups
 // TODO: implement "recently closed" tab groups feature
-// TODO: implement "copy to session / copy to tab group" feature
-// TODO: implement tab discarding
+// TODO: implement "move/copy to session / move/copy to tab group" feature
 // TODO: implement automatic session saving
+// TODO: filter out current session
+//
+// --- Docs ---
+// Turn of reopening of session in browser
+// Be weary of native saved tab groups in chrome
+// Don't close sidepanel while action is in progress

@@ -8,8 +8,6 @@ import {
   sessionsTreeData,
 } from "./sessionService";
 import { helpDialogRef, saveCurrentSessionDialogRef } from "./App";
-import { setStorageData } from "../sharedUtils";
-import { sessionStorageKeys } from "../constants";
 
 export async function sessionsTreeContent() {
   const sessionsTreeContent = (await sessionsTreeData()).map((sessionData) => {

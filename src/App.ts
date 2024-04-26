@@ -30,12 +30,12 @@ import {
   updateSessionTitle,
   createTabGroup,
 } from "./sessionService";
-import { createRootBookmarkNode } from "../sharedUtils";
+import { createRootBookmarkNode, updateTabGroupTreeData } from "../sharedUtils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { sessionsTreeContent } from "./sessionsTreeContent";
 
-// Disable animations for all tree items
+// disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
 setDefaultAnimation("tree-item.collapse", null);
 
@@ -59,6 +59,7 @@ export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
 
 export function App() {
   createRootBookmarkNode();
+  updateTabGroupTreeData();
 
   return () =>
     html`<div
