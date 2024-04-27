@@ -211,6 +211,7 @@ export async function createSession(
       await chrome.bookmarks.create({ title, parentId: rootBookmarkNodeId });
     }
     notify("Session created successfully", "success");
+    location.reload();
   } else {
     notifyWithErrorMessageAndReloadButton();
   }
