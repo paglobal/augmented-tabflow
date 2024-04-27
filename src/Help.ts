@@ -1,5 +1,6 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
+import { rootBookmarkNodeTitle } from "../constants";
 
 export function Help() {
   return () => html`
@@ -23,25 +24,31 @@ export function Help() {
       Here are a few things you need to know when working with this extension
     </p>
     <ul>
+      <li>It is centered around tab groups.</li>
       <li>
-        It assumes a workflow that is mostly central to one open chrome window
-        at a time. If you prefer working with multiple chrome windows, this is
-        probably not the right extension for you (I would at least give it a try
-        first though).
+        It allows you to save your sessions as bookmarks that are automatically
+        updated anytime you make a change to your current active session
+        (provided it has been saved).
       </li>
       <li>
-        It's is centered around tab groups. It's going to be most beneficial to
-        you if you make heavy use of tab groups.
+        Sessions normally consist of all tabs from all "normal" windows (no
+        popups, PWAs, etc).
       </li>
       <li>
-        By design, only two forms of sorting are allowed: alphabetical sorting
-        and sorting by date. No custom sorting is permitted. This is maintain
-        simplicity in the design of the extension and allow the easy
-        implementation of certain features. I personally find that it removes
-        that mental burden associated with sorted and makes me more efficient as
-        well, but that may not be your cup of tea (you could still give it a try
-        first though).
+        Your sessions are saved in the bookmark folder
+        "${rootBookmarkNodeTitle}" but you can change the title if you wish. Be
+        careful of how you and other extensions modify this folder.
       </li>
+      <li>
+        Please don't modify any session's bookmark folder while that session is
+        active.
+      </li>
+      <li>
+        There are many buttons in the UI that allow you to perform many
+        functions. Hover over any of them to find out what they do.
+      </li>
+      <li>The rest is pretty intuitive. You'll figure it out.</li>
+      <li>I hope you enjoy this extension. Go forth and be productive!</li>
     </ul>
   `;
 }

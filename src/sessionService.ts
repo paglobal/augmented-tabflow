@@ -5,7 +5,7 @@ import {
   syncStorageKeys,
   tabGroupTypes,
 } from "../constants";
-import { notify } from "./utils";
+import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
   type TabGroupTreeData,
   getStorageData,
@@ -19,6 +19,7 @@ import {
 export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
   Promise<TabGroupTreeData> | TabGroupTreeData
 >(async () => {
+  // @error
   const tabGroupTreeData = await getStorageData<TabGroupTreeData>(
     sessionStorageKeys.tabGroupTreeData,
   );
@@ -122,13 +123,14 @@ export function updateTabGroup(
   }
 }
 
-// don't subscribe to storage updates for this state. it seems to cause/trigger bugs in the `sl-tree` component. plus we don't need to because we create a new window anyways
 export const [currentSessionData, setCurrentSessionData] = adaptState<
   | Promise<chrome.bookmarks.BookmarkTreeNode | undefined | null>
   | chrome.bookmarks.BookmarkTreeNode
   | undefined
   | null
+  | ""
 >(async () => {
+  // @error
   const currentSessionData =
     await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
       sessionStorageKeys.currentSessionData,
@@ -137,10 +139,20 @@ export const [currentSessionData, setCurrentSessionData] = adaptState<
   return currentSessionData;
 });
 
+subscribeToStorageData(
+  sessionStorageKeys.currentSessionData,
+  ({ oldValue }) => {
+    if (oldValue === "") {
+      location.reload();
+    }
+  },
+);
+
 export const [sessionsTreeData, setSessionsTreeData] = adaptState<
   | chrome.bookmarks.BookmarkTreeNode[]
   | Promise<chrome.bookmarks.BookmarkTreeNode[]>
 >(async () => {
+  // @error
   const rootBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(syncStorageKeys.rootBookmarkNodeId);
@@ -165,11 +177,12 @@ export const [sessionsTreeData, setSessionsTreeData] = adaptState<
 });
 
 async function updateSessionsTreeData() {
+  // @errorConsider
   const rootBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(syncStorageKeys.rootBookmarkNodeId);
   if (rootBookmarkNodeId) {
-    const sessionDataChildren = (
+    const sessionsDataChildren = (
       await chrome.bookmarks.getChildren(rootBookmarkNodeId)
     ).filter(async (tabGroupData) => {
       if (tabGroupData.url) {
@@ -180,25 +193,9 @@ async function updateSessionsTreeData() {
 
       return true;
     });
-    setSessionsTreeData(sessionDataChildren);
+    setSessionsTreeData(sessionsDataChildren);
   }
 }
-
-chrome.bookmarks.onChanged.addListener(() => {
-  updateSessionsTreeData();
-});
-chrome.bookmarks.onChildrenReordered.addListener(() => {
-  updateSessionsTreeData();
-});
-chrome.bookmarks.onCreated.addListener(() => {
-  updateSessionsTreeData();
-});
-chrome.bookmarks.onMoved.addListener(() => {
-  updateSessionsTreeData();
-});
-chrome.bookmarks.onRemoved.addListener(() => {
-  updateSessionsTreeData();
-});
 
 export async function createSession(
   title: string,
@@ -215,7 +212,7 @@ export async function createSession(
     }
     notify("Session created successfully", "success");
   } else {
-    // error here!
+    notifyWithErrorMessageAndReloadButton();
   }
 }
 
@@ -229,13 +226,23 @@ export async function updateSessionTitle(
         sessionStorageKeys.currentSessionData,
       );
     if (currentSessionData) {
-      await chrome.bookmarks.update(currentSessionData.id, { title });
+      const newSessionData = await chrome.bookmarks.update(
+        currentSessionData.id,
+        { title },
+      );
+      await setStorageData(
+        sessionStorageKeys.currentSessionData,
+        newSessionData,
+      );
     } else {
       notify("Session does not exist", "danger");
+
+      return;
     }
   } else if (typeof sesssionIdOrIsCurrentSession === "string") {
     await chrome.bookmarks.update(sesssionIdOrIsCurrentSession, { title });
   }
+  location.reload();
 }
 
 export async function deleteSession(
@@ -245,24 +252,13 @@ export async function deleteSession(
   await chrome.bookmarks.removeTree(sessionId);
   if (isCurrentSession) {
     await openNewSession(null);
+  } else {
+    location.reload();
   }
 }
 
 export async function openNewSession(
   newSessionData: chrome.bookmarks.BookmarkTreeNode | null,
 ) {
-  sendMessage(
-    { type: messageTypes.initSessionTabs, data: newSessionData },
-    async (windowId) => {
-      if (windowId) {
-        await chrome.sidePanel.open({ windowId });
-        setTimeout(() => {
-          setStorageData(
-            sessionStorageKeys.readyToClosePreviousSession,
-            windowId,
-          );
-        }, 500);
-      }
-    },
-  );
+  sendMessage({ type: messageTypes.initSessionTabs, data: newSessionData });
 }

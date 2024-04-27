@@ -20,6 +20,7 @@ import {
 
 export function Toolbar() {
   async function tabGroupTreeButton() {
+    // @fallback
     const _currentSessionData = await currentSessionData();
 
     return _currentSessionData
@@ -27,7 +28,10 @@ export function Toolbar() {
       : html`<sl-icon-button
           name="list-ul"
           title="Show Tab Group Tree"
-          @click=${() => tabGroupTreeDialogRef.value?.show()}
+          @click=${() => {
+            // @error
+            tabGroupTreeDialogRef.value?.show();
+          }}
         ></sl-icon-button>`;
   }
 
@@ -52,6 +56,7 @@ export function Toolbar() {
           name="arrow-left"
           title="Go Back One Page In Current Tab"
           @click=${() => {
+            // @error
             chrome.tabs.goBack();
           }}
         ></sl-icon-button>
@@ -59,6 +64,7 @@ export function Toolbar() {
           name="arrow-right"
           title="Go Forward One Page In Current Tab"
           @click=${() => {
+            // @error
             chrome.tabs.goForward();
           }}
         ></sl-icon-button>
@@ -66,6 +72,7 @@ export function Toolbar() {
           name="arrow-clockwise"
           title="Reload Current Tab"
           @click=${() => {
+            // @error
             chrome.tabs.reload();
           }}
         ></sl-icon-button>
@@ -73,22 +80,32 @@ export function Toolbar() {
         <sl-icon-button
           name="plus-circle"
           title="Add Tab Group"
-          @click=${() => addTabGroupDialogRef.value?.show()}
+          @click=${() => {
+            // @error
+            addTabGroupDialogRef.value?.show();
+          }}
         ></sl-icon-button>
         <sl-icon-button
           name="stickies"
           title="Group Ungrouped Tabs In This Window"
-          @click=${groupUngroupedTabsInWindow}
+          @click=${() => {
+            // @error
+            groupUngroupedTabsInWindow();
+          }}
         ></sl-icon-button>
         <sl-icon-button
           name="window-plus"
           title="Create Empty Session"
-          @click=${() => newSessionDialogRef.value?.show()}
+          @click=${() => {
+            // @error
+            newSessionDialogRef.value?.show();
+          }}
         ></sl-icon-button>
         <sl-icon-button
           name="pen"
           title="Edit Current Session Title"
           @click=${async () => {
+            // @error
             if (editSessionInputRef.value) {
               const currentSessionData =
                 await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
@@ -111,6 +128,7 @@ export function Toolbar() {
           name="trash"
           title="Delete Current Session"
           @click=${async () => {
+            // @error
             const currentSessionData =
               await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
                 sessionStorageKeys.currentSessionData,
@@ -125,7 +143,10 @@ export function Toolbar() {
         <sl-icon-button
           name="question-circle"
           title="Help"
-          @click=${() => helpDialogRef.value?.show()}
+          @click=${() => {
+            // @error
+            helpDialogRef.value?.show();
+          }}
         ></sl-icon-button>
       </sl-button-group>
     </div>`;

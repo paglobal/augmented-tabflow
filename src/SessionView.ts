@@ -9,6 +9,7 @@ import { currentSessionData } from "./sessionService";
 
 export function SessionView() {
   async function sessionViewTree() {
+    // @fallback
     const _currentSessionData = await currentSessionData();
 
     return html`

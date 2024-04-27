@@ -6,14 +6,14 @@ settings:
 
 dependencies:
   '@shoelace-style/shoelace':
-    specifier: ^2.12.0
-    version: 2.12.0(@types/react@18.2.79)
+    specifier: ^2.15.0
+    version: 2.15.0(@types/react@18.2.79)
   lit:
     specifier: ^3.1.2
     version: 3.1.2
   promethium-js:
-    specifier: ^0.9.4
-    version: 0.9.4
+    specifier: ^0.9.5
+    version: 0.9.5
 
 devDependencies:
   chrome-types:
@@ -424,8 +424,8 @@ packages:
     resolution: {integrity: sha512-Hf45HeO+vdQblabpyZOTxJ4ZeZsmIUYXXPmoYrrR4OJ5OKxL+bhMz5mK8JXgl7HsoEowfz7+e248UGi861de9Q==}
     dev: false
 
-  /@shoelace-style/shoelace@2.12.0(@types/react@18.2.79):
-    resolution: {integrity: sha512-1Amirj0c5WLkymDcP6ZQmBfMC6zTNmGGK7/mjmGq4yhljrVaECVlBoKm0tfmo1jd3r8XJ8xYbQ8cxPAlwiDDvw==}
+  /@shoelace-style/shoelace@2.15.0(@types/react@18.2.79):
+    resolution: {integrity: sha512-Lcg938Y8U2VsHqIYewzlt+H1rbrXC4GRSUkTJgXyF8/0YAOlI+srd5OSfIw+/LYmwLP2Peyh398Kae/6tg4PDA==}
     engines: {node: '>=14.17.0'}
     dependencies:
       '@ctrl/tinycolor': 4.0.2
@@ -909,8 +909,8 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
-  /promethium-js@0.9.4:
-    resolution: {integrity: sha512-N77Hh8+ps8IdS0Sg0J/lkKkSqrvIhdGvBnvo/JAunwLxw/ItUggo61tw7gYzpB5Gg5K8F3MkLwy24REdhCHdQQ==}
+  /promethium-js@0.9.5:
+    resolution: {integrity: sha512-G/nWoBxVyktx+MU1nBSlwONe9PaOT8g7NoEw6XT2Tu096AL4E3hap5MZbA3XT0IHtu8HN6aQQpt5182CCQ9Pgw==}
     dependencies:
       lit: 3.1.2
     dev: false

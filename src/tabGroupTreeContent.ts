@@ -14,16 +14,19 @@ import { editTabGroupDialogRefs, setCurrentlyEditedTabGroupId } from "./App";
 import { newTabUrls, tabGroupTypes } from "../constants";
 
 export async function tabGroupTreeContent() {
+  // @fallback
   return (await tabGroupTreeData()).map((tabGroup) => {
     return html`
       ${h(TreeItem, {
         tooltipContent: tabGroup.title as string,
         expanded: !tabGroup.collapsed,
         onExpand(e: Event) {
+          // @error
           e.stopPropagation();
           expandTabGroup(tabGroup);
         },
         onCollapse(e: Event) {
+          // @error
           e.stopPropagation();
           collapseTabGroup(tabGroup);
         },
@@ -32,6 +35,7 @@ export async function tabGroupTreeContent() {
             name="plus-lg"
             title="Add Tab"
             @click=${(e: Event) => {
+              // @error
               e.stopPropagation();
               addTabToTabGroup(tabGroup);
             }}
@@ -41,6 +45,7 @@ export async function tabGroupTreeContent() {
                 name="pen"
                 title="Edit"
                 @click=${(e: Event) => {
+                  // @error
                   e.stopPropagation();
                   setCurrentlyEditedTabGroupId(tabGroup.id);
                   editTabGroupDialogRefs.dialog.value?.show();
@@ -63,6 +68,7 @@ export async function tabGroupTreeContent() {
             name="x-lg"
             title="Close"
             @click=${async (e: Event) => {
+              // @error
               e.stopPropagation();
               closeTabGroup(tabGroup);
             }}
@@ -80,6 +86,7 @@ export async function tabGroupTreeContent() {
                 tooltipContent: tab.title as string,
                 selected: tab.active,
                 onSelect(e: Event) {
+                  // @error
                   e.stopPropagation();
                   activateTab(tab);
                 },
@@ -88,6 +95,7 @@ export async function tabGroupTreeContent() {
                     name="x-lg"
                     title="Close"
                     @click=${(e: Event) => {
+                      // @error
                       e.stopPropagation();
                       chrome.tabs.remove(tab.id as number);
                     }}

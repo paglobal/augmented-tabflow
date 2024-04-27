@@ -2,9 +2,10 @@ import { html } from "lit";
 import { h, renderTemplateFn } from "promethium-js";
 import { App } from "./src/App";
 import { setThemeMode } from "./src/utils";
+import { createRootBookmarkNode, updateTabGroupTreeData } from "./sharedUtils";
 
-renderTemplateFn(() => html`${h(App)}`, { renderContainer: "body" });
-
+createRootBookmarkNode();
+updateTabGroupTreeData();
 // auto light/dark mode based on user preferences
 if (window.matchMedia) {
   if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
@@ -26,3 +27,4 @@ if (window.matchMedia) {
       }
     });
 }
+renderTemplateFn(() => html`${h(App)}`, { renderContainer: "body" });

@@ -23,6 +23,7 @@ export function DialogForm(props: {
           ${ref(formRef)}
           class="dialog-form"
           @submit=${(e: Event) => {
+            // @error
             e.preventDefault();
             if (formRef.value) {
               const data = serialize(formRef.value);

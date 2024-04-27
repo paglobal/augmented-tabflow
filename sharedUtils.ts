@@ -12,6 +12,7 @@ import {
   initialTabUrlBeginning,
   initialTabUrlSeparatingStub,
   tabGroupTreeDataUpdateDebounceTimeout,
+  applyUpdatesLockName,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -156,7 +157,7 @@ async function updateCurrentSessionData() {
 }
 
 async function applyUpdates() {
-  navigator.locks.request("applyUpdates", async () => {
+  navigator.locks.request(applyUpdatesLockName, async () => {
     const tabGroupTreeData = await getTabGroupTreeData();
     await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
     await updateCurrentSessionData();
@@ -233,14 +234,14 @@ export async function createRootBookmarkNode() {
 
 export async function sendMessage(
   message: { type: MessageType; data?: any },
-  fn: (response: any) => void,
+  fn?: (response: any) => void,
 ) {
   chrome.runtime.sendMessage(
     {
       type: message.type,
       data: message.data,
     },
-    // @ts-ignore. looks like `chrome.runtime.sendMessage` was typed wrongly
+    // @ts-ignore. looks like `chrome.runtime.sendMessage` was typed incorrectly
     fn,
   );
 }

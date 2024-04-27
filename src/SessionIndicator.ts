@@ -7,6 +7,7 @@ import { sessionsTreeDialogRef } from "./App";
 
 export function SessionIndicator() {
   async function currentSessionTitle() {
+    // @fallback
     const _currentSessionData = await currentSessionData();
 
     return _currentSessionData
@@ -15,6 +16,7 @@ export function SessionIndicator() {
   }
 
   async function buttonVariant() {
+    // @fallback
     const _currentSessionData = await currentSessionData();
 
     return _currentSessionData ? "primary" : "default";
@@ -32,8 +34,10 @@ export function SessionIndicator() {
         outline
         style=${styleMap({ width: "100%" })}
         @click=${() => {
+          // @error
           sessionsTreeDialogRef.value?.show();
         }}
+        title="Show Sessions"
         >${until(currentSessionTitle(), unsavedSessionTitle)}</sl-button
       >
     </div>`;

@@ -30,7 +30,6 @@ import {
   updateSessionTitle,
   createTabGroup,
 } from "./sessionService";
-import { createRootBookmarkNode, updateTabGroupTreeData } from "../sharedUtils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { sessionsTreeContent } from "./sessionsTreeContent";
@@ -56,13 +55,12 @@ export const sessionsTreeDialogRef = createRef<SlDialog>();
 
 export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
+export const [currentlyEditedSessionId, setCurrentlyEditedSessionId] =
+  adaptState<chrome.bookmarks.BookmarkTreeNode["id"] | null>(null);
 
 export function App() {
-  createRootBookmarkNode();
-  updateTabGroupTreeData();
-
-  return () =>
-    html`<div
+  function mainAppView() {
+    return html`<div
       id="app"
       style=${styleMap({
         height: "100vh",
@@ -159,6 +157,7 @@ export function App() {
                 title: chrome.tabGroups.TabGroup["title"];
                 color: chrome.tabGroups.Color;
               }) {
+                // @error
                 updateTabGroup(currentlyEditedTabGroupId(), data);
               },
             })}
@@ -170,6 +169,7 @@ export function App() {
               `,
               submitButtonText: "Save",
               formAction({ title }: { title: string }) {
+                // @error
                 createSession(title, true);
               },
             })}
@@ -207,6 +207,7 @@ export function App() {
                 title: chrome.tabGroups.TabGroup["title"];
                 color: chrome.tabGroups.Color;
               }) {
+                // @error
                 if (!data.color) {
                   data.color = randomTabGroupColorValue();
                 }
@@ -221,11 +222,12 @@ export function App() {
               `,
               submitButtonText: "Save",
               formAction({ title }: { title: string }) {
+                // @error
                 createSession(title);
               },
             })}
             ${h(DialogForm, {
-              dialogLabel: "Edit Current Session Title",
+              dialogLabel: "Edit Session Title",
               dialogRef: editSessionDialogRef,
               formContent: html`
                 <sl-input
@@ -236,12 +238,19 @@ export function App() {
                 ></sl-input>
               `,
               submitButtonText: "Save",
-              formAction({ title }: { title: string }) {
-                updateSessionTitle(true, title);
+              async formAction({ title }: { title: string }) {
+                // @error
+                const _currentlyEditedSessionId =
+                  currentlyEditedSessionId() ?? true;
+                await updateSessionTitle(_currentlyEditedSessionId, title);
+                setCurrentlyEditedSessionId(null);
               },
             })}
           </div>
         </div>
       </div>
     </div>`;
+  }
+
+  return () => html`${mainAppView()}`;
 }

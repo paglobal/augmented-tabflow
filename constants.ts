@@ -11,8 +11,7 @@ export const sessionStorageKeys = {
   previousUnsavedSessionTabGroupTreeData: "session-7",
   recentlyClosedTabGroups: "session-8",
   recentlyClosedTabGroupsCollapsed: "session-9",
-  readyToClosePreviousSession: "session-10",
-  readyToUpdateCurrentSessionData: "session-11",
+  readyToUpdateCurrentSessionData: "session-10",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;
@@ -60,3 +59,5 @@ export const initialTabUrlSeparatingStub =
   "Augmented Tabflow Sessions Tab Stub Title. Use Side Panel UI For A Better View. All This Is Just An Initial Tab URL Separating Stub.";
 
 export const tabGroupTreeDataUpdateDebounceTimeout = 200;
+
+export const applyUpdatesLockName = "applyUpdates";

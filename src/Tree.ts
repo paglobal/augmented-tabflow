@@ -19,6 +19,7 @@ export function Tree(props: {
       selection="leaf"
       tabindex="-1"
       @sl-selection-change=${(e: SlSelectionChangeEvent) => {
+        // @error
         e.detail.selection.forEach((treeItem) => treeItem.click());
       }}
     >
