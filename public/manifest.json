@@ -3,7 +3,7 @@
   "name": "Augmented Tabflow",
   "version": "0.0.1",
   "minimum_chrome_version": "116",
-  "description": "Augment your tab workflow with extended tab group managment",
+  "description": "Augment your tab workflow with extended tab group and session managment",
   "permissions": [
     "sidePanel",
     "tabs",
