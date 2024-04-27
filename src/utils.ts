@@ -78,6 +78,8 @@ export function notifyWithErrorMessageAndReloadButton() {
 // TODO: implement drag-and-drop for tabs and tab groups
 // TODO: implement confirmation dialog for deleting sessions
 // TODO: show loading state for tab group tree when switching between sessions
+// TODO: resolve problem with switching sessions when user is currently editing form fields
+// DOCS: don't work well with chrome native saved tab groups
 //
 // --- Docs ---
 // Turn of reopening of session in browser
