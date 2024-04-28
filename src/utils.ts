@@ -79,8 +79,7 @@ export function notifyWithErrorMessageAndReloadButton() {
 // TODO: implement confirmation dialog for deleting sessions
 // TODO: show loading state for tab group tree when switching between sessions
 // TODO: resolve problem with switching sessions when user is currently editing form fields
-// HELP: don't work well with chrome native saved tab groups
-// HELP: stub tabs
+// TODO: upload better screenshots and listing content
 //
 // --- Docs ---
 // Turn of reopening of session in browser
@@ -89,3 +88,5 @@ export function notifyWithErrorMessageAndReloadButton() {
 // Tabs load in a "discarded" state
 // Don't use with chrome native saved tab groups
 // Designed to be used with one "normal" browser window at a time
+// Don't work well with chrome native saved tab groups
+// Title and icon of stub tabs can only be seen in side panel ui
