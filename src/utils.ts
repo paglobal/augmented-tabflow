@@ -79,6 +79,7 @@ export function notifyWithErrorMessageAndReloadButton() {
 // TODO: implement confirmation dialog for deleting sessions
 // TODO: show loading state for tab group tree when switching between sessions
 // TODO: resolve problem with switching sessions when user is currently editing form fields
+// TODO: don't update session data when `tabGroupTreeData` is empty
 // TODO: upload better screenshots and listing content
 //
 // --- Docs ---
