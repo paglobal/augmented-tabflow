@@ -58,7 +58,8 @@ export function notifyWithErrorMessageAndReloadButton() {
 }
 
 // --- Later ---
-// TODO: delete unneeded icons (if necessary). be sure not to break anything if you attempt this! look for instances of `sl-icon` element with `name="<icon-name>"`
+// TODO: delete unneeded icons (if necessary). be sure not to break anything if you attempt this! look for instances of `icon` and `sl-icon` element
+//       with `name="<icon-name>"`
 // TODO: implement internationalization
 // TODO: come up with a way to handle storage migrations
 // TODO: theme switcher
@@ -71,13 +72,12 @@ export function notifyWithErrorMessageAndReloadButton() {
 //
 // --- Urgent ---
 // TODO: resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. use the old "timeout and retry a couple of times"
-// TODO: implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `until` and `chrome`
 // TODO: add alerts for action in progress and action complete (if necessary).
+// TODO: implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `until` and `chrome`
 // TODO: implement "move/copy to session / move/copy to tab group" feature
 // TODO: implement "recently closed" tab groups feature
-// TODO: implement drag-and-drop for tabs and tab groups
+// TODO: implement drag-and-drop for tabs, tab groups and sessions
 // TODO: show confirmation dialog for deleting sessions
-// TODO: implement new extension page to correctly display page title and icon while reducing load time
 // TODO: implement loading fallback for session and tab group trees which provide a way to exit loading of current session (eg. for when user interrupts session switching
 //       loading continues indefinitely)
 // TODO: add option to create new tab group with existing tab

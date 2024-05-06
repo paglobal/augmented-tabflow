@@ -53,11 +53,6 @@ export const messageTypes = {
   initSessionTabs: "message-1",
 } as const satisfies Record<string, MessageType>;
 
-export const initialTabUrlBeginning = "data:text/html,<title>";
-
-export const initialTabUrlSeparatingStub =
-  "Augmented Tabflow Sessions Tab Stub Title. Use Side Panel UI For A Better View. All This Is Just An Initial Tab URL Separating Stub.";
-
 export const tabGroupTreeDataUpdateDebounceTimeout = 200;
 
 export const applyUpdatesLockName = "applyUpdates";

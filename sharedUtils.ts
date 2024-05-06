@@ -9,8 +9,6 @@ import {
   sessionStorageKeys,
   ungroupedTabGroupTitle,
   MessageType,
-  initialTabUrlBeginning,
-  initialTabUrlSeparatingStub,
   tabGroupTreeDataUpdateDebounceTimeout,
   applyUpdatesLockName,
 } from "./constants";
@@ -60,20 +58,6 @@ async function getTabGroupTreeData() {
   });
   const tabGroupTreeData = tabs.reduce<TabGroupTreeData>(
     (tabGroupTreeData, currentTab) => {
-      if (currentTab.url) {
-        currentTab.url = decodeURIComponent(currentTab.url);
-      }
-      if (
-        currentTab.url?.startsWith(
-          `${initialTabUrlBeginning}${initialTabUrlSeparatingStub}`,
-        )
-      ) {
-        const currentTabInitialUrlSegments = currentTab.url.split(
-          `${initialTabUrlSeparatingStub}`,
-        );
-        currentTab.title = currentTabInitialUrlSegments[1];
-        currentTab.url = currentTabInitialUrlSegments[2];
-      }
       const currentTabGroupIndex = tabGroupTreeData.findIndex(
         (tabGroup) => tabGroup.id === currentTab.groupId,
       );
@@ -100,22 +84,6 @@ async function getTabGroupTreeData() {
   const ungroupedTabs = await chrome.tabs.query({
     groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
     windowType: "normal",
-  });
-  ungroupedTabs.forEach((tab) => {
-    if (tab.url) {
-      tab.url = decodeURIComponent(tab.url);
-    }
-    if (
-      tab.url?.startsWith(
-        `${initialTabUrlBeginning}${initialTabUrlSeparatingStub}`,
-      )
-    ) {
-      const currentTabInitialUrlSegments = tab.url.split(
-        `${initialTabUrlSeparatingStub}`,
-      );
-      tab.title = currentTabInitialUrlSegments[1];
-      tab.url = currentTabInitialUrlSegments[2];
-    }
   });
   const ungroupedTabGroupCollapsed = await getStorageData<boolean>(
     sessionStorageKeys.ungroupedTabGroupCollapsed,
@@ -294,4 +262,12 @@ export async function saveCurrentSessionData(sessionData: {
   }
 
   return newSessionData;
+}
+
+export function getFaviconUrl(pageUrl: string | null | undefined) {
+  const url = new URL(chrome.runtime.getURL("/_favicon/"));
+  url.searchParams.set("pageUrl", pageUrl ?? "null");
+  url.searchParams.set("size", "32");
+
+  return url.toString();
 }

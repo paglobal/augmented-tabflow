@@ -1,7 +1,5 @@
 import {
   applyUpdatesLockName,
-  initialTabUrlBeginning,
-  initialTabUrlSeparatingStub,
   messageTypes,
   sessionStorageKeys,
   tabGroupColorList,
@@ -59,19 +57,14 @@ chrome.tabGroups.onUpdated.addListener(async () => {
 async function restoreTabIfBlank(tabId: NonNullable<chrome.tabs.Tab["id"]>) {
   try {
     const tab = await chrome.tabs.get(tabId);
+    let url: URL | undefined;
     if (tab.url) {
-      tab.url = decodeURIComponent(tab.url);
+      url = new URL(tab.url);
     }
-    if (
-      tab.url?.startsWith(
-        `${initialTabUrlBeginning}${initialTabUrlSeparatingStub}`,
-      )
-    ) {
-      const currentTabInitialUrlSegments = tab.url.split(
-        `${initialTabUrlSeparatingStub}`,
-      );
+    if (url?.hostname === chrome.runtime.id) {
+      const params = new URLSearchParams(url.search);
       await chrome.tabs.update(tabId, {
-        url: currentTabInitialUrlSegments[2],
+        url: params.get("url") ?? undefined,
       });
     }
   } catch (error) {
@@ -216,7 +209,7 @@ async function initSessionTabs(
             const tabUrl =
               i === 0 && j === 0
                 ? tabData.url
-                : `${initialTabUrlBeginning}${initialTabUrlSeparatingStub}${tabData.title}${initialTabUrlSeparatingStub}${tabData.url}`;
+                : `/stubPage.html?title=${tabData.title}&url=${tabData.url}`;
             const tabIsActive = i === 0 && j === 0 ? true : false;
             const tab = await chrome.tabs.create({
               url: tabUrl,
@@ -259,7 +252,7 @@ async function initSessionTabs(
           const tabUrl =
             i === 0 && j === 0
               ? oldTab.url
-              : `${initialTabUrlBeginning}${initialTabUrlSeparatingStub}${oldTab.title}${initialTabUrlSeparatingStub}${oldTab.url}`;
+              : `/stubPage.html?title=${oldTab.title}&url=${oldTab.url}`;
           const tabIsActive = i === 0 && j === 0 ? true : false;
           const tab = await chrome.tabs.create({
             url: tabUrl,

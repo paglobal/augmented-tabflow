@@ -1,14 +1,7 @@
 import { html } from "lit";
+import { getFaviconUrl } from "../sharedUtils";
 import { tabGroupColors } from "./utils";
 import { styleMap } from "lit/directives/style-map.js";
-
-function faviconUrl(pageUrl: string) {
-  const url = new URL(chrome.runtime.getURL("/_favicon/"));
-  url.searchParams.set("pageUrl", pageUrl);
-  url.searchParams.set("size", "32");
-
-  return url.toString();
-}
 
 export function TreeItemColorPatchOrIcon(props: {
   color?: chrome.tabGroups.TabGroup["color"];
@@ -58,7 +51,7 @@ export function TreeItemColorPatchOrIcon(props: {
                     })}
                   ></sl-spinner>`
                 : html`<img
-                    src=${faviconUrl(props.pageUrl as string)}
+                    src=${getFaviconUrl(props.pageUrl)}
                     style=${styleMap({
                       width: "1.3rem",
                       padding: "0.2rem",
