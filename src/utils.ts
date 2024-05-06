@@ -58,7 +58,7 @@ export function notifyWithErrorMessageAndReloadButton() {
 }
 
 // --- Later ---
-// TODO: delete unneeded icons (if necessary). be sure not to break anything if you attempt this!
+// TODO: delete unneeded icons (if necessary). be sure not to break anything if you attempt this! look for instances of `sl-icon` element with `name="<icon-name>"`
 // TODO: implement internationalization
 // TODO: come up with a way to handle storage migrations
 // TODO: theme switcher
@@ -66,21 +66,26 @@ export function notifyWithErrorMessageAndReloadButton() {
 // TODO: differentiate state update functions from storage data update functions (if necessary)
 // TODO: type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 // TODO: type `sendMessage` and `subscribeToMessage` for automatic inference
-// TODO: fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click)
+// TODO: fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 // TODO: add more entries to the `newTabUrls` array to cater for more browsers
-// TODO: resolve unloaded tab status thingy with `TreeItemColorPatchOrIcon` component
 //
 // --- Urgent ---
+// TODO: resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. use the old timeout and retry a couple of times
 // TODO: implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `until` and `chrome`
-// TODO: add alerts for action in progress and action complete.
+// TODO: add alerts for action in progress and action complete (if necessary).
 // TODO: implement "move/copy to session / move/copy to tab group" feature
 // TODO: implement "recently closed" tab groups feature
 // TODO: implement drag-and-drop for tabs and tab groups
-// TODO: implement confirmation dialog for deleting sessions
-// TODO: show loading state for tab group tree when switching between sessions
-// TODO: resolve problem with switching sessions when user is currently editing form fields
-// TODO: don't update session data when `tabGroupTreeData` is empty
-// TODO: upload better screenshots and listing content
+// TODO: show confirmation dialog for deleting sessions
+// TODO: implement new extension page to correctly display page title and icon while reducing load time
+// TODO: implement loading fallback for session and tab group trees which provide a way to exit loading of current session (eg. for when user interrupts session switching
+//       loading continues indefinitely)
+// TODO: add option to create new tab group with existing tab
+// TODO: fix bug with filtering out current session
+// TODO: update session data in service worker
+//
+// --- Extension ---
+// Upload better screenshots and listing content
 //
 // --- Docs ---
 // Turn of reopening of session in browser
@@ -91,3 +96,6 @@ export function notifyWithErrorMessageAndReloadButton() {
 // Designed to be used with one "normal" browser window at a time
 // Don't work well with chrome native saved tab groups
 // Title and icon of stub tabs can only be seen in side panel ui
+// Extension pages (like new tab pages) and other pages may be blocked by chrome when restored from session data. Click address bar and press enter to reopen them
+// You can turn off session restoration in chrome
+// When you interrupt session switching, you can use "Canel" to repair damage

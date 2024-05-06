@@ -273,21 +273,23 @@ export async function saveCurrentSessionData(sessionData: {
     (await getStorageData<TabGroupTreeData>(
       sessionStorageKeys.tabGroupTreeData,
     )) ?? [];
-  for (const tabGroup of tabGroupTreeData) {
-    const tabGroupDataId = (
-      await chrome.bookmarks.create({
-        parentId: newSessionData.id,
-        title: tabGroup.icon
-          ? tabGroup.title
-          : `${tabGroup.color}-${tabGroup.title}`,
-      })
-    ).id;
-    for (const tab of tabGroup.tabs) {
-      await chrome.bookmarks.create({
-        parentId: tabGroupDataId,
-        title: tab.title,
-        url: tab.url,
-      });
+  if (tabGroupTreeData.length) {
+    for (const tabGroup of tabGroupTreeData) {
+      const tabGroupDataId = (
+        await chrome.bookmarks.create({
+          parentId: newSessionData.id,
+          title: tabGroup.icon
+            ? tabGroup.title
+            : `${tabGroup.color}-${tabGroup.title}`,
+        })
+      ).id;
+      for (const tab of tabGroup.tabs) {
+        await chrome.bookmarks.create({
+          parentId: tabGroupDataId,
+          title: tab.title,
+          url: tab.url,
+        });
+      }
     }
   }
 
