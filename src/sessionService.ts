@@ -142,7 +142,7 @@ export const [currentSessionData, setCurrentSessionData] = adaptState<
 subscribeToStorageData(
   sessionStorageKeys.currentSessionData,
   ({ oldValue }) => {
-    if (oldValue === "") {
+    if (oldValue === null || oldValue === "") {
       location.reload();
     }
   },
@@ -196,6 +196,22 @@ async function updateSessionsTreeData() {
     setSessionsTreeData(sessionsDataChildren);
   }
 }
+
+chrome.bookmarks.onCreated.addListener(() => {
+  updateSessionsTreeData();
+});
+
+chrome.bookmarks.onChanged.addListener(() => {
+  updateSessionsTreeData();
+});
+
+chrome.bookmarks.onMoved.addListener(() => {
+  updateSessionsTreeData();
+});
+
+chrome.bookmarks.onRemoved.addListener(() => {
+  updateSessionsTreeData();
+});
 
 export async function createSession(
   title: string,

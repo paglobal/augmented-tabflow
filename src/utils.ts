@@ -70,7 +70,7 @@ export function notifyWithErrorMessageAndReloadButton() {
 // TODO: add more entries to the `newTabUrls` array to cater for more browsers
 //
 // --- Urgent ---
-// TODO: resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. use the old timeout and retry a couple of times
+// TODO: resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. use the old "timeout and retry a couple of times"
 // TODO: implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `until` and `chrome`
 // TODO: add alerts for action in progress and action complete (if necessary).
 // TODO: implement "move/copy to session / move/copy to tab group" feature
@@ -81,8 +81,6 @@ export function notifyWithErrorMessageAndReloadButton() {
 // TODO: implement loading fallback for session and tab group trees which provide a way to exit loading of current session (eg. for when user interrupts session switching
 //       loading continues indefinitely)
 // TODO: add option to create new tab group with existing tab
-// TODO: fix bug with filtering out current session
-// TODO: update session data in service worker
 //
 // --- Extension ---
 // Upload better screenshots and listing content

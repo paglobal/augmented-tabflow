@@ -3,7 +3,6 @@ import { h } from "promethium-js";
 import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import {
-  currentSessionData,
   deleteSession,
   openNewSession,
   sessionsTreeData,
@@ -15,16 +14,18 @@ import {
   saveCurrentSessionDialogRef,
   setCurrentlyEditedSessionId,
 } from "./App";
+import { getStorageData } from "../sharedUtils";
+import { sessionStorageKeys } from "../constants";
 
 export async function sessionsTreeContent() {
   // @fallback
-  const _currentSessionData = await currentSessionData();
-  const _sessionsTreeData = await sessionsTreeData();
-  if (_currentSessionData) {
-    if (_currentSessionData.index) {
-      _sessionsTreeData.splice(_currentSessionData.index, 1);
-    }
-  }
+  const currentSessionData =
+    await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
+      sessionStorageKeys.currentSessionData,
+    );
+  const _sessionsTreeData = (await sessionsTreeData()).filter(
+    (sessionData) => sessionData.id !== currentSessionData?.id,
+  );
   const sessionsTreeContent = _sessionsTreeData.map((sessionData) => {
     return html`
       ${h(TreeItem, {
@@ -68,7 +69,7 @@ export async function sessionsTreeContent() {
       })}
     `;
   });
-  if (_currentSessionData) {
+  if (currentSessionData) {
     sessionsTreeContent.unshift(
       html`${h(TreeItem, {
         content: html`${h(TreeItemColorPatchOrIcon, {
