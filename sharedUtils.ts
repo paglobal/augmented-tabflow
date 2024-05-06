@@ -58,6 +58,14 @@ async function getTabGroupTreeData() {
   });
   const tabGroupTreeData = tabs.reduce<TabGroupTreeData>(
     (tabGroupTreeData, currentTab) => {
+      let url: URL | undefined;
+      if (currentTab.url) {
+        url = new URL(currentTab.url);
+      }
+      if (url?.hostname === chrome.runtime.id) {
+        const params = new URLSearchParams(url.search);
+        currentTab.url = params.get("url") ?? undefined;
+      }
       const currentTabGroupIndex = tabGroupTreeData.findIndex(
         (tabGroup) => tabGroup.id === currentTab.groupId,
       );
@@ -84,6 +92,16 @@ async function getTabGroupTreeData() {
   const ungroupedTabs = await chrome.tabs.query({
     groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
     windowType: "normal",
+  });
+  ungroupedTabs.forEach((tab) => {
+    let url: URL | undefined;
+    if (tab.url) {
+      url = new URL(tab.url);
+    }
+    if (url?.hostname === chrome.runtime.id) {
+      const params = new URLSearchParams(url.search);
+      tab.url = params.get("url") ?? undefined;
+    }
   });
   const ungroupedTabGroupCollapsed = await getStorageData<boolean>(
     sessionStorageKeys.ungroupedTabGroupCollapsed,
