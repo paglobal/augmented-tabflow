@@ -4,22 +4,35 @@ import { until } from "lit/directives/until.js";
 import { currentSessionData } from "./sessionService";
 import { unsavedSessionTitle } from "../constants";
 import { sessionsTreeDialogRef } from "./App";
+import { notifyWithErrorMessageAndReloadButton } from "./utils";
 
 export function SessionIndicator() {
   async function currentSessionTitle() {
-    // @fallback
-    const _currentSessionData = await currentSessionData();
+    // @handled
+    try {
+      const _currentSessionData = await currentSessionData();
 
-    return _currentSessionData
-      ? _currentSessionData.title
-      : unsavedSessionTitle;
+      return _currentSessionData
+        ? _currentSessionData.title
+        : unsavedSessionTitle;
+    } catch (error) {
+      notifyWithErrorMessageAndReloadButton();
+
+      return "Error!";
+    }
   }
 
   async function buttonVariant() {
-    // @fallback
-    const _currentSessionData = await currentSessionData();
+    // @handled
+    try {
+      const _currentSessionData = await currentSessionData();
 
-    return _currentSessionData ? "primary" : "default";
+      return _currentSessionData ? "primary" : "default";
+    } catch (error) {
+      notifyWithErrorMessageAndReloadButton();
+
+      return "danger";
+    }
   }
 
   return () =>
@@ -34,8 +47,12 @@ export function SessionIndicator() {
         outline
         style=${styleMap({ width: "100%" })}
         @click=${() => {
-          // @error
-          sessionsTreeDialogRef.value?.show();
+          // @handled
+          try {
+            sessionsTreeDialogRef.value?.show();
+          } catch (error) {
+            notifyWithErrorMessageAndReloadButton();
+          }
         }}
         title="Show Sessions"
         >${until(currentSessionTitle(), unsavedSessionTitle)}</sl-button

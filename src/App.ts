@@ -157,7 +157,7 @@ export function App() {
                 title: chrome.tabGroups.TabGroup["title"];
                 color: chrome.tabGroups.Color;
               }) {
-                // @error
+                // @maybe
                 updateTabGroup(currentlyEditedTabGroupId(), data);
               },
             })}
@@ -169,7 +169,7 @@ export function App() {
               `,
               submitButtonText: "Save",
               formAction({ title }: { title: string }) {
-                // @error
+                // @maybe
                 createSession(title, true);
               },
             })}
@@ -207,7 +207,7 @@ export function App() {
                 title: chrome.tabGroups.TabGroup["title"];
                 color: chrome.tabGroups.Color;
               }) {
-                // @error
+                // @maybe
                 if (!data.color) {
                   data.color = randomTabGroupColorValue();
                 }
@@ -222,7 +222,7 @@ export function App() {
               `,
               submitButtonText: "Save",
               formAction({ title }: { title: string }) {
-                // @error
+                // @maybe
                 createSession(title);
               },
             })}
@@ -239,7 +239,7 @@ export function App() {
               `,
               submitButtonText: "Save",
               async formAction({ title }: { title: string }) {
-                // @error
+                // @maybe
                 const _currentlyEditedSessionId =
                   currentlyEditedSessionId() ?? true;
                 await updateSessionTitle(_currentlyEditedSessionId, title);

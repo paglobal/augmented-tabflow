@@ -2,6 +2,7 @@ import { TemplateResult, html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import "@shoelace-style/shoelace/dist/components/tree/tree.js";
 import { type SlSelectionChangeEvent } from "@shoelace-style/shoelace/dist/events/sl-selection-change";
+import { notifyWithErrorMessageAndReloadButton } from "./utils";
 
 export function Tree(props: {
   contentFn: () => TemplateResult;
@@ -19,8 +20,12 @@ export function Tree(props: {
       selection="leaf"
       tabindex="-1"
       @sl-selection-change=${(e: SlSelectionChangeEvent) => {
-        // @error
-        e.detail.selection.forEach((treeItem) => treeItem.click());
+        // @handled
+        try {
+          e.detail.selection.forEach((treeItem) => treeItem.click());
+        } catch (error) {
+          notifyWithErrorMessageAndReloadButton();
+        }
       }}
     >
       ${props.contentFn()}

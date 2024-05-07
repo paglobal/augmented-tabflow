@@ -6,7 +6,7 @@ import {
   deleteSession,
   groupUngroupedTabsInWindow,
 } from "./sessionService";
-import { notify } from "./utils";
+import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import { getStorageData } from "../sharedUtils";
 import { sessionStorageKeys } from "../constants";
 import {
@@ -20,19 +20,29 @@ import {
 
 export function Toolbar() {
   async function tabGroupTreeButton() {
-    // @fallback
-    const _currentSessionData = await currentSessionData();
+    // @handled
+    try {
+      const _currentSessionData = await currentSessionData();
 
-    return _currentSessionData
-      ? null
-      : html`<sl-icon-button
-          name="list-ul"
-          title="Show Tab Group Tree"
-          @click=${() => {
-            // @error
-            tabGroupTreeDialogRef.value?.show();
-          }}
-        ></sl-icon-button>`;
+      return _currentSessionData
+        ? null
+        : html`<sl-icon-button
+            name="list-ul"
+            title="Show Tab Group Tree"
+            @click=${() => {
+              // @handled
+              try {
+                tabGroupTreeDialogRef.value?.show();
+              } catch (error) {
+                notifyWithErrorMessageAndReloadButton();
+              }
+            }}
+          ></sl-icon-button>`;
+    } catch (error) {
+      notifyWithErrorMessageAndReloadButton();
+
+      return null;
+    }
   }
 
   return () =>
@@ -56,24 +66,36 @@ export function Toolbar() {
           name="arrow-left"
           title="Go Back One Page In Current Tab"
           @click=${() => {
-            // @error
-            chrome.tabs.goBack();
+            // @handled
+            try {
+              chrome.tabs.goBack();
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
+            }
           }}
         ></sl-icon-button>
         <sl-icon-button
           name="arrow-right"
           title="Go Forward One Page In Current Tab"
           @click=${() => {
-            // @error
-            chrome.tabs.goForward();
+            // @handled
+            try {
+              chrome.tabs.goForward();
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
+            }
           }}
         ></sl-icon-button>
         <sl-icon-button
           name="arrow-clockwise"
           title="Reload Current Tab"
           @click=${() => {
-            // @error
-            chrome.tabs.reload();
+            // @handled
+            try {
+              chrome.tabs.reload();
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
+            }
           }}
         ></sl-icon-button>
         ${until(tabGroupTreeButton(), null)}
@@ -81,46 +103,63 @@ export function Toolbar() {
           name="plus-circle"
           title="Add Tab Group"
           @click=${() => {
-            // @error
-            addTabGroupDialogRef.value?.show();
+            // @handled
+            try {
+              addTabGroupDialogRef.value?.show();
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
+            }
           }}
         ></sl-icon-button>
         <sl-icon-button
           name="stickies"
           title="Group Ungrouped Tabs In This Window"
           @click=${() => {
-            // @error
-            groupUngroupedTabsInWindow();
+            // @handled
+            try {
+              groupUngroupedTabsInWindow();
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
+            }
           }}
         ></sl-icon-button>
         <sl-icon-button
           name="window-plus"
           title="Create Empty Session"
           @click=${() => {
-            // @error
-            newSessionDialogRef.value?.show();
+            // @handled
+            try {
+              newSessionDialogRef.value?.show();
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
+            }
           }}
         ></sl-icon-button>
         <sl-icon-button
           name="pen"
           title="Edit Current Session Title"
           @click=${async () => {
-            // @error
-            if (editSessionInputRef.value) {
-              const currentSessionData =
-                await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-                  sessionStorageKeys.currentSessionData,
-                );
-              if (currentSessionData) {
-                editSessionDialogRef.value?.show();
-                setTimeout(() => {
-                  if (editSessionInputRef.value) {
-                    editSessionInputRef.value.value = currentSessionData.title;
-                  }
-                });
-              } else {
-                notify("Current session is unsaved", "warning");
+            // @handled
+            try {
+              if (editSessionInputRef.value) {
+                const currentSessionData =
+                  await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
+                    sessionStorageKeys.currentSessionData,
+                  );
+                if (currentSessionData) {
+                  editSessionDialogRef.value?.show();
+                  setTimeout(() => {
+                    if (editSessionInputRef.value) {
+                      editSessionInputRef.value.value =
+                        currentSessionData.title;
+                    }
+                  });
+                } else {
+                  notify("Current session is unsaved", "warning");
+                }
               }
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
             }
           }}
         ></sl-icon-button>
@@ -128,15 +167,19 @@ export function Toolbar() {
           name="trash"
           title="Delete Current Session"
           @click=${async () => {
-            // @error
-            const currentSessionData =
-              await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-                sessionStorageKeys.currentSessionData,
-              );
-            if (currentSessionData) {
-              deleteSession(currentSessionData.id, true);
-            } else {
-              notify("Current session is unsaved", "warning");
+            // @handled
+            try {
+              const currentSessionData =
+                await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
+                  sessionStorageKeys.currentSessionData,
+                );
+              if (currentSessionData) {
+                deleteSession(currentSessionData.id, true);
+              } else {
+                notify("Current session is unsaved", "warning");
+              }
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
             }
           }}
         ></sl-icon-button>
@@ -144,8 +187,12 @@ export function Toolbar() {
           name="question-circle"
           title="Help"
           @click=${() => {
-            // @error
-            helpDialogRef.value?.show();
+            // @handled
+            try {
+              helpDialogRef.value?.show();
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
+            }
           }}
         ></sl-icon-button>
       </sl-button-group>

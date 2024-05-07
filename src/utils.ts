@@ -47,7 +47,7 @@ export function notify(
 export function notifyWithErrorMessageAndReloadButton() {
   const errorMessage =
     "Error occurred while executing action. You can click the button below to attempt to recover.";
-  const reloadButtonHTML = `<sl-icon-button name="arrow-counterclockwise" title="Reload UI" class="reload-button"></sl-icon-button>`;
+  const reloadButtonHTML = `<sl-icon-button name="arrow-clockwise" title="Reload UI" class="reload-button"></sl-icon-button>`;
   const fullMessageContent = `<div>${errorMessage}</div><div style="display: flex; justify-content: center; align-items: center;">${reloadButtonHTML}</div>`;
   notify(fullMessageContent, "danger", 6000);
   document
@@ -63,17 +63,19 @@ export function notifyWithErrorMessageAndReloadButton() {
 // TODO: implement internationalization
 // TODO: come up with a way to handle storage migrations
 // TODO: theme switcher
-// TODO: general code inspection and refactoring
 // TODO: differentiate state update functions from storage data update functions (if necessary)
 // TODO: type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 // TODO: type `sendMessage` and `subscribeToMessage` for automatic inference
 // TODO: fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 // TODO: add more entries to the `newTabUrls` array to cater for more browsers
+// TODO: refine text. look for anything in quotation marks like "Error!" and such
+// TODO: general code inspection and refactoring
+// TODO: implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
+// TODO: notify users of errors that happen in service workers through message `chrome.runtime.message`
 //
 // --- Urgent ---
 // TODO: resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. use the old "timeout and retry a couple of times"
-// TODO: add alerts for action in progress and action complete (if necessary).
-// TODO: implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `until` and `chrome`
+// TODO: add alerts for action in progress and action complete (if necessary) (mostly when saving current session).
 // TODO: implement "move/copy to session / move/copy to tab group" feature
 // TODO: implement "recently closed" tab groups feature
 // TODO: implement drag-and-drop for tabs, tab groups and sessions
@@ -81,19 +83,12 @@ export function notifyWithErrorMessageAndReloadButton() {
 // TODO: implement loading fallback for session and tab group trees which provide a way to exit loading of current session (eg. for when user interrupts session switching
 //       loading continues indefinitely)
 // TODO: add option to create new tab group with existing tab
+// TODO: implement pinned tab groups
 //
 // --- Extension ---
-// Upload better screenshots and listing content
+// Upload better screenshots and photos
+// Upload better description and summary
+// Maybe upload a video
 //
 // --- Docs ---
-// Turn of reopening of session in browser
-// Be weary of native saved tab groups in chrome
-// Don't close sidepanel while action is in progress
-// Tabs load in a "discarded" state
-// Don't use with chrome native saved tab groups
-// Designed to be used with one "normal" browser window at a time
-// Don't work well with chrome native saved tab groups
-// Title and icon of stub tabs can only be seen in side panel ui
-// Extension pages (like new tab pages) and other pages may be blocked by chrome when restored from session data. Click address bar and press enter to reopen them
-// You can turn off session restoration in chrome
-// When you interrupt session switching, you can use "Canel" to repair damage
+//

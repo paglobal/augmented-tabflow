@@ -19,12 +19,18 @@ import {
 export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
   Promise<TabGroupTreeData> | TabGroupTreeData
 >(async () => {
-  // @error
-  const tabGroupTreeData = await getStorageData<TabGroupTreeData>(
-    sessionStorageKeys.tabGroupTreeData,
-  );
+  // @handled
+  try {
+    const tabGroupTreeData = await getStorageData<TabGroupTreeData>(
+      sessionStorageKeys.tabGroupTreeData,
+    );
 
-  return tabGroupTreeData ?? [];
+    return tabGroupTreeData ?? [];
+  } catch (error) {
+    notifyWithErrorMessageAndReloadButton();
+
+    return [];
+  }
 });
 
 subscribeToStorageData<TabGroupTreeData>(
@@ -130,13 +136,17 @@ export const [currentSessionData, setCurrentSessionData] = adaptState<
   | null
   | ""
 >(async () => {
-  // @error
-  const currentSessionData =
-    await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-      sessionStorageKeys.currentSessionData,
-    );
+  // @handled
+  try {
+    const currentSessionData =
+      await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
+        sessionStorageKeys.currentSessionData,
+      );
 
-  return currentSessionData;
+    return currentSessionData;
+  } catch (error) {
+    notifyWithErrorMessageAndReloadButton();
+  }
 });
 
 subscribeToStorageData(
@@ -152,32 +162,37 @@ export const [sessionsTreeData, setSessionsTreeData] = adaptState<
   | chrome.bookmarks.BookmarkTreeNode[]
   | Promise<chrome.bookmarks.BookmarkTreeNode[]>
 >(async () => {
-  // @error
-  const rootBookmarkNodeId = await getStorageData<
-    chrome.bookmarks.BookmarkTreeNode["id"]
-  >(syncStorageKeys.rootBookmarkNodeId);
-  if (rootBookmarkNodeId) {
-    // not a typo. there's a difference between `sessionsData` and `sessionData`
-    const sessionsData = (
-      await chrome.bookmarks.getChildren(rootBookmarkNodeId)
-    ).filter(async (tabGroupData) => {
-      if (tabGroupData.url) {
-        await chrome.bookmarks.remove(tabGroupData.id);
+  // @handled
+  try {
+    const rootBookmarkNodeId = await getStorageData<
+      chrome.bookmarks.BookmarkTreeNode["id"]
+    >(syncStorageKeys.rootBookmarkNodeId);
+    if (rootBookmarkNodeId) {
+      // not a typo. there's a difference between `sessionsData` and `sessionData`
+      const sessionsData = (
+        await chrome.bookmarks.getChildren(rootBookmarkNodeId)
+      ).filter(async (tabGroupData) => {
+        if (tabGroupData.url) {
+          await chrome.bookmarks.remove(tabGroupData.id);
 
-        return false;
-      }
+          return false;
+        }
 
-      return true;
-    });
+        return true;
+      });
 
-    return sessionsData ?? [];
-  } else {
+      return sessionsData ?? [];
+    } else {
+      return [];
+    }
+  } catch (error) {
+    notifyWithErrorMessageAndReloadButton();
+
     return [];
   }
 });
 
 async function updateSessionsTreeData() {
-  // @errorConsider
   const rootBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(syncStorageKeys.rootBookmarkNodeId);
@@ -198,19 +213,35 @@ async function updateSessionsTreeData() {
 }
 
 chrome.bookmarks.onCreated.addListener(() => {
-  updateSessionsTreeData();
+  try {
+    updateSessionsTreeData();
+  } catch (error) {
+    notifyWithErrorMessageAndReloadButton();
+  }
 });
 
 chrome.bookmarks.onChanged.addListener(() => {
-  updateSessionsTreeData();
+  try {
+    updateSessionsTreeData();
+  } catch (error) {
+    notifyWithErrorMessageAndReloadButton();
+  }
 });
 
 chrome.bookmarks.onMoved.addListener(() => {
-  updateSessionsTreeData();
+  try {
+    updateSessionsTreeData();
+  } catch (error) {
+    notifyWithErrorMessageAndReloadButton();
+  }
 });
 
 chrome.bookmarks.onRemoved.addListener(() => {
-  updateSessionsTreeData();
+  try {
+    updateSessionsTreeData();
+  } catch (error) {
+    notifyWithErrorMessageAndReloadButton();
+  }
 });
 
 export async function createSession(

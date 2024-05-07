@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Augmented Tabflow",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "minimum_chrome_version": "116",
   "description": "Augment your tab workflow with extended tab group and session managment",
   "permissions": [

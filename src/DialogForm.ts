@@ -5,6 +5,7 @@ import { createRef, ref, type Ref } from "lit/directives/ref.js";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import { Dialog } from "./Dialog";
 import { serialize } from "@shoelace-style/shoelace/dist/utilities/form.js";
+import { notifyWithErrorMessageAndReloadButton } from "./utils";
 
 export function DialogForm(props: {
   dialogLabel: string;
@@ -23,21 +24,25 @@ export function DialogForm(props: {
           ${ref(formRef)}
           class="dialog-form"
           @submit=${(e: Event) => {
-            // @error
-            e.preventDefault();
-            if (formRef.value) {
-              const data = serialize(formRef.value);
-              props.formAction(data);
+            // @handled
+            try {
+              e.preventDefault();
+              if (formRef.value) {
+                const data = serialize(formRef.value);
+                props.formAction(data);
+              }
+              props.dialogRef.value?.hide();
+              formRef.value?.reset();
+              document.addEventListener(
+                "focusin",
+                () => {
+                  (document.activeElement as HTMLElement)?.blur();
+                },
+                { once: true },
+              );
+            } catch (error) {
+              notifyWithErrorMessageAndReloadButton();
             }
-            props.dialogRef.value?.hide();
-            formRef.value?.reset();
-            document.addEventListener(
-              "focusin",
-              () => {
-                (document.activeElement as HTMLElement)?.blur();
-              },
-              { once: true },
-            );
           }}
         >
           ${props.formContent}
