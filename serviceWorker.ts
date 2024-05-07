@@ -209,7 +209,9 @@ async function initSessionTabs(
             const tabUrl =
               i === 0 && j === 0
                 ? tabData.url
-                : `/stubPage.html?title=${tabData.title}&url=${tabData.url}`;
+                : `/stubPage.html?title=${encodeURIComponent(
+                    tabData.title,
+                  )}&url=${encodeURIComponent(tabData.url)}`;
             const tabIsActive = i === 0 && j === 0 ? true : false;
             const tab = await chrome.tabs.create({
               url: tabUrl,
@@ -252,7 +254,9 @@ async function initSessionTabs(
           const tabUrl =
             i === 0 && j === 0
               ? oldTab.url
-              : `/stubPage.html?title=${oldTab.title}&url=${oldTab.url}`;
+              : `/stubPage.html?title=${encodeURIComponent(
+                  oldTab.title ?? "",
+                )}&url=${encodeURIComponent(oldTab.url ?? "")}`;
           const tabIsActive = i === 0 && j === 0 ? true : false;
           const tab = await chrome.tabs.create({
             url: tabUrl,
