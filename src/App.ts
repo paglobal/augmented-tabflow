@@ -23,12 +23,17 @@ import { Dialog } from "./Dialog";
 import { SessionIndicator } from "./SessionIndicator";
 import { DialogForm } from "./DialogForm";
 import { Tree } from "./Tree";
-import { tabGroupColors, randomTabGroupColorValue } from "./utils";
+import {
+  tabGroupColors,
+  randomTabGroupColorValue,
+  notifyWithErrorMessageAndReloadButton,
+} from "./utils";
 import {
   createSession,
   updateTabGroup,
   updateSessionTitle,
   createTabGroup,
+  deleteSession,
 } from "./sessionService";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
@@ -52,11 +57,18 @@ export const editSessionDialogRef = createRef<SlDialog>();
 export const editSessionInputRef = createRef<SlInput>();
 export const tabGroupTreeDialogRef = createRef<SlDialog>();
 export const sessionsTreeDialogRef = createRef<SlDialog>();
+export const deleteSessionDialogRef = createRef<SlDialog>();
 
 export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
 export const [currentlyEditedSessionId, setCurrentlyEditedSessionId] =
   adaptState<chrome.bookmarks.BookmarkTreeNode["id"] | null>(null);
+export const [currentlyDeletedSessionId, setCurrentlyDeletedSessionId] =
+  adaptState<chrome.bookmarks.BookmarkTreeNode["id"] | null>(null);
+export const [
+  currentlyDeletedSessionIsCurrentSession,
+  setCurrentlyDeletedSessionIsCurrentSession,
+] = adaptState<boolean>(false);
 
 export function App() {
   function mainAppView() {
@@ -103,9 +115,9 @@ export function App() {
                 contentFn: () =>
                   html`${until(tabGroupTreeContent(), fallbackTreeContent())}`,
               })}`,
-              ref: tabGroupTreeDialogRef,
               fullWidth: true,
               noTopBodyMargin: true,
+              ref: tabGroupTreeDialogRef,
             })}
             ${h(Dialog, {
               label: "Help",
@@ -245,6 +257,65 @@ export function App() {
                 await updateSessionTitle(_currentlyEditedSessionId, title);
                 setCurrentlyEditedSessionId(null);
               },
+            })}
+            ${h(Dialog, {
+              label: "Delete Session?",
+              content: html`
+                <div>
+                  Are you sure you want to delete session?
+                  <sl-button
+                    style=${styleMap({
+                      display: "block",
+                      fontSize: "1rem",
+                      marginTop: "3rem",
+                    })}
+                    variant="neutral"
+                    outline
+                    @click=${() => {
+                      // @handled
+                      try {
+                        deleteSessionDialogRef.value?.hide();
+                      } catch (error) {
+                        notifyWithErrorMessageAndReloadButton();
+                      }
+                    }}
+                    >No</sl-button
+                  >
+                  <sl-button
+                    style=${styleMap({
+                      display: "block",
+                      fontSize: "1rem",
+                      marginTop: "1rem",
+                    })}
+                    variant="danger"
+                    @click=${() => {
+                      // @handled
+                      try {
+                        const _currentlyDeletedSessionId =
+                          currentlyDeletedSessionId();
+                        if (_currentlyDeletedSessionId) {
+                          deleteSession(
+                            _currentlyDeletedSessionId,
+                            currentlyDeletedSessionIsCurrentSession(),
+                          );
+                        }
+                        setCurrentlyDeletedSessionId(null);
+                        setCurrentlyDeletedSessionIsCurrentSession(false);
+                      } catch (error) {
+                        notifyWithErrorMessageAndReloadButton();
+                      }
+                    }}
+                    >Yes</sl-button
+                  >
+                </div>
+              `,
+              ref: deleteSessionDialogRef,
+            })}
+            ${h(Dialog, {
+              label: "Help",
+              content: html`${h(Help)}`,
+              ref: helpDialogRef,
+              noTopBodyMargin: true,
             })}
           </div>
         </div>

@@ -133,9 +133,11 @@ async function updateCurrentSessionData() {
   if (!readyToUpdateCurrentSessionData || !currentSessionData) {
     return;
   }
-  await chrome.bookmarks.removeTree(currentSessionData.id);
   const newSessionData = await saveCurrentSessionData(currentSessionData);
-  await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
+  if (newSessionData) {
+    await chrome.bookmarks.removeTree(currentSessionData.id);
+    await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
+  }
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     false,
@@ -204,7 +206,7 @@ export async function createRootBookmarkNode() {
         ).id;
         setStorageData(syncStorageKeys.rootBookmarkNodeId, rootBookmarkNodeId);
       }
-    } catch (e) {
+    } catch (error) {
       const rootBookmarkNodeId = (
         await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
       ).id;
@@ -213,7 +215,7 @@ export async function createRootBookmarkNode() {
         rootBookmarkNodeId,
       );
     }
-  } catch (e) {
+  } catch (error) {
     // no error handling here. we'll do that in the sidepanel ui
   }
 }
@@ -250,16 +252,16 @@ export async function saveCurrentSessionData(sessionData: {
   parentId?: chrome.bookmarks.BookmarkTreeNode["id"];
   index?: chrome.bookmarks.BookmarkTreeNode["index"];
 }) {
-  const newSessionData = await chrome.bookmarks.create({
-    index: sessionData.index,
-    parentId: sessionData.parentId,
-    title: sessionData.title,
-  });
   const tabGroupTreeData =
     (await getStorageData<TabGroupTreeData>(
       sessionStorageKeys.tabGroupTreeData,
     )) ?? [];
   if (tabGroupTreeData.length) {
+    const newSessionData = await chrome.bookmarks.create({
+      index: sessionData.index,
+      parentId: sessionData.parentId,
+      title: sessionData.title,
+    });
     for (const tabGroup of tabGroupTreeData) {
       const tabGroupDataId = (
         await chrome.bookmarks.create({
@@ -277,9 +279,9 @@ export async function saveCurrentSessionData(sessionData: {
         });
       }
     }
-  }
 
-  return newSessionData;
+    return newSessionData;
+  }
 }
 
 export function getFaviconUrl(pageUrl: string | null | undefined) {

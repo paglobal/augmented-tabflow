@@ -2,16 +2,15 @@ import { html } from "lit";
 import { h } from "promethium-js";
 import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
+import { openNewSession, sessionsTreeData } from "./sessionService";
 import {
-  deleteSession,
-  openNewSession,
-  sessionsTreeData,
-} from "./sessionService";
-import {
+  deleteSessionDialogRef,
   editSessionDialogRef,
   editSessionInputRef,
   helpDialogRef,
   saveCurrentSessionDialogRef,
+  setCurrentlyDeletedSessionId,
+  setCurrentlyDeletedSessionIsCurrentSession,
   setCurrentlyEditedSessionId,
 } from "./App";
 import { getStorageData } from "../sharedUtils";
@@ -71,7 +70,9 @@ export async function sessionsTreeContent() {
                 // @handled
                 try {
                   e.stopPropagation();
-                  deleteSession(sessionData.id);
+                  setCurrentlyDeletedSessionId(sessionData.id);
+                  setCurrentlyDeletedSessionIsCurrentSession(false);
+                  deleteSessionDialogRef.value?.show();
                 } catch (error) {
                   notifyWithErrorMessageAndReloadButton();
                 }

@@ -19,11 +19,13 @@ chrome.sidePanel
   .catch((error) => console.error(error));
 
 chrome.runtime.onInstalled.addListener(() => {
+  // @error
   createRootBookmarkNode();
   updateTabGroupTreeData();
 });
 
 chrome.runtime.onStartup.addListener(() => {
+  // @error
   createRootBookmarkNode();
   updateTabGroupTreeData();
 });
@@ -31,6 +33,7 @@ chrome.runtime.onStartup.addListener(() => {
 updateTabGroupTreeData();
 
 chrome.tabGroups.onCreated.addListener(async () => {
+  // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -39,6 +42,7 @@ chrome.tabGroups.onCreated.addListener(async () => {
 });
 
 chrome.tabGroups.onRemoved.addListener(async () => {
+  // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -47,6 +51,7 @@ chrome.tabGroups.onRemoved.addListener(async () => {
 });
 
 chrome.tabGroups.onUpdated.addListener(async () => {
+  // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -73,11 +78,13 @@ async function restoreTabIfBlank(tabId: NonNullable<chrome.tabs.Tab["id"]>) {
 }
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  // @error
   await restoreTabIfBlank(activeInfo.tabId);
   await updateTabGroupTreeData();
 });
 
 chrome.tabs.onAttached.addListener(async () => {
+  // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -86,6 +93,7 @@ chrome.tabs.onAttached.addListener(async () => {
 });
 
 chrome.tabs.onCreated.addListener(async () => {
+  // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -94,6 +102,7 @@ chrome.tabs.onCreated.addListener(async () => {
 });
 
 chrome.tabs.onDetached.addListener(async () => {
+  // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -103,6 +112,7 @@ chrome.tabs.onDetached.addListener(async () => {
 
 // `chrome.tabGroups.onMoved` for tab groups is not necessary because of this. do not add it, it drastically reduces performance!
 chrome.tabs.onMoved.addListener(async () => {
+  // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -111,6 +121,7 @@ chrome.tabs.onMoved.addListener(async () => {
 });
 
 chrome.tabs.onRemoved.addListener(async () => {
+  // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -119,6 +130,7 @@ chrome.tabs.onRemoved.addListener(async () => {
 });
 
 chrome.tabs.onReplaced.addListener(async () => {
+  // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -127,6 +139,7 @@ chrome.tabs.onReplaced.addListener(async () => {
 });
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
+  // @error
   if (changeInfo.title || changeInfo.url) {
     await setStorageData(
       sessionStorageKeys.readyToUpdateCurrentSessionData,
@@ -139,6 +152,7 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
 async function initSessionTabs(
   newSessionData?: chrome.bookmarks.BookmarkTreeNode,
 ) {
+  // @maybe
   navigator.locks.request(applyUpdatesLockName, async () => {
     const oldSessionData =
       await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
@@ -282,5 +296,6 @@ async function initSessionTabs(
 }
 
 subscribeToMessage(messageTypes.initSessionTabs, async (newSessionData) => {
+  // @error
   await initSessionTabs(newSessionData);
 });

@@ -3,7 +3,6 @@ import { styleMap } from "lit/directives/style-map.js";
 import { until } from "lit/directives/until.js";
 import {
   currentSessionData,
-  deleteSession,
   groupUngroupedTabsInWindow,
 } from "./sessionService";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
@@ -16,6 +15,9 @@ import {
   editSessionInputRef,
   editSessionDialogRef,
   tabGroupTreeDialogRef,
+  setCurrentlyDeletedSessionId,
+  setCurrentlyDeletedSessionIsCurrentSession,
+  deleteSessionDialogRef,
 } from "./App";
 
 export function Toolbar() {
@@ -174,7 +176,9 @@ export function Toolbar() {
                   sessionStorageKeys.currentSessionData,
                 );
               if (currentSessionData) {
-                deleteSession(currentSessionData.id, true);
+                setCurrentlyDeletedSessionId(currentSessionData.id);
+                setCurrentlyDeletedSessionIsCurrentSession(true);
+                deleteSessionDialogRef.value?.show();
               } else {
                 notify("Current session is unsaved", "warning");
               }

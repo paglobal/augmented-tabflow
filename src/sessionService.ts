@@ -36,6 +36,7 @@ export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
 subscribeToStorageData<TabGroupTreeData>(
   sessionStorageKeys.tabGroupTreeData,
   ({ newValue }) => {
+    // @error
     if (newValue) {
       setTabGroupTreeData(newValue);
     }
@@ -43,6 +44,7 @@ subscribeToStorageData<TabGroupTreeData>(
 );
 
 export function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
+  // @maybe
   if (tabGroup.type === tabGroupTypes.ungrouped) {
     setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, false);
     updateTabGroupTreeData();
@@ -54,6 +56,7 @@ export function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
 }
 
 export function collapseTabGroup(tabGroup: TabGroupTreeData[number]) {
+  // @maybe
   if (tabGroup.type === tabGroupTypes.ungrouped) {
     setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, true);
     updateTabGroupTreeData();
@@ -65,6 +68,7 @@ export function collapseTabGroup(tabGroup: TabGroupTreeData[number]) {
 }
 
 export async function addTabToTabGroup(tabGroup: TabGroupTreeData[number]) {
+  // @maybe
   const tab = await chrome.tabs.create({});
   if (tabGroup.type === tabGroupTypes.normal) {
     chrome.tabs.group({
@@ -75,6 +79,7 @@ export async function addTabToTabGroup(tabGroup: TabGroupTreeData[number]) {
 }
 
 export async function closeTabGroup(tabGroup: TabGroupTreeData[number]) {
+  // @maybe
   const tabIds = tabGroup.tabs.map((tab) => tab.id) as [number, ...number[]];
   await chrome.tabs.ungroup(tabIds);
   tabGroup.tabs.forEach(async (tab) => {
@@ -83,6 +88,7 @@ export async function closeTabGroup(tabGroup: TabGroupTreeData[number]) {
 }
 
 export function activateTab(tab: chrome.tabs.Tab) {
+  // @maybe
   // focus tab window first if it's not already in focus
   if (tab.windowId !== chrome.windows.WINDOW_ID_CURRENT) {
     chrome.windows.update(tab.windowId, { focused: true });
@@ -91,6 +97,7 @@ export function activateTab(tab: chrome.tabs.Tab) {
 }
 
 export async function groupUngroupedTabsInWindow() {
+  // @maybe
   const ungroupedTabs = await chrome.tabs.query({
     groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
     currentWindow: true,
@@ -107,6 +114,7 @@ export async function createTabGroup(options: {
   title: chrome.tabGroups.TabGroup["title"];
   color: chrome.tabGroups.Color;
 }) {
+  // @maybe
   const tab = await chrome.tabs.create({
     active: true,
   });
@@ -121,6 +129,7 @@ export function updateTabGroup(
     color: chrome.tabGroups.Color;
   },
 ) {
+  // @maybe
   if (tabId) {
     chrome.tabGroups.update(tabId, {
       title: options.title,
@@ -152,6 +161,7 @@ export const [currentSessionData, setCurrentSessionData] = adaptState<
 subscribeToStorageData(
   sessionStorageKeys.currentSessionData,
   ({ oldValue }) => {
+    // @error
     if (oldValue === null || oldValue === "") {
       location.reload();
     }
@@ -193,6 +203,7 @@ export const [sessionsTreeData, setSessionsTreeData] = adaptState<
 });
 
 async function updateSessionsTreeData() {
+  // @error
   const rootBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(syncStorageKeys.rootBookmarkNodeId);
@@ -248,6 +259,7 @@ export async function createSession(
   title: string,
   useCurrentSessionData?: boolean,
 ) {
+  // @maybe
   const rootBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(syncStorageKeys.rootBookmarkNodeId);
@@ -257,7 +269,6 @@ export async function createSession(
     } else {
       await chrome.bookmarks.create({ title, parentId: rootBookmarkNodeId });
     }
-    notify("Session created successfully", "success");
     location.reload();
   } else {
     notifyWithErrorMessageAndReloadButton();
@@ -268,6 +279,7 @@ export async function updateSessionTitle(
   sesssionIdOrIsCurrentSession: chrome.bookmarks.BookmarkTreeNode["id"] | true,
   title: string,
 ) {
+  // @maybe
   if (sesssionIdOrIsCurrentSession === true) {
     const currentSessionData =
       await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
@@ -297,6 +309,7 @@ export async function deleteSession(
   sessionId: chrome.bookmarks.BookmarkTreeNode["id"],
   isCurrentSession?: boolean,
 ) {
+  // @maybe
   await chrome.bookmarks.removeTree(sessionId);
   if (isCurrentSession) {
     await openNewSession(null);
@@ -308,5 +321,6 @@ export async function deleteSession(
 export async function openNewSession(
   newSessionData: chrome.bookmarks.BookmarkTreeNode | null,
 ) {
+  // @maybe
   sendMessage({ type: messageTypes.initSessionTabs, data: newSessionData });
 }
