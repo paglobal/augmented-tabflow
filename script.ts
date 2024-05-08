@@ -2,10 +2,13 @@ import { html } from "lit";
 import { h, renderTemplateFn } from "promethium-js";
 import { App } from "./src/App";
 import { setThemeMode } from "./src/utils";
-import { createRootBookmarkNode, updateTabGroupTreeData } from "./sharedUtils";
+import {
+  createRootBookmarkNode,
+  updateTabGroupTreeDataAndCurrentSessionData,
+} from "./sharedUtils";
 
 createRootBookmarkNode();
-updateTabGroupTreeData();
+updateTabGroupTreeDataAndCurrentSessionData();
 // auto light/dark mode based on user preferences
 if (window.matchMedia) {
   if (window.matchMedia("(prefers-color-scheme: dark)").matches) {

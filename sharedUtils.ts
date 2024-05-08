@@ -152,7 +152,7 @@ async function applyUpdates() {
   });
 }
 
-export async function updateTabGroupTreeData() {
+export async function updateTabGroupTreeDataAndCurrentSessionData() {
   const debounceTabGroupTreeDataUpdates = await getStorageData<boolean>(
     sessionStorageKeys.debounceTabGroupTreeDataUpdates,
   );

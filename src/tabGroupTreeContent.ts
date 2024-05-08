@@ -8,9 +8,14 @@ import {
   closeTabGroup,
   collapseTabGroup,
   expandTabGroup,
+  setFirstTabInNewTabGroupId,
   tabGroupTreeData,
 } from "./sessionService";
-import { editTabGroupDialogRefs, setCurrentlyEditedTabGroupId } from "./App";
+import {
+  addTabGroupDialogRef,
+  editTabGroupDialogRefs,
+  setCurrentlyEditedTabGroupId,
+} from "./App";
 import { newTabUrls, tabGroupTypes } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
@@ -122,6 +127,20 @@ export async function tabGroupTreeContent() {
                     }
                   },
                   actionButtons: html`
+                    <sl-icon-button
+                      name="plus-circle"
+                      title="Add Tab To New Group"
+                      @click=${(e: Event) => {
+                        // @handled
+                        try {
+                          e.stopPropagation();
+                          setFirstTabInNewTabGroupId(tab.id);
+                          addTabGroupDialogRef.value?.show();
+                        } catch (error) {
+                          notifyWithErrorMessageAndReloadButton();
+                        }
+                      }}
+                    ></sl-icon-button>
                     <sl-icon-button
                       name="x-lg"
                       title="Close"

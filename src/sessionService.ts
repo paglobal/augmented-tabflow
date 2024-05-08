@@ -11,7 +11,7 @@ import {
   getStorageData,
   setStorageData,
   subscribeToStorageData,
-  updateTabGroupTreeData,
+  updateTabGroupTreeDataAndCurrentSessionData,
   sendMessage,
   saveCurrentSessionData,
 } from "../sharedUtils";
@@ -47,7 +47,7 @@ export function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
   if (tabGroup.type === tabGroupTypes.ungrouped) {
     setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, false);
-    updateTabGroupTreeData();
+    updateTabGroupTreeDataAndCurrentSessionData();
   } else if (tabGroup.type === tabGroupTypes.normal) {
     chrome.tabGroups.update(tabGroup.id, {
       collapsed: false,
@@ -59,7 +59,7 @@ export function collapseTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
   if (tabGroup.type === tabGroupTypes.ungrouped) {
     setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, true);
-    updateTabGroupTreeData();
+    updateTabGroupTreeDataAndCurrentSessionData();
   } else if (tabGroup.type === tabGroupTypes.normal) {
     chrome.tabGroups.update(tabGroup.id, {
       collapsed: true,
@@ -110,16 +110,30 @@ export async function groupUngroupedTabsInWindow() {
   }
 }
 
+export const [firstTabInNewTabGroupId, setFirstTabInNewTabGroupId] = adaptState<
+  chrome.tabs.Tab["id"] | null
+>(null);
+
 export async function createTabGroup(options: {
   title: chrome.tabGroups.TabGroup["title"];
   color: chrome.tabGroups.Color;
 }) {
   // @maybe
-  const tab = await chrome.tabs.create({
-    active: true,
+  let _firstTabInNewTabGroupId = firstTabInNewTabGroupId();
+  if (
+    _firstTabInNewTabGroupId === null ||
+    _firstTabInNewTabGroupId === undefined
+  ) {
+    _firstTabInNewTabGroupId = (await chrome.tabs.create({ active: false })).id;
+  }
+  const groupId = await chrome.tabs.group({
+    tabIds: _firstTabInNewTabGroupId as number,
   });
-  const groupId = await chrome.tabs.group({ tabIds: tab.id as number });
-  chrome.tabGroups.update(groupId, options);
+  await chrome.tabGroups.update(groupId, options);
+  if (_firstTabInNewTabGroupId) {
+    await chrome.tabs.update(_firstTabInNewTabGroupId, { active: true });
+  }
+  setFirstTabInNewTabGroupId(null);
 }
 
 export function updateTabGroup(
