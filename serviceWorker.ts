@@ -66,7 +66,10 @@ async function restoreTabIfBlank(tabId: NonNullable<chrome.tabs.Tab["id"]>) {
     if (tab.url) {
       url = new URL(tab.url);
     }
-    if (url?.hostname === chrome.runtime.id) {
+    if (
+      url?.hostname === chrome.runtime.id &&
+      url?.pathname === "/stubPage.html"
+    ) {
       const params = new URLSearchParams(url.search);
       await chrome.tabs.update(tabId, {
         url: params.get("url") ?? undefined,
@@ -229,6 +232,12 @@ async function initSessionTabs(
             const tabIsActive = i === 0 && j === 0 ? true : false;
             const tab = await chrome.tabs.create({
               url: tabUrl,
+              active: tabIsActive,
+            });
+            tabIds.push(tab.id);
+          } else {
+            const tabIsActive = i === 0 && j === 0 ? true : false;
+            const tab = await chrome.tabs.create({
               active: tabIsActive,
             });
             tabIds.push(tab.id);

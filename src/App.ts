@@ -38,6 +38,7 @@ import {
 import { fallbackTreeContent } from "./fallbackTreeContent";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { sessionsTreeContent } from "./sessionsTreeContent";
+import { moveOrCopyToSessionTreeContent } from "./moveOrCopyToSessionTreeContent";
 
 // disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -58,6 +59,8 @@ export const editSessionInputRef = createRef<SlInput>();
 export const tabGroupTreeDialogRef = createRef<SlDialog>();
 export const sessionsTreeDialogRef = createRef<SlDialog>();
 export const deleteSessionDialogRef = createRef<SlDialog>();
+export const moveOrCopyTabToSessionTreeDialogRef = createRef<SlDialog>();
+export const moveOrCopyTabGroupToSessionTreeDialogRef = createRef<SlDialog>();
 
 export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
@@ -118,6 +121,32 @@ export function App() {
               fullWidth: true,
               noTopBodyMargin: true,
               ref: tabGroupTreeDialogRef,
+            })}
+            ${h(Dialog, {
+              label: "Move Or Copy Tab",
+              content: html`${h(Tree, {
+                contentFn: () =>
+                  html`${until(
+                    moveOrCopyToSessionTreeContent("tab"),
+                    fallbackTreeContent(),
+                  )}`,
+              })}`,
+              fullWidth: true,
+              noTopBodyMargin: true,
+              ref: moveOrCopyTabToSessionTreeDialogRef,
+            })}
+            ${h(Dialog, {
+              label: "Move Or Copy Tab Group",
+              content: html`${h(Tree, {
+                contentFn: () =>
+                  html`${until(
+                    moveOrCopyToSessionTreeContent("tabGroup"),
+                    fallbackTreeContent(),
+                  )}`,
+              })}`,
+              fullWidth: true,
+              noTopBodyMargin: true,
+              ref: moveOrCopyTabGroupToSessionTreeDialogRef,
             })}
             ${h(Dialog, {
               label: "Help",

@@ -157,7 +157,7 @@ export function Toolbar() {
                     }
                   });
                 } else {
-                  notify("Current session is unsaved", "warning");
+                  notify("Current session is unsaved.", "warning");
                 }
               }
             } catch (error) {
@@ -180,7 +180,7 @@ export function Toolbar() {
                 setCurrentlyDeletedSessionIsCurrentSession(true);
                 deleteSessionDialogRef.value?.show();
               } else {
-                notify("Current session is unsaved", "warning");
+                notify("Current session is unsaved.", "warning");
               }
             } catch (error) {
               notifyWithErrorMessageAndReloadButton();

@@ -8,12 +8,15 @@ import {
   closeTabGroup,
   collapseTabGroup,
   expandTabGroup,
+  setCurrentMovedOrCopiedTabOrTabGroup,
   setFirstTabInNewTabGroupId,
   tabGroupTreeData,
 } from "./sessionService";
 import {
   addTabGroupDialogRef,
   editTabGroupDialogRefs,
+  moveOrCopyTabGroupToSessionTreeDialogRef,
+  moveOrCopyTabToSessionTreeDialogRef,
   setCurrentlyEditedTabGroupId,
 } from "./App";
 import { newTabUrls, tabGroupTypes } from "../constants";
@@ -72,6 +75,7 @@ export async function tabGroupTreeContent() {
                       editTabGroupDialogRefs.dialog.value?.show();
                       // use `setTimeout` to ensure that the cursor gets placed in the right position in the input
                       setTimeout(() => {
+                        // @handled
                         try {
                           if (
                             editTabGroupDialogRefs.input.value &&
@@ -86,6 +90,22 @@ export async function tabGroupTreeContent() {
                           notifyWithErrorMessageAndReloadButton();
                         }
                       });
+                    } catch (error) {
+                      notifyWithErrorMessageAndReloadButton();
+                    }
+                  }}
+                ></sl-icon-button>`
+              : null}
+            ${tabGroup.type === tabGroupTypes.normal
+              ? html`<sl-icon-button
+                  name="arrow-up-right"
+                  title="Move Or Copy To Session"
+                  @click=${async (e: Event) => {
+                    // @handled
+                    try {
+                      e.stopPropagation();
+                      setCurrentMovedOrCopiedTabOrTabGroup(tabGroup);
+                      await moveOrCopyTabGroupToSessionTreeDialogRef.value?.show();
                     } catch (error) {
                       notifyWithErrorMessageAndReloadButton();
                     }
@@ -136,6 +156,20 @@ export async function tabGroupTreeContent() {
                           e.stopPropagation();
                           setFirstTabInNewTabGroupId(tab.id);
                           addTabGroupDialogRef.value?.show();
+                        } catch (error) {
+                          notifyWithErrorMessageAndReloadButton();
+                        }
+                      }}
+                    ></sl-icon-button>
+                    <sl-icon-button
+                      name="arrow-up-right"
+                      title="Move Or Copy To Session"
+                      @click=${async (e: Event) => {
+                        // @handled
+                        try {
+                          e.stopPropagation();
+                          setCurrentMovedOrCopiedTabOrTabGroup(tab);
+                          await moveOrCopyTabToSessionTreeDialogRef.value?.show();
                         } catch (error) {
                           notifyWithErrorMessageAndReloadButton();
                         }

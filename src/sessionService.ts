@@ -15,6 +15,10 @@ import {
   sendMessage,
   saveCurrentSessionData,
 } from "../sharedUtils";
+import {
+  moveOrCopyTabGroupToSessionTreeDialogRef,
+  moveOrCopyTabToSessionTreeDialogRef,
+} from "./App";
 
 export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
   Promise<TabGroupTreeData> | TabGroupTreeData
@@ -337,4 +341,97 @@ export async function openNewSession(
 ) {
   // @maybe
   sendMessage({ type: messageTypes.initSessionTabs, data: newSessionData });
+}
+
+export const [
+  currentlyMovedOrCopiedTabOrTabGroup,
+  setCurrentMovedOrCopiedTabOrTabGroup,
+] = adaptState<chrome.tabs.Tab | chrome.tabGroups.TabGroup | null>(null);
+
+export async function moveOrCopyToSession(
+  sessionOrTabGroupDataId: chrome.bookmarks.BookmarkTreeNode["id"],
+  copy: boolean = false,
+) {
+  // @maybe
+  const _currentlyMovedOrCopiedTabOrTabGroup =
+    currentlyMovedOrCopiedTabOrTabGroup();
+  if (!_currentlyMovedOrCopiedTabOrTabGroup) {
+    return;
+  }
+  if ((_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabs.Tab).url) {
+    const url = new URL(
+      (_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabs.Tab).url!,
+    );
+    if (
+      url?.hostname === chrome.runtime.id &&
+      url?.pathname === "/stubPage.html"
+    ) {
+      const params = new URLSearchParams(url.search);
+      (_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabs.Tab).url =
+        params.get("url") ?? undefined;
+      (_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabs.Tab).title =
+        params.get("title") ?? undefined;
+    }
+    await chrome.bookmarks.create({
+      parentId: sessionOrTabGroupDataId,
+      url: (_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabs.Tab).url,
+      title: _currentlyMovedOrCopiedTabOrTabGroup.title,
+    });
+    if (copy) {
+      notify("Tab copied successfully.", "success");
+    } else {
+      await chrome.tabs.remove(_currentlyMovedOrCopiedTabOrTabGroup.id!);
+    }
+    moveOrCopyTabToSessionTreeDialogRef.value?.hide();
+  } else if (
+    (_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabGroups.TabGroup).color
+  ) {
+    const tabGroupData = await chrome.bookmarks.create({
+      parentId: sessionOrTabGroupDataId,
+      title: `${
+        (_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabGroups.TabGroup)
+          .color
+      }-${_currentlyMovedOrCopiedTabOrTabGroup.title}`,
+    });
+    const tabs = await chrome.tabs.query({
+      groupId: _currentlyMovedOrCopiedTabOrTabGroup.id,
+    });
+    const tabIds = tabs.map((tab) => tab.id);
+    for (const tab of tabs) {
+      if (tab.url) {
+        const url = new URL(tab.url);
+        if (
+          url?.hostname === chrome.runtime.id &&
+          url?.pathname === "/stubPage.html"
+        ) {
+          const params = new URLSearchParams(url.search);
+          tab.url = params.get("url") ?? undefined;
+          tab.title = params.get("title") ?? undefined;
+          console.log(tab.title);
+        }
+        await chrome.bookmarks.create({
+          parentId: tabGroupData.id,
+          url: tab.url,
+          title: tab.title,
+        });
+      }
+    }
+    if (copy) {
+      notify("Tab group copied successfully.", "success");
+    } else {
+      const tabGroupTreeData =
+        (await getStorageData<TabGroupTreeData>(
+          sessionStorageKeys.tabGroupTreeData,
+        )) ?? [];
+      if (tabGroupTreeData.length > 1) {
+        await chrome.tabs.ungroup(tabIds as [number, ...number[]]);
+        await chrome.tabs.remove(tabIds as number[]);
+      } else {
+        notify("Tab group copied successfully.", "success");
+        notify("Cannot leave session empty.", "warning");
+      }
+    }
+    moveOrCopyTabGroupToSessionTreeDialogRef.value?.hide();
+  }
+  setCurrentMovedOrCopiedTabOrTabGroup(null);
 }
