@@ -1,19 +1,19 @@
 {
   "name": "augmented-tabflow",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Augment your tab workflow with extended tab group managment",
   "scripts": {
-    "dev": "concurrently \"nodemon --watch public --ext js,json,png --exec 'vite build --watch --sourcemap true --minify false'\" \"tsc --watch\"",
-    "build": "vite build",
-    "package": "vite build && zip -r augmented-tabflow.zip dist/"
+    "build": "cp manifest-dev.json public/manifest.json && vite build --outDir package-dev",
+    "dev": "concurrently \"nodemon --watch public --ext js,json,png --exec 'cp manifest-dev.json public/manifest.json && vite build --outDir package-dev --watch --sourcemap true --minify false'\" \"tsc --watch\"",
+    "package": "cp manifest-prod.json public/manifest.json && vite build && zip -r augmented-tabflow.zip package/ && rm -rf package"
   },
   "author": "Paul Amoah",
   "license": "MIT",
   "devDependencies": {
     "chrome-types": "^0.1.250",
     "concurrently": "^8.2.2",
-    "nodemon": "^3.0.2",
+    "nodemon": "^3.1.0",
     "ts-lit-plugin": "^2.0.2",
     "typescript": "^5.3.3",
     "vite": "^5.1.5"

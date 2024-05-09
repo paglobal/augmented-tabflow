@@ -166,7 +166,8 @@ export function Toolbar() {
           }}
         ></sl-icon-button>
         <sl-icon-button
-          name="trash"
+          name="MaterialSymbolsDeleteOutlineRounded"
+          class="icones-icon"
           title="Delete Current Session"
           @click=${async () => {
             // @handled

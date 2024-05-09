@@ -1,6 +1,6 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
-import { rootBookmarkNodeTitle } from "../constants";
+import { titles } from "../constants";
 
 export function Help() {
   return () => html`
@@ -54,8 +54,8 @@ export function Help() {
       </li>
       <li>
         Your sessions are saved in the bookmark folder
-        "${rootBookmarkNodeTitle}" but you can change the title if you wish. Be
-        careful of how you and other extensions modify this folder.
+        "${titles.rootBookmarkNode}" but you can change the title if you wish.
+        Be careful of how you and other extensions modify this folder.
       </li>
       <li>
         Please don't modify any session's bookmark folder while that session is

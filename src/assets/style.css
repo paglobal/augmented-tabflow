@@ -111,3 +111,11 @@ sl-button::part(label) {
   top: auto;
   bottom: 0;
 }
+
+sl-icon-button.icones-icon::part(base) {
+  margin-top: -0.1rem;
+}
+
+sl-icon-button.icones-icon {
+  font-size: 1.25rem;
+}

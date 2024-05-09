@@ -2,12 +2,13 @@ import {
   lockNames,
   messageTypes,
   sessionStorageKeys,
+  syncStorageKeys,
   tabGroupColorList,
-  ungroupedTabGroupTitle,
+  titles,
 } from "./constants";
 import {
   type TabGroupTreeData,
-  createRootBookmarkNode,
+  createBookmarkNodeAndSyncId,
   getStorageData,
   setStorageData,
   subscribeToMessage,
@@ -20,13 +21,27 @@ chrome.sidePanel
 
 chrome.runtime.onInstalled.addListener(async () => {
   // @error
-  await createRootBookmarkNode();
+  await createBookmarkNodeAndSyncId(
+    syncStorageKeys.rootBookmarkNodeId,
+    titles.rootBookmarkNode,
+  );
+  await createBookmarkNodeAndSyncId(
+    syncStorageKeys.pinnedTabGroupBookmarkNodeId,
+    titles.pinnedTabGroup,
+  );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   // @error
-  await createRootBookmarkNode();
+  await createBookmarkNodeAndSyncId(
+    syncStorageKeys.rootBookmarkNodeId,
+    titles.rootBookmarkNode,
+  );
+  await createBookmarkNodeAndSyncId(
+    syncStorageKeys.pinnedTabGroupBookmarkNodeId,
+    titles.pinnedTabGroup,
+  );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
@@ -197,7 +212,7 @@ async function initSessionTabs(
           "-",
         )[0] as chrome.tabGroups.Color;
         const isUngroupedTabGroupData =
-          tabGroupData.title === ungroupedTabGroupTitle;
+          tabGroupData.title === titles.ungroupedTabGroup;
         if (tabGroupData.url) {
           await chrome.bookmarks.remove(tabGroupData.id);
 

@@ -2,15 +2,14 @@ import {
   type SyncStorageKey,
   type SessionStorageKey,
   syncStorageKeys,
-  rootBookmarkNodeTitle,
   AreaName,
   TabGroupType,
   tabGroupTypes,
   sessionStorageKeys,
-  ungroupedTabGroupTitle,
   MessageType,
   tabGroupTreeDataUpdateDebounceTimeout,
   lockNames,
+  titles,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -62,7 +61,10 @@ async function getTabGroupTreeData() {
       if (currentTab.url) {
         url = new URL(currentTab.url);
       }
-      if (url?.hostname === chrome.runtime.id) {
+      if (
+        url?.hostname === chrome.runtime.id &&
+        url?.pathname === "/stubPage.html"
+      ) {
         const params = new URLSearchParams(url.search);
         currentTab.url = params.get("url") ?? undefined;
       }
@@ -92,13 +94,17 @@ async function getTabGroupTreeData() {
   const ungroupedTabs = await chrome.tabs.query({
     groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
     windowType: "normal",
+    pinned: false,
   });
   ungroupedTabs.forEach((tab) => {
     let url: URL | undefined;
     if (tab.url) {
       url = new URL(tab.url);
     }
-    if (url?.hostname === chrome.runtime.id) {
+    if (
+      url?.hostname === chrome.runtime.id &&
+      url?.pathname === "/stubPage.html"
+    ) {
       const params = new URLSearchParams(url.search);
       tab.url = params.get("url") ?? undefined;
     }
@@ -112,10 +118,43 @@ async function getTabGroupTreeData() {
       type: tabGroupTypes.ungrouped,
       color: null as unknown as chrome.tabGroups.Color,
       windowId: null as unknown as NonNullable<chrome.windows.Window["id"]>,
-      title: ungroupedTabGroupTitle,
-      icon: "folder2-open",
+      title: titles.ungroupedTabGroup,
+      icon: "MaterialSymbolsFolderOpenOutlineRounded",
       collapsed: !!ungroupedTabGroupCollapsed,
       tabs: ungroupedTabs,
+    });
+  }
+  const pinnedTabs = await chrome.tabs.query({
+    groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
+    windowType: "normal",
+    pinned: true,
+  });
+  pinnedTabs.forEach((tab) => {
+    let url: URL | undefined;
+    if (tab.url) {
+      url = new URL(tab.url);
+    }
+    if (
+      url?.hostname === chrome.runtime.id &&
+      url?.pathname === "/stubPage.html"
+    ) {
+      const params = new URLSearchParams(url.search);
+      tab.url = params.get("url") ?? undefined;
+    }
+  });
+  const pinnedTabGroupCollapsed = await getStorageData<boolean>(
+    sessionStorageKeys.pinnedTabGroupCollapsed,
+  );
+  if (pinnedTabs.length) {
+    tabGroupTreeData.unshift({
+      id: chrome.tabGroups.TAB_GROUP_ID_NONE,
+      type: tabGroupTypes.ungrouped,
+      color: null as unknown as chrome.tabGroups.Color,
+      windowId: null as unknown as NonNullable<chrome.windows.Window["id"]>,
+      title: titles.pinnedTabGroup,
+      icon: "MaterialSymbolsFolderOpenOutlineRounded",
+      collapsed: !!pinnedTabGroupCollapsed,
+      tabs: pinnedTabs,
     });
   }
 
@@ -192,34 +231,39 @@ export async function updateTabGroupTreeDataAndCurrentSessionData() {
   }
 }
 
-export async function createRootBookmarkNode() {
-  await navigator.locks.request(lockNames.createRootBookmarkNode, async () => {
+export async function createBookmarkNodeAndSyncId(
+  syncStorageKey: SyncStorageKey,
+  bookmarkNodeTitle: string,
+) {
+  await navigator.locks.request(lockNames.createBookmarkNode, async () => {
     try {
-      const rootBookmarkNodeId = await getStorageData<
-        chrome.bookmarks.BookmarkTreeNode["id"]
-      >(syncStorageKeys.rootBookmarkNodeId);
+      const bookmarkNodeId =
+        await getStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
+          syncStorageKey,
+        );
+      let parentId: chrome.bookmarks.BookmarkTreeNode["id"] | undefined;
+      if (syncStorageKey === syncStorageKeys.pinnedTabGroupBookmarkNodeId) {
+        parentId = await getStorageData<
+          chrome.bookmarks.BookmarkTreeNode["id"]
+        >(syncStorageKeys.rootBookmarkNodeId);
+      }
       try {
-        const rootBookmarkNode = (
-          await chrome.bookmarks.get(rootBookmarkNodeId!)
-        )[0];
-        // this isn't even necessary because `chrome.bookmarks.get` will error if our bookmark id is invalid...but just in case!
-        if (!rootBookmarkNode) {
-          const rootBookmarkNodeId = (
-            await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
+        const bookmarkNode = (await chrome.bookmarks.get(bookmarkNodeId!))[0];
+        // this isn't even necessary because `chrome.bookmarks.get` will error if our bookmark id is invalid...but just in case
+        if (!bookmarkNode) {
+          const bookmarkNodeId = (
+            await chrome.bookmarks.create({
+              title: bookmarkNodeTitle,
+              parentId,
+            })
           ).id;
-          setStorageData(
-            syncStorageKeys.rootBookmarkNodeId,
-            rootBookmarkNodeId,
-          );
+          setStorageData(syncStorageKey, bookmarkNodeId);
         }
       } catch (error) {
-        const rootBookmarkNodeId = (
-          await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
+        const bookmarkNodeId = (
+          await chrome.bookmarks.create({ title: bookmarkNodeTitle, parentId })
         ).id;
-        await setStorageData(
-          syncStorageKeys.rootBookmarkNodeId,
-          rootBookmarkNodeId,
-        );
+        await setStorageData(syncStorageKey, bookmarkNodeId);
       }
     } catch (error) {
       // no error handling here. we'll do that in the sidepanel ui

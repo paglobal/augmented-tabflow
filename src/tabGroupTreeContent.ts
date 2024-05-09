@@ -98,7 +98,7 @@ export async function tabGroupTreeContent() {
               : null}
             ${tabGroup.type === tabGroupTypes.normal
               ? html`<sl-icon-button
-                  name="arrow-up-right"
+                  name="arrow-90deg-right"
                   title="Move Or Copy To Session"
                   @click=${async (e: Event) => {
                     // @handled
@@ -162,7 +162,7 @@ export async function tabGroupTreeContent() {
                       }}
                     ></sl-icon-button>
                     <sl-icon-button
-                      name="arrow-up-right"
+                      name="arrow-90deg-right"
                       title="Move Or Copy To Session"
                       @click=${async (e: Event) => {
                         // @handled
@@ -197,7 +197,7 @@ export async function tabGroupTreeContent() {
                       : null}
                     ${tab.audible && !tab.mutedInfo?.muted
                       ? h(TreeItemColorPatchOrIcon, {
-                          icon: "volume-down",
+                          icon: "MaterialSymbolsVolumeUpOutlineRounded",
                         })
                       : null}
                     ${h(TreeItemColorPatchOrIcon, {

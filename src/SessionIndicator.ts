@@ -2,7 +2,7 @@ import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { until } from "lit/directives/until.js";
 import { currentSessionData } from "./sessionService";
-import { unsavedSessionTitle } from "../constants";
+import { titles } from "../constants";
 import { sessionsTreeDialogRef } from "./App";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 
@@ -14,7 +14,7 @@ export function SessionIndicator() {
 
       return _currentSessionData
         ? _currentSessionData.title
-        : unsavedSessionTitle;
+        : titles.unsavedSession;
     } catch (error) {
       notifyWithErrorMessageAndReloadButton();
 
@@ -55,7 +55,7 @@ export function SessionIndicator() {
           }
         }}
         title="Show Sessions"
-        >${until(currentSessionTitle(), unsavedSessionTitle)}</sl-button
+        >${until(currentSessionTitle(), titles.unsavedSession)}</sl-button
       >
     </div>`;
 }

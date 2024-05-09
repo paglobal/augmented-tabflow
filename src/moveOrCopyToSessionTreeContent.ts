@@ -4,7 +4,7 @@ import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import { moveOrCopyToSession, sessionsTreeData } from "./sessionService";
 import { getStorageData } from "../sharedUtils";
-import { sessionStorageKeys, ungroupedTabGroupTitle } from "../constants";
+import { sessionStorageKeys, titles } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 
@@ -44,8 +44,8 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
 
               return html`${h(TreeItem, {
                 tooltipContent:
-                  tabGroupData.title === ungroupedTabGroupTitle
-                    ? ungroupedTabGroupTitle
+                  tabGroupData.title === titles.ungroupedTabGroup
+                    ? titles.ungroupedTabGroup
                     : tabGroupTitle,
                 async onSelect(e: Event) {
                   // @handled
@@ -73,15 +73,15 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
                 `,
                 content: html`${h(TreeItemColorPatchOrIcon, {
                   color:
-                    tabGroupData.title === ungroupedTabGroupTitle
+                    tabGroupData.title === titles.ungroupedTabGroup
                       ? undefined
                       : tabGroupColor,
                   icon:
-                    tabGroupData.title === ungroupedTabGroupTitle
-                      ? "folder2-open"
+                    tabGroupData.title === titles.ungroupedTabGroup
+                      ? "MaterialSymbolsFolderOpenOutlineRounded"
                       : undefined,
-                })}${tabGroupData.title === ungroupedTabGroupTitle
-                  ? ungroupedTabGroupTitle
+                })}${tabGroupData.title === titles.ungroupedTabGroup
+                  ? titles.ungroupedTabGroup
                   : tabGroupTitle}`,
               })}`;
             })}`,

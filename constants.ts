@@ -12,12 +12,14 @@ export const sessionStorageKeys = {
   recentlyClosedTabGroups: "session-8",
   recentlyClosedTabGroupsCollapsed: "session-9",
   readyToUpdateCurrentSessionData: "session-10",
+  pinnedTabGroupCollapsed: "session-11",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;
 
 export const syncStorageKeys = {
   rootBookmarkNodeId: "sync-1",
+  pinnedTabGroupBookmarkNodeId: "sync-2",
 } as const satisfies Record<string, SyncStorageKey>;
 
 export type TabGroupType = `tabGroup-${number}`;
@@ -25,22 +27,24 @@ export type TabGroupType = `tabGroup-${number}`;
 export const tabGroupTypes = {
   normal: "tabGroup-1",
   ungrouped: "tabGroup-2",
+  pinned: "tabGroup-3",
 } as const satisfies Record<string, TabGroupType>;
 
 type LockName = `lock-${number}`;
 
 export const lockNames = {
   applyUpdates: "lock-1",
-  createRootBookmarkNode: "lock-2",
+  createBookmarkNode: "lock-2",
 } as const satisfies Record<string, LockName>;
 
-export const rootBookmarkNodeTitle = "Augmented Tabflow Sessions";
+export const titles = {
+  rootBookmarkNode: "Augmented Tabflow Sessions",
+  pinnedTabGroup: "Pinned",
+  ungroupedTabGroup: "Ungrouped",
+  unsavedSession: "Unsaved Session",
+};
 
 export const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
-
-export const ungroupedTabGroupTitle = "Ungrouped";
-
-export const unsavedSessionTitle = "Unsaved Session";
 
 export const tabGroupColorList = [
   "grey",

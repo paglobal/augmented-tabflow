@@ -17,6 +17,7 @@ import { getStorageData } from "../sharedUtils";
 import { sessionStorageKeys } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
+import { styleMap } from "lit/directives/style-map.js";
 
 export async function sessionsTreeContent() {
   // @handled
@@ -64,7 +65,8 @@ export async function sessionsTreeContent() {
               }}
             ></sl-icon-button>
             <sl-icon-button
-              name="trash"
+              name="MaterialSymbolsDeleteOutlineRounded"
+              class="icones-icon"
               title="Delete Session"
               @click=${async (e: Event) => {
                 // @handled
