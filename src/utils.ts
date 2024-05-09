@@ -87,10 +87,10 @@ export function notifyWithErrorMessageAndReloadButton() {
 // TODO: implement "overwrite with current session" feature
 //
 // --- Urgent ---
-// TODO: implement pinned tab groups
-// TODO: implement drag-and-drop for tabs, tab groups and sessions. be careful when trying to move pinned tabs.
 // TODO: implement loading fallback for session and tab group trees which provide a way to exit loading of current session (eg. for when user interrupts session switching
 //       loading continues indefinitely)
+// TODO: implement pinned tab groups
+// TODO: implement drag-and-drop for tabs, tab groups and sessions. be careful when trying to move pinned tabs.
 // TODO: implement recently closed tab groups feature
 //
 // --- Extension ---

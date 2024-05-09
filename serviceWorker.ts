@@ -154,7 +154,7 @@ async function initSessionTabs(
   newSessionData?: chrome.bookmarks.BookmarkTreeNode,
 ) {
   // @maybe
-  navigator.locks.request(lockNames.applyUpdates, async () => {
+  await navigator.locks.request(lockNames.applyUpdates, async () => {
     const oldSessionData =
       await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
         sessionStorageKeys.currentSessionData,
