@@ -7,8 +7,11 @@ import {
   updateTabGroupTreeDataAndCurrentSessionData,
 } from "./sharedUtils";
 
-createRootBookmarkNode();
-updateTabGroupTreeDataAndCurrentSessionData();
+(async function () {
+  await createRootBookmarkNode();
+  await updateTabGroupTreeDataAndCurrentSessionData();
+})();
+
 // auto light/dark mode based on user preferences
 if (window.matchMedia) {
   if (window.matchMedia("(prefers-color-scheme: dark)").matches) {

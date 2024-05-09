@@ -27,6 +27,13 @@ export const tabGroupTypes = {
   ungrouped: "tabGroup-2",
 } as const satisfies Record<string, TabGroupType>;
 
+type LockName = `lock-${number}`;
+
+export const lockNames = {
+  applyUpdates: "lock-1",
+  createRootBookmarkNode: "lock-2",
+} as const satisfies Record<string, LockName>;
+
 export const rootBookmarkNodeTitle = "Augmented Tabflow Sessions";
 
 export const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
@@ -54,5 +61,3 @@ export const messageTypes = {
 } as const satisfies Record<string, MessageType>;
 
 export const tabGroupTreeDataUpdateDebounceTimeout = 200;
-
-export const applyUpdatesLockName = "applyUpdates";

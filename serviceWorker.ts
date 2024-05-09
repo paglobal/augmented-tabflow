@@ -1,5 +1,5 @@
 import {
-  applyUpdatesLockName,
+  lockNames,
   messageTypes,
   sessionStorageKeys,
   tabGroupColorList,
@@ -18,19 +18,17 @@ chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error));
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(async () => {
   // @error
-  createRootBookmarkNode();
-  updateTabGroupTreeDataAndCurrentSessionData();
+  await createRootBookmarkNode();
+  await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
-chrome.runtime.onStartup.addListener(() => {
+chrome.runtime.onStartup.addListener(async () => {
   // @error
-  createRootBookmarkNode();
-  updateTabGroupTreeDataAndCurrentSessionData();
+  await createRootBookmarkNode();
+  await updateTabGroupTreeDataAndCurrentSessionData();
 });
-
-updateTabGroupTreeDataAndCurrentSessionData();
 
 chrome.tabGroups.onCreated.addListener(async () => {
   // @error
@@ -156,7 +154,7 @@ async function initSessionTabs(
   newSessionData?: chrome.bookmarks.BookmarkTreeNode,
 ) {
   // @maybe
-  navigator.locks.request(applyUpdatesLockName, async () => {
+  navigator.locks.request(lockNames.applyUpdates, async () => {
     const oldSessionData =
       await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
         sessionStorageKeys.currentSessionData,

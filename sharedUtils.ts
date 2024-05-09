@@ -10,7 +10,7 @@ import {
   ungroupedTabGroupTitle,
   MessageType,
   tabGroupTreeDataUpdateDebounceTimeout,
-  applyUpdatesLockName,
+  lockNames,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -137,6 +137,8 @@ async function updateCurrentSessionData() {
   if (newSessionData) {
     await chrome.bookmarks.removeTree(currentSessionData.id);
     await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
+  } else {
+    await setStorageData(sessionStorageKeys.currentSessionData, null);
   }
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
@@ -145,7 +147,7 @@ async function updateCurrentSessionData() {
 }
 
 async function applyUpdates() {
-  navigator.locks.request(applyUpdatesLockName, async () => {
+  navigator.locks.request(lockNames.applyUpdates, async () => {
     const tabGroupTreeData = await getTabGroupTreeData();
     await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
     await updateCurrentSessionData();
@@ -191,33 +193,38 @@ export async function updateTabGroupTreeDataAndCurrentSessionData() {
 }
 
 export async function createRootBookmarkNode() {
-  try {
-    const rootBookmarkNodeId = await getStorageData<
-      chrome.bookmarks.BookmarkTreeNode["id"]
-    >(syncStorageKeys.rootBookmarkNodeId);
+  await navigator.locks.request(lockNames.createRootBookmarkNode, async () => {
     try {
-      const rootBookmarkNode = (
-        await chrome.bookmarks.get(rootBookmarkNodeId!)
-      )[0];
-      // this isn't even necessary because `chrome.bookmarks.get` will error if our bookmark id is invalid...but just in case!
-      if (!rootBookmarkNode) {
+      const rootBookmarkNodeId = await getStorageData<
+        chrome.bookmarks.BookmarkTreeNode["id"]
+      >(syncStorageKeys.rootBookmarkNodeId);
+      try {
+        const rootBookmarkNode = (
+          await chrome.bookmarks.get(rootBookmarkNodeId!)
+        )[0];
+        // this isn't even necessary because `chrome.bookmarks.get` will error if our bookmark id is invalid...but just in case!
+        if (!rootBookmarkNode) {
+          const rootBookmarkNodeId = (
+            await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
+          ).id;
+          setStorageData(
+            syncStorageKeys.rootBookmarkNodeId,
+            rootBookmarkNodeId,
+          );
+        }
+      } catch (error) {
         const rootBookmarkNodeId = (
           await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
         ).id;
-        setStorageData(syncStorageKeys.rootBookmarkNodeId, rootBookmarkNodeId);
+        await setStorageData(
+          syncStorageKeys.rootBookmarkNodeId,
+          rootBookmarkNodeId,
+        );
       }
     } catch (error) {
-      const rootBookmarkNodeId = (
-        await chrome.bookmarks.create({ title: rootBookmarkNodeTitle })
-      ).id;
-      await setStorageData(
-        syncStorageKeys.rootBookmarkNodeId,
-        rootBookmarkNodeId,
-      );
+      // no error handling here. we'll do that in the sidepanel ui
     }
-  } catch (error) {
-    // no error handling here. we'll do that in the sidepanel ui
-  }
+  });
 }
 
 export async function sendMessage(
