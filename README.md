@@ -12,12 +12,11 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 - implement loading fallback for session and tab group trees which provide a way to exit loading of current session (eg. for when user interrupts session switching
   loading continues indefinitely)
-- implement pinned tab group
 - implement drag-and-drop for tabs, tab groups and sessions
 - implement recently closed tab groups feature
 - implement window management
 - (maybe) show random color when creating new tab group
-- implement "overwrite with current session" feature
+- fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 
 ### Later
 
@@ -26,7 +25,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) cater for more browser eg. by adding more entries to the `newTabUrls` array
 - (if necessary) come up with a way to handle storage migrations
 - implement theme switcher
-- fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 - refine and organise text. look for anything in quotation marks like "Error!" and such. make use of full stops
 - general code inspection and refactoring
 - (if necessary) differentiate state update functions from storage data update functions

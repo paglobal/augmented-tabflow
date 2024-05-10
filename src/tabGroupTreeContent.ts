@@ -14,13 +14,17 @@ import {
 } from "./sessionService";
 import {
   addTabGroupDialogRef,
+  addTabGroupSelectRef,
   editTabGroupDialogRefs,
   moveOrCopyTabGroupToSessionTreeDialogRef,
   moveOrCopyTabToSessionTreeDialogRef,
   setCurrentlyEditedTabGroupId,
 } from "./App";
 import { newTabUrls, tabGroupTypes } from "../constants";
-import { notifyWithErrorMessageAndReloadButton } from "./utils";
+import {
+  notifyWithErrorMessageAndReloadButton,
+  randomTabGroupColorValue,
+} from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 
 export async function tabGroupTreeContent() {
@@ -155,6 +159,39 @@ export async function tabGroupTreeContent() {
                     }
                   },
                   actionButtons: html`
+                    ${tabGroup.type === tabGroupTypes.pinned
+                      ? html`
+                          <sl-icon-button
+                            name="pin-angle-fill"
+                            title="Unpin Tab"
+                            @click=${(e: Event) => {
+                              // @handled
+                              try {
+                                e.stopPropagation();
+                                chrome.tabs.update(tab.id!, { pinned: false });
+                              } catch (error) {
+                                console.error(error);
+                                notifyWithErrorMessageAndReloadButton();
+                              }
+                            }}
+                          ></sl-icon-button>
+                        `
+                      : html`
+                          <sl-icon-button
+                            name="pin-angle"
+                            title="Pin Tab"
+                            @click=${(e: Event) => {
+                              // @handled
+                              try {
+                                e.stopPropagation();
+                                chrome.tabs.update(tab.id!, { pinned: true });
+                              } catch (error) {
+                                console.error(error);
+                                notifyWithErrorMessageAndReloadButton();
+                              }
+                            }}
+                          ></sl-icon-button>
+                        `}
                     <sl-icon-button
                       name="plus-circle"
                       title="Add Tab To New Group"
@@ -163,6 +200,10 @@ export async function tabGroupTreeContent() {
                         try {
                           e.stopPropagation();
                           setFirstTabInNewTabGroupId(tab.id);
+                          if (addTabGroupSelectRef.value) {
+                            addTabGroupSelectRef.value.value =
+                              randomTabGroupColorValue();
+                          }
                           addTabGroupDialogRef.value?.show();
                         } catch (error) {
                           console.error(error);

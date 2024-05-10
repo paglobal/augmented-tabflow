@@ -53,6 +53,7 @@ export const editTabGroupDialogRefs = {
 export const helpDialogRef = createRef<SlDialog>();
 export const saveCurrentSessionDialogRef = createRef<SlDialog>();
 export const addTabGroupDialogRef = createRef<SlDialog>();
+export const addTabGroupSelectRef = createRef<SlSelect>();
 export const newSessionDialogRef = createRef<SlDialog>();
 export const editSessionDialogRef = createRef<SlDialog>();
 export const editSessionInputRef = createRef<SlInput>();
@@ -203,23 +204,16 @@ export function App() {
               },
             })}
             ${h(DialogForm, {
-              dialogLabel: "Save Current Session",
-              dialogRef: saveCurrentSessionDialogRef,
-              formContent: html`
-                <sl-input name="title" placeholder="Title" autofocus></sl-input>
-              `,
-              submitButtonText: "Save",
-              formAction({ title }: { title: string }) {
-                // @maybe
-                createSession(title, true);
-              },
-            })}
-            ${h(DialogForm, {
               dialogLabel: "Add Tab Group",
               dialogRef: addTabGroupDialogRef,
               formContent: html`
                 <sl-input name="title" placeholder="Title" autofocus></sl-input>
-                <sl-select name="color" placeholder="Color" hoist>
+                <sl-select
+                  ${ref(addTabGroupSelectRef)}
+                  name="color"
+                  placeholder="Color"
+                  hoist
+                >
                   ${Object.entries(tabGroupColors()).map(
                     ([colorName, colorValue]) => html`
                       <sl-option value=${colorName}
@@ -253,6 +247,18 @@ export function App() {
                   data.color = randomTabGroupColorValue();
                 }
                 createTabGroup(data);
+              },
+            })}
+            ${h(DialogForm, {
+              dialogLabel: "Save Current Session",
+              dialogRef: saveCurrentSessionDialogRef,
+              formContent: html`
+                <sl-input name="title" placeholder="Title" autofocus></sl-input>
+              `,
+              submitButtonText: "Save",
+              formAction({ title }: { title: string }) {
+                // @maybe
+                createSession(title, true);
               },
             })}
             ${h(DialogForm, {

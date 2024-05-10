@@ -5,7 +5,11 @@ import {
   currentSessionData,
   groupUngroupedTabsInWindow,
 } from "./sessionService";
-import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
+import {
+  notify,
+  notifyWithErrorMessageAndReloadButton,
+  randomTabGroupColorValue,
+} from "./utils";
 import { getStorageData } from "../sharedUtils";
 import { sessionStorageKeys } from "../constants";
 import {
@@ -18,6 +22,7 @@ import {
   setCurrentlyDeletedSessionId,
   setCurrentlyDeletedSessionIsCurrentSession,
   deleteSessionDialogRef,
+  addTabGroupSelectRef,
 } from "./App";
 
 export function Toolbar() {
@@ -112,6 +117,9 @@ export function Toolbar() {
           @click=${() => {
             // @handled
             try {
+              if (addTabGroupSelectRef.value) {
+                addTabGroupSelectRef.value.value = randomTabGroupColorValue();
+              }
               addTabGroupDialogRef.value?.show();
             } catch (error) {
               console.error(error);
@@ -180,8 +188,7 @@ export function Toolbar() {
           }}
         ></sl-icon-button>
         <sl-icon-button
-          name="MaterialSymbolsDeleteOutlineRounded"
-          class="icones-icon"
+          name="trash"
           title="Delete Current Session"
           @click=${async () => {
             // @handled

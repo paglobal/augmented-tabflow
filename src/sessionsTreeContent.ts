@@ -66,8 +66,7 @@ export async function sessionsTreeContent() {
               }}
             ></sl-icon-button>
             <sl-icon-button
-              name="MaterialSymbolsDeleteOutlineRounded"
-              class="icones-icon"
+              name="trash"
               title="Delete Session"
               @click=${async (e: Event) => {
                 // @handled
