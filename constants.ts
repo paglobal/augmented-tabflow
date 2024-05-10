@@ -62,6 +62,7 @@ export type MessageType = `message-${number}`;
 
 export const messageTypes = {
   initSessionTabs: "message-1",
+  restoreTab: "message-2",
 } as const satisfies Record<string, MessageType>;
 
 export const tabGroupTreeDataUpdateDebounceTimeout = 200;

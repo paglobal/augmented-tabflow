@@ -305,6 +305,7 @@ export function App() {
                       try {
                         deleteSessionDialogRef.value?.hide();
                       } catch (error) {
+                        console.error(error);
                         notifyWithErrorMessageAndReloadButton();
                       }
                     }}
@@ -331,6 +332,7 @@ export function App() {
                         setCurrentlyDeletedSessionId(null);
                         setCurrentlyDeletedSessionIsCurrentSession(false);
                       } catch (error) {
+                        console.error(error);
                         notifyWithErrorMessageAndReloadButton();
                       }
                     }}

@@ -16,6 +16,7 @@ export function SessionIndicator() {
         ? _currentSessionData.title
         : titles.unsavedSession;
     } catch (error) {
+      console.error(error);
       notifyWithErrorMessageAndReloadButton();
 
       return "Error!";
@@ -29,6 +30,7 @@ export function SessionIndicator() {
 
       return _currentSessionData ? "primary" : "default";
     } catch (error) {
+      console.error(error);
       notifyWithErrorMessageAndReloadButton();
 
       return "danger";
@@ -51,6 +53,7 @@ export function SessionIndicator() {
           try {
             sessionsTreeDialogRef.value?.show();
           } catch (error) {
+            console.error(error);
             notifyWithErrorMessageAndReloadButton();
           }
         }}

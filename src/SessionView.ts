@@ -28,6 +28,7 @@ export function SessionView() {
             })}`}
       `;
     } catch (error) {
+      console.error(error);
       notifyWithErrorMessageAndReloadButton();
 
       return fallbackTreeContent(true);

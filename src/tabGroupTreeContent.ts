@@ -37,6 +37,7 @@ export async function tabGroupTreeContent() {
               e.stopPropagation();
               expandTabGroup(tabGroup);
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           },
@@ -46,6 +47,7 @@ export async function tabGroupTreeContent() {
               e.stopPropagation();
               collapseTabGroup(tabGroup);
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           },
@@ -59,6 +61,7 @@ export async function tabGroupTreeContent() {
                   e.stopPropagation();
                   addTabToTabGroup(tabGroup);
                 } catch (error) {
+                  console.error(error);
                   notifyWithErrorMessageAndReloadButton();
                 }
               }}
@@ -87,10 +90,12 @@ export async function tabGroupTreeContent() {
                               tabGroup.color;
                           }
                         } catch (error) {
+                          console.error(error);
                           notifyWithErrorMessageAndReloadButton();
                         }
                       });
                     } catch (error) {
+                      console.error(error);
                       notifyWithErrorMessageAndReloadButton();
                     }
                   }}
@@ -107,6 +112,7 @@ export async function tabGroupTreeContent() {
                       setCurrentMovedOrCopiedTabOrTabGroup(tabGroup);
                       await moveOrCopyTabGroupToSessionTreeDialogRef.value?.show();
                     } catch (error) {
+                      console.error(error);
                       notifyWithErrorMessageAndReloadButton();
                     }
                   }}
@@ -121,6 +127,7 @@ export async function tabGroupTreeContent() {
                   e.stopPropagation();
                   closeTabGroup(tabGroup);
                 } catch (error) {
+                  console.error(error);
                   notifyWithErrorMessageAndReloadButton();
                 }
               }}
@@ -143,6 +150,7 @@ export async function tabGroupTreeContent() {
                       e.stopPropagation();
                       activateTab(tab);
                     } catch (error) {
+                      console.error(error);
                       notifyWithErrorMessageAndReloadButton();
                     }
                   },
@@ -157,6 +165,7 @@ export async function tabGroupTreeContent() {
                           setFirstTabInNewTabGroupId(tab.id);
                           addTabGroupDialogRef.value?.show();
                         } catch (error) {
+                          console.error(error);
                           notifyWithErrorMessageAndReloadButton();
                         }
                       }}
@@ -171,6 +180,7 @@ export async function tabGroupTreeContent() {
                           setCurrentMovedOrCopiedTabOrTabGroup(tab);
                           await moveOrCopyTabToSessionTreeDialogRef.value?.show();
                         } catch (error) {
+                          console.error(error);
                           notifyWithErrorMessageAndReloadButton();
                         }
                       }}
@@ -184,6 +194,7 @@ export async function tabGroupTreeContent() {
                           e.stopPropagation();
                           chrome.tabs.remove(tab.id as number);
                         } catch (error) {
+                          console.error(error);
                           notifyWithErrorMessageAndReloadButton();
                         }
                       }}
@@ -219,6 +230,7 @@ export async function tabGroupTreeContent() {
     });
     // doesn't take effect when used with `until` and a fallback
   } catch (error) {
+    console.error(error);
     notifyWithErrorMessageAndReloadButton();
 
     return fallbackTreeContent(true);

@@ -53,6 +53,7 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
                     e.stopPropagation();
                     await moveOrCopyToSession(tabGroupData.id);
                   } catch (error) {
+                    console.error(error);
                     notifyWithErrorMessageAndReloadButton();
                   }
                 },
@@ -66,6 +67,7 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
                         e.stopPropagation();
                         await moveOrCopyToSession(tabGroupData.id, true);
                       } catch (error) {
+                        console.error(error);
                         notifyWithErrorMessageAndReloadButton();
                       }
                     }}
@@ -101,6 +103,7 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
                 e.stopPropagation();
                 await moveOrCopyToSession(sessionData.id);
               } catch (error) {
+                console.error(error);
                 notifyWithErrorMessageAndReloadButton();
               }
             },
@@ -114,6 +117,7 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
                     e.stopPropagation();
                     await moveOrCopyToSession(sessionData.id, true);
                   } catch (error) {
+                    console.error(error);
                     notifyWithErrorMessageAndReloadButton();
                   }
                 }}
@@ -129,6 +133,7 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
       return sessionsTreeContent;
     }
   } catch (error) {
+    console.error(error);
     notifyWithErrorMessageAndReloadButton();
 
     return fallbackTreeContent(true);

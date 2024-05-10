@@ -5,7 +5,7 @@
   "description": "Augment your tab workflow with extended tab group managment",
   "scripts": {
     "build": "cp manifest-dev.json public/manifest.json && vite build --outDir package-dev",
-    "dev": "concurrently \"nodemon --watch public --ext js,json,png --exec 'cp manifest-dev.json public/manifest.json && vite build --outDir package-dev --watch --sourcemap true --minify false'\" \"tsc --watch\"",
+    "dev": "concurrently \"nodemon --watch public --ext js,json,png,html --exec 'cp manifest-dev.json public/manifest.json && vite build --outDir package-dev --watch --sourcemap true --minify false'\" \"tsc --watch\"",
     "package": "cp manifest-prod.json public/manifest.json && vite build && zip -r augmented-tabflow.zip package/ && rm -rf package"
   },
   "author": "Paul Amoah",

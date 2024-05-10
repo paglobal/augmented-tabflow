@@ -52,6 +52,9 @@ export function TreeItemColorPatchOrIcon(props: {
                   ></sl-spinner>`
                 : html`<img
                     src=${getFaviconUrl(props.pageUrl)}
+                    @error=${(e: Event) =>
+                      ((e.target as HTMLImageElement).src =
+                        getFaviconUrl(null))}
                     style=${styleMap({
                       width: "1.3rem",
                       padding: "0.2rem",

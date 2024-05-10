@@ -15,7 +15,9 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - implement pinned tab group
 - implement drag-and-drop for tabs, tab groups and sessions
 - implement recently closed tab groups feature
+- implement window management
 - (maybe) show random color when creating new tab group
+- implement "overwrite with current session" feature
 
 ### Later
 
@@ -40,10 +42,10 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (if necessary) add alerts for action start and action complete
 - (if necessary) add test suite
 - create `TreeDialog` and `ConfirmationDialog`
-- use `await` anywhere you can
+- use `await` anywhere you can. don't use `async-await` in array filter functions
+- use early returns anywhere you can
 - show warning or error alerts for when certain data is unavailable
 - maybe change the way arrays are typed to use `Array<T>`
-- implement "overwrite with current session" feature
 
 ### Extension
 

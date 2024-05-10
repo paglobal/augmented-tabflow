@@ -41,6 +41,7 @@ export function DialogForm(props: {
                 { once: true },
               );
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}

@@ -24,6 +24,7 @@ export function Tree(props: {
         try {
           e.detail.selection.forEach((treeItem) => treeItem.click());
         } catch (error) {
+          console.error(error);
           notifyWithErrorMessageAndReloadButton();
         }
       }}

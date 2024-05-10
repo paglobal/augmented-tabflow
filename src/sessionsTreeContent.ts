@@ -17,7 +17,6 @@ import { getStorageData } from "../sharedUtils";
 import { sessionStorageKeys } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
-import { styleMap } from "lit/directives/style-map.js";
 
 export async function sessionsTreeContent() {
   // @handled
@@ -39,6 +38,7 @@ export async function sessionsTreeContent() {
               e.stopPropagation();
               await openNewSession(sessionData);
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           },
@@ -60,6 +60,7 @@ export async function sessionsTreeContent() {
                     });
                   }
                 } catch (error) {
+                  console.error(error);
                   notifyWithErrorMessageAndReloadButton();
                 }
               }}
@@ -76,6 +77,7 @@ export async function sessionsTreeContent() {
                   setCurrentlyDeletedSessionIsCurrentSession(false);
                   deleteSessionDialogRef.value?.show();
                 } catch (error) {
+                  console.error(error);
                   notifyWithErrorMessageAndReloadButton();
                 }
               }}
@@ -101,6 +103,7 @@ export async function sessionsTreeContent() {
               e.stopPropagation();
               await openNewSession(null);
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           },
@@ -120,6 +123,7 @@ export async function sessionsTreeContent() {
             e.stopPropagation();
             helpDialogRef.value?.show();
           } catch (error) {
+            console.error(error);
             notifyWithErrorMessageAndReloadButton();
           }
         },
@@ -136,6 +140,7 @@ export async function sessionsTreeContent() {
             e.stopPropagation();
             saveCurrentSessionDialogRef.value?.show();
           } catch (error) {
+            console.error(error);
             notifyWithErrorMessageAndReloadButton();
           }
         },
@@ -144,6 +149,7 @@ export async function sessionsTreeContent() {
 
     return sessionsTreeContent;
   } catch (error) {
+    console.error(error);
     notifyWithErrorMessageAndReloadButton();
 
     return fallbackTreeContent(true);

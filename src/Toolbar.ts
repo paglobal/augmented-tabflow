@@ -36,11 +36,13 @@ export function Toolbar() {
               try {
                 tabGroupTreeDialogRef.value?.show();
               } catch (error) {
+                console.error(error);
                 notifyWithErrorMessageAndReloadButton();
               }
             }}
           ></sl-icon-button>`;
     } catch (error) {
+      console.error(error);
       notifyWithErrorMessageAndReloadButton();
 
       return null;
@@ -72,6 +74,7 @@ export function Toolbar() {
             try {
               chrome.tabs.goBack();
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}
@@ -84,6 +87,7 @@ export function Toolbar() {
             try {
               chrome.tabs.goForward();
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}
@@ -96,6 +100,7 @@ export function Toolbar() {
             try {
               chrome.tabs.reload();
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}
@@ -109,6 +114,7 @@ export function Toolbar() {
             try {
               addTabGroupDialogRef.value?.show();
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}
@@ -121,6 +127,7 @@ export function Toolbar() {
             try {
               groupUngroupedTabsInWindow();
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}
@@ -133,6 +140,7 @@ export function Toolbar() {
             try {
               newSessionDialogRef.value?.show();
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}
@@ -151,9 +159,14 @@ export function Toolbar() {
                 if (currentSessionData) {
                   editSessionDialogRef.value?.show();
                   setTimeout(() => {
-                    if (editSessionInputRef.value) {
-                      editSessionInputRef.value.value =
-                        currentSessionData.title;
+                    // @handled
+                    try {
+                      if (editSessionInputRef.value) {
+                        editSessionInputRef.value.value =
+                          currentSessionData.title;
+                      }
+                    } catch (error) {
+                      console.error(error);
                     }
                   });
                 } else {
@@ -161,6 +174,7 @@ export function Toolbar() {
                 }
               }
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}
@@ -184,6 +198,7 @@ export function Toolbar() {
                 notify("Current session is unsaved.", "warning");
               }
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}
@@ -196,6 +211,7 @@ export function Toolbar() {
             try {
               helpDialogRef.value?.show();
             } catch (error) {
+              console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
           }}
