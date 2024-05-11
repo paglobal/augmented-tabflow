@@ -192,13 +192,11 @@ async function updateCurrentSessionData() {
   if (tabGroupTreeData.length) {
     await removeBookmarkNodeChildren(currentSessionData.id);
     await saveCurrentSessionDataIntoBookmarkNode(currentSessionData.id);
-  }
-  if (tabGroupTreeData[0]?.type === tabGroupTypes.pinned) {
     const pinnedTabGroupBookmarkNodeId = await getStorageData<
       chrome.bookmarks.BookmarkTreeNode["id"]
     >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
-    if (pinnedTabGroupBookmarkNodeId) {
-      await removeBookmarkNodeChildren(pinnedTabGroupBookmarkNodeId);
+    await removeBookmarkNodeChildren(pinnedTabGroupBookmarkNodeId!);
+    if (tabGroupTreeData[0]?.type === tabGroupTypes.pinned) {
       for (const tab of tabGroupTreeData[0].tabs) {
         await chrome.bookmarks.create({
           parentId: pinnedTabGroupBookmarkNodeId,
@@ -206,8 +204,6 @@ async function updateCurrentSessionData() {
           url: tab.url,
         });
       }
-    } else {
-      // @error
     }
   }
   await setStorageData(

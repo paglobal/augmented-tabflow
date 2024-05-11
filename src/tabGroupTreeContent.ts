@@ -8,8 +8,7 @@ import {
   closeTabGroup,
   collapseTabGroup,
   expandTabGroup,
-  setCurrentMovedOrCopiedTabOrTabGroup,
-  setFirstTabInNewTabGroupId,
+  setFirstTabInNewTabGroup,
   tabGroupTreeData,
 } from "./sessionService";
 import {
@@ -17,8 +16,10 @@ import {
   addTabGroupSelectRef,
   editTabGroupDialogRefs,
   moveOrCopyTabGroupToSessionTreeDialogRef,
-  moveOrCopyTabToSessionTreeDialogRef,
+  sessionWindowsTreeDialogRef,
+  setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEditedTabGroupId,
+  setCurrentlyEjectedTabOrTabGroup,
 } from "./App";
 import { newTabUrls, tabGroupTypes } from "../constants";
 import {
@@ -98,6 +99,23 @@ export async function tabGroupTreeContent() {
                           notifyWithErrorMessageAndReloadButton();
                         }
                       });
+                    } catch (error) {
+                      console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
+                    }
+                  }}
+                ></sl-icon-button>`
+              : null}
+            ${tabGroup.type === tabGroupTypes.normal
+              ? html`<sl-icon-button
+                  name="box-arrow-in-up-right"
+                  title="Move To Window"
+                  @click=${async (e: Event) => {
+                    // @handled
+                    try {
+                      e.stopPropagation();
+                      setCurrentlyEjectedTabOrTabGroup(tabGroup);
+                      sessionWindowsTreeDialogRef.value?.show();
                     } catch (error) {
                       console.error(error);
                       notifyWithErrorMessageAndReloadButton();
@@ -199,12 +217,27 @@ export async function tabGroupTreeContent() {
                         // @handled
                         try {
                           e.stopPropagation();
-                          setFirstTabInNewTabGroupId(tab.id);
+                          setFirstTabInNewTabGroup(tab);
                           if (addTabGroupSelectRef.value) {
                             addTabGroupSelectRef.value.value =
                               randomTabGroupColorValue();
                           }
                           addTabGroupDialogRef.value?.show();
+                        } catch (error) {
+                          console.error(error);
+                          notifyWithErrorMessageAndReloadButton();
+                        }
+                      }}
+                    ></sl-icon-button>
+                    <sl-icon-button
+                      name="box-arrow-in-up-right"
+                      title="Move To Window"
+                      @click=${async (e: Event) => {
+                        // @handled
+                        try {
+                          e.stopPropagation();
+                          setCurrentlyEjectedTabOrTabGroup(tab);
+                          sessionWindowsTreeDialogRef.value?.show();
                         } catch (error) {
                           console.error(error);
                           notifyWithErrorMessageAndReloadButton();
@@ -218,8 +251,6 @@ export async function tabGroupTreeContent() {
                         // @handled
                         try {
                           e.stopPropagation();
-                          setCurrentMovedOrCopiedTabOrTabGroup(tab);
-                          await moveOrCopyTabToSessionTreeDialogRef.value?.show();
                         } catch (error) {
                           console.error(error);
                           notifyWithErrorMessageAndReloadButton();
@@ -244,7 +275,7 @@ export async function tabGroupTreeContent() {
                   content: html`
                     ${tab.mutedInfo?.muted
                       ? h(TreeItemColorPatchOrIcon, {
-                          icon: "volume-mute",
+                          icon: "MaterialSymbolsNoSoundOutlineRounded",
                         })
                       : null}
                     ${tab.audible && !tab.mutedInfo?.muted
@@ -269,7 +300,7 @@ export async function tabGroupTreeContent() {
         })}
       `;
     });
-    // doesn't take effect when used with `until` and a fallback
+    // TODO: doesn't seem to take effect when used with `until` and a fallback. investigate
   } catch (error) {
     console.error(error);
     notifyWithErrorMessageAndReloadButton();

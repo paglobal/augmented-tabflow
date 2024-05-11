@@ -15,8 +15,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - implement drag-and-drop for tabs, tab groups and sessions
 - implement recently closed tab groups feature
 - implement window management
-- (maybe) show random color when creating new tab group
-- fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 
 ### Later
 
@@ -27,15 +25,17 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - implement theme switcher
 - refine and organise text. look for anything in quotation marks like "Error!" and such. make use of full stops
 - general code inspection and refactoring
+- inspect and verify types across entire codebase
+- remove all unused imports
+- (maybe) organise all imports
 - (if necessary) differentiate state update functions from storage data update functions
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 - type `sendMessage` and `subscribeToMessage` for automatic inference
-- look for `currentlyDeletedBlahBlah` and `currentlyEditedBlahBlah` and make sure they're in the right places. they should probably be in `sessionService.ts` along with their corresponding functions
 - implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - handle errors in timeouts as well
 - notify users of errors that happen in service workers through message `chrome.runtime.message`
-- make sure to log caught errors (maybe in dev mode only)
-- create util for try catch notify
+- make sure to log caught errors
+- (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. try to retry and timeout a couple of times
 - (if necessary) add alerts for action start and action complete
 - (if necessary) add test suite
@@ -44,6 +44,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - use early returns anywhere you can
 - show warning or error alerts for when certain data is unavailable
 - maybe change the way arrays are typed to use `Array<T>`
+- fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
+- maybe implement "overwrite with current session data"
 
 ### Extension
 
@@ -54,3 +56,4 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 ### Docs
 
 - Add reference to video
+- Popups not supported

@@ -39,6 +39,8 @@ import { fallbackTreeContent } from "./fallbackTreeContent";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { sessionsTreeContent } from "./sessionsTreeContent";
 import { moveOrCopyToSessionTreeContent } from "./moveOrCopyToSessionTreeContent";
+import { sessionWindowsTreeContent } from "./sessionWindowsTreeContent";
+import { TabGroupTreeData } from "../sharedUtils";
 
 // disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -62,6 +64,7 @@ export const sessionsTreeDialogRef = createRef<SlDialog>();
 export const deleteSessionDialogRef = createRef<SlDialog>();
 export const moveOrCopyTabToSessionTreeDialogRef = createRef<SlDialog>();
 export const moveOrCopyTabGroupToSessionTreeDialogRef = createRef<SlDialog>();
+export const sessionWindowsTreeDialogRef = createRef<SlDialog>();
 
 export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
@@ -73,6 +76,12 @@ export const [
   currentlyDeletedSessionIsCurrentSession,
   setCurrentlyDeletedSessionIsCurrentSession,
 ] = adaptState<boolean>(false);
+export const [
+  currentlyMovedOrCopiedTabOrTabGroup,
+  setCurrentMovedOrCopiedTabOrTabGroup,
+] = adaptState<chrome.tabs.Tab | TabGroupTreeData[number] | null>(null);
+export const [currentlyEjectedTabOrTabGroup, setCurrentlyEjectedTabOrTabGroup] =
+  adaptState<chrome.tabs.Tab | TabGroupTreeData[number] | null>(null);
 
 export function App() {
   function mainAppView() {
@@ -124,7 +133,20 @@ export function App() {
               ref: tabGroupTreeDialogRef,
             })}
             ${h(Dialog, {
-              label: "Move Or Copy Tab",
+              label: "Move To Window",
+              content: html`${h(Tree, {
+                contentFn: () =>
+                  html`${until(
+                    sessionWindowsTreeContent(),
+                    fallbackTreeContent(),
+                  )}`,
+              })}`,
+              fullWidth: true,
+              noTopBodyMargin: true,
+              ref: sessionWindowsTreeDialogRef,
+            })}
+            ${h(Dialog, {
+              label: "Move Or Copy Tab To Session",
               content: html`${h(Tree, {
                 contentFn: () =>
                   html`${until(
@@ -137,7 +159,7 @@ export function App() {
               ref: moveOrCopyTabToSessionTreeDialogRef,
             })}
             ${h(Dialog, {
-              label: "Move Or Copy Tab Group",
+              label: "Move Or Copy Tab Group To Session",
               content: html`${h(Tree, {
                 contentFn: () =>
                   html`${until(

@@ -195,7 +195,7 @@ async function initSessionTabs(
       true,
     );
     await setStorageData(sessionStorageKeys.recentlyClosedTabGroups, []);
-    const stubTab = await chrome.tabs.create({ active: false });
+    const stubTabId = (await chrome.tabs.create({ active: false })).id;
     for (const tabGroup of tabGroupTreeData) {
       if (
         oldSessionData &&
@@ -242,15 +242,11 @@ async function initSessionTabs(
         const tabGroupColor = tabGroupData.title.split(
           "-",
         )[0] as chrome.tabGroups.Color;
-        const isUngroupedTabGroupData =
-          tabGroupData.title === titles.ungroupedTabGroup;
+        const ungrouped = tabGroupData.title === titles.ungroupedTabGroup;
         if (tabGroupData.url) {
           continue;
         }
-        if (
-          !tabGroupColorList.includes(tabGroupColor) &&
-          !isUngroupedTabGroupData
-        ) {
+        if (!tabGroupColorList.includes(tabGroupColor) && !ungrouped) {
           continue;
         }
         const tabIds: chrome.tabs.Tab["id"][] = [];
@@ -269,7 +265,7 @@ async function initSessionTabs(
           });
           tabIds.push(tab.id);
         }
-        if (!isUngroupedTabGroupData && tabIds.length) {
+        if (!ungrouped && tabIds.length) {
           const tabGroupTitle = tabGroupData.title
             .split("-")
             .slice(1)
@@ -294,12 +290,11 @@ async function initSessionTabs(
       }
       for (let i = 0; i < previousUnsavedSessionTabGroupTreeData.length; i++) {
         const tabGroup = previousUnsavedSessionTabGroupTreeData[i];
-        if (tabGroup.type === tabGroupTypes.pinned) {
+        const pinned = tabGroup.type === tabGroupTypes.pinned;
+        if (pinned) {
           tabGroup.tabs.reverse();
         }
-        const pinned = tabGroup.type === tabGroupTypes.pinned;
-        const isUngroupedTabGroupData =
-          tabGroup.id === chrome.tabGroups.TAB_GROUP_ID_NONE;
+        const ungrouped = tabGroup.id === chrome.tabGroups.TAB_GROUP_ID_NONE;
         const tabIds: chrome.tabs.Tab["id"][] = [];
         const tabs = tabGroup.tabs;
         for (let j = 0; j < tabs.length; j++) {
@@ -325,7 +320,7 @@ async function initSessionTabs(
           });
           tabIds.push(tab.id);
         }
-        if (!isUngroupedTabGroupData && tabIds.length) {
+        if (!ungrouped && tabIds.length) {
           const { title, color } = tabGroup;
           const tabGroupId = await chrome.tabs.group({
             tabIds: tabIds as [number, ...number[]],
@@ -340,7 +335,7 @@ async function initSessionTabs(
     }
     const sessionTabs = await chrome.tabs.query({ windowType: "normal" });
     if (sessionTabs.length > 1) {
-      await chrome.tabs.remove(stubTab.id!);
+      await chrome.tabs.remove(stubTabId!);
     }
   });
 }
@@ -353,4 +348,54 @@ subscribeToMessage(messageTypes.initSessionTabs, async (newSessionData) => {
 subscribeToMessage(messageTypes.restoreTab, async (_, sender) => {
   // @error
   await restoreTabIfBlank(sender.tab?.id);
+});
+
+chrome.windows.onRemoved.addListener(async (windowId) => {
+  const tabGroupTreeData =
+    (await getStorageData<TabGroupTreeData>(
+      sessionStorageKeys.tabGroupTreeData,
+    )) ?? [];
+  await navigator.locks.request(lockNames.applyUpdates, async () => {
+    const currentSessionData =
+      await getStorageData<chrome.bookmarks.BookmarkTreeNode>(
+        sessionStorageKeys.currentSessionData,
+      );
+    const currentWindow = await chrome.windows.getCurrent({
+      windowTypes: ["normal"],
+    });
+    if (currentWindow && currentSessionData) {
+      for (const tabGroup of tabGroupTreeData) {
+        const pinned = tabGroup.type === tabGroupTypes.pinned;
+        if (pinned) {
+          tabGroup.tabs.reverse();
+        }
+        const ungrouped = tabGroup.id === chrome.tabGroups.TAB_GROUP_ID_NONE;
+        const tabIds: chrome.tabs.Tab["id"][] = [];
+        for (const oldTab of tabGroup.tabs) {
+          if (oldTab.windowId !== windowId) {
+            continue;
+          }
+          const url = `/stubPage.html?title=${encodeURIComponent(
+            oldTab.title ?? "",
+          )}&url=${encodeURIComponent(oldTab.url ?? "")}`;
+          const tab = await chrome.tabs.create({
+            url,
+            active: false,
+          });
+          tabIds.push(tab.id);
+        }
+        if (!ungrouped && tabIds.length) {
+          const { title, color } = tabGroup;
+          const tabGroupId = await chrome.tabs.group({
+            tabIds: tabIds as [number, ...number[]],
+          });
+          await chrome.tabGroups.update(tabGroupId, {
+            color,
+            collapsed: true,
+            title,
+          });
+        }
+      }
+    }
+  });
 });

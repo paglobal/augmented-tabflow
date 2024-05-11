@@ -91,11 +91,11 @@ export async function sessionsTreeContent() {
     if (currentSessionData) {
       sessionsTreeContent.unshift(
         html`${h(TreeItem, {
+          tooltipContent: "Exit Current Session",
           content: html`${h(TreeItemColorPatchOrIcon, {
             icon: "window-x",
           })}
           Exit Current Session`,
-          tooltipContent: "Exit Current Session",
           async onSelect(e: Event) {
             // @handled
             try {
@@ -109,13 +109,13 @@ export async function sessionsTreeContent() {
         })}`,
       );
     }
-    sessionsTreeContent?.unshift(
+    sessionsTreeContent.unshift(
       html`${h(TreeItem, {
+        tooltipContent: "Help",
         content: html`${h(TreeItemColorPatchOrIcon, {
           icon: "question-circle",
         })}
         Help`,
-        tooltipContent: "Help",
         onSelect(e: Event) {
           // @handled
           try {
@@ -128,11 +128,11 @@ export async function sessionsTreeContent() {
         },
       })}`,
       html`${h(TreeItem, {
+        tooltipContent: "Save Current Session",
         content: html`${h(TreeItemColorPatchOrIcon, {
           icon: "window-plus",
         })}
         Save Current Session`,
-        tooltipContent: "Save Current Session",
         onSelect(e: Event) {
           // @handled
           try {

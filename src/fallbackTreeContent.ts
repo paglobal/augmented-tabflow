@@ -10,10 +10,10 @@ export function fallbackTreeContent(errorOccurred: boolean = false) {
   }
 
   return html`${h(TreeItem, {
+    tooltipContent: message,
     content: html`${h(TreeItemColorPatchOrIcon, {
       showSpinner: !errorOccurred,
       icon: errorOccurred ? "exclamation-octagon" : undefined,
     })}${message}`,
-    tooltipContent: message,
   })}`;
 }
