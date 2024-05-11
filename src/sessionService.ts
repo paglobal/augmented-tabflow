@@ -18,10 +18,13 @@ import {
 import {
   currentlyEjectedTabOrTabGroup,
   currentlyMovedOrCopiedTabOrTabGroup,
+  firstTabInNewTabGroup,
   moveOrCopyTabGroupToSessionTreeDialogRef,
+  moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEjectedTabOrTabGroup,
+  setFirstTabInNewTabGroup,
 } from "./App";
 
 export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
@@ -126,9 +129,6 @@ export async function groupUngroupedTabsInWindow() {
     notify("No ungrouped tabs in this window", "warning");
   }
 }
-
-export const [firstTabInNewTabGroup, setFirstTabInNewTabGroup] =
-  adaptState<chrome.tabs.Tab | null>(null);
 
 export async function createTabGroup(options: {
   title: chrome.tabGroups.TabGroup["title"];
@@ -378,7 +378,7 @@ export async function openNewSession(
   newSessionData: chrome.bookmarks.BookmarkTreeNode | null,
 ) {
   // @maybe
-  sendMessage({ type: messageTypes.initSessionTabs, data: newSessionData });
+  sendMessage({ type: messageTypes.openNewSession, data: newSessionData });
 }
 
 export async function moveOrCopyToSession(
@@ -402,6 +402,7 @@ export async function moveOrCopyToSession(
     } else {
       await chrome.tabs.remove(_currentlyMovedOrCopiedTabOrTabGroup.id!);
     }
+    moveOrCopyTabToSessionTreeDialogRef.value?.hide();
   } else if (
     (_currentlyMovedOrCopiedTabOrTabGroup as TabGroupTreeData[number]).tabs
   ) {
@@ -428,52 +429,21 @@ export async function moveOrCopyToSession(
       await chrome.tabs.ungroup(tabIds as [number, ...number[]]);
       await chrome.tabs.remove(tabIds as number[]);
     }
+    moveOrCopyTabGroupToSessionTreeDialogRef.value?.hide();
   }
   setCurrentMovedOrCopiedTabOrTabGroup(null);
-  moveOrCopyTabGroupToSessionTreeDialogRef.value?.hide();
 }
 
 export async function moveTabOrTabGroupToWindow(
   windowId?: chrome.windows.Window["id"],
 ) {
-  let stubTabId: chrome.tabs.Tab["id"] | undefined;
-  console.log({ windowId });
-
-  if (!windowId) {
-    const window = await chrome.windows.create();
-    stubTabId = (await chrome.tabs.query({ windowId: window?.id }))[0].id;
-    windowId = window?.id;
-  }
-  const _currentlyEjectedTabOrTabGroup = currentlyEjectedTabOrTabGroup();
-  if ((_currentlyEjectedTabOrTabGroup as chrome.tabs.Tab).url) {
-    await chrome.tabs.move(_currentlyEjectedTabOrTabGroup?.id!, {
+  sendMessage({
+    type: messageTypes.moveTabOrTabGroupToWindow,
+    data: {
+      currentlyEjectedTabOrTabGroup: currentlyEjectedTabOrTabGroup(),
       windowId,
-      index: -1,
-    });
-  } else if (
-    (_currentlyEjectedTabOrTabGroup as TabGroupTreeData[number]).tabs
-  ) {
-    const tabIds = (
-      _currentlyEjectedTabOrTabGroup as TabGroupTreeData[number]
-    ).tabs.map((tab) => tab.id);
-    await chrome.tabs.ungroup(tabIds as [number, ...number[]]);
-    await chrome.tabs.move(tabIds as number[], {
-      windowId,
-      index: -1,
-    });
-    const newTabGroupId = await chrome.tabs.group({
-      tabIds: tabIds as [number, ...number[]],
-      createProperties: {
-        windowId,
-      },
-    });
-    const { color, title, collapsed } =
-      _currentlyEjectedTabOrTabGroup as TabGroupTreeData[number];
-    await chrome.tabGroups.update(newTabGroupId, { color, title, collapsed });
-  }
-  if (stubTabId) {
-    await chrome.tabs.remove(stubTabId);
-  }
+    },
+  });
   setCurrentlyEjectedTabOrTabGroup(null);
   sessionWindowsTreeDialogRef.value?.hide();
 }

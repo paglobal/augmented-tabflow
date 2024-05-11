@@ -61,8 +61,9 @@ export const tabGroupColorList = [
 export type MessageType = `message-${number}`;
 
 export const messageTypes = {
-  initSessionTabs: "message-1",
+  openNewSession: "message-1",
   restoreTab: "message-2",
+  moveTabOrTabGroupToWindow: "message-3",
 } as const satisfies Record<string, MessageType>;
 
 export const tabGroupTreeDataUpdateDebounceTimeout = 200;

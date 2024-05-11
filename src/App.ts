@@ -82,6 +82,8 @@ export const [
 ] = adaptState<chrome.tabs.Tab | TabGroupTreeData[number] | null>(null);
 export const [currentlyEjectedTabOrTabGroup, setCurrentlyEjectedTabOrTabGroup] =
   adaptState<chrome.tabs.Tab | TabGroupTreeData[number] | null>(null);
+export const [firstTabInNewTabGroup, setFirstTabInNewTabGroup] =
+  adaptState<chrome.tabs.Tab | null>(null);
 
 export function App() {
   function mainAppView() {

@@ -31,7 +31,7 @@ export function SessionView() {
       console.error(error);
       notifyWithErrorMessageAndReloadButton();
 
-      return fallbackTreeContent(true);
+      return fallbackTreeContent();
     }
   }
 

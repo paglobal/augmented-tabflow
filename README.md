@@ -14,40 +14,38 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
   loading continues indefinitely)
 - implement drag-and-drop for tabs, tab groups and sessions
 - implement recently closed tab groups feature
-- implement window management
 
-### Later
+### Important
 
-- (if necessary) delete unneeded icons. be sure not to break anything if you attempt this! look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
-- (maybe) implement internationalization
-- (maybe) cater for more browser eg. by adding more entries to the `newTabUrls` array
-- (if necessary) come up with a way to handle storage migrations
-- implement theme switcher
-- refine and organise text. look for anything in quotation marks like "Error!" and such. make use of full stops
+- resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. try to retry and timeout a couple of times
+- fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
+- (if necessary) add alerts for action start and action complete
 - general code inspection and refactoring
 - inspect and verify types across entire codebase
+- refine and organise text. look for anything in quotation marks like "Error!" and such. make use of full stops
 - remove all unused imports
 - (maybe) organise all imports
-- (if necessary) differentiate state update functions from storage data update functions
+- use `Array<T>` to type arrays
+- use `await` anywhere you can. don't use `async-await` in array filter functions
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 - type `sendMessage` and `subscribeToMessage` for automatic inference
 - implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - handle errors in timeouts as well
-- notify users of errors that happen in service workers through message `chrome.runtime.message`
-- make sure to log caught errors
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
-- resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. try to retry and timeout a couple of times
-- (if necessary) add alerts for action start and action complete
-- (if necessary) add test suite
+- notify users of errors that happen in service workers through message `chrome.runtime.message`
 - create `TreeDialog` and `ConfirmationDialog`
-- use `await` anywhere you can. don't use `async-await` in array filter functions
 - use early returns anywhere you can
-- show warning or error alerts for when certain data is unavailable
-- maybe change the way arrays are typed to use `Array<T>`
-- fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
-- maybe implement "overwrite with current session data"
+- refine fallback code
 
-### Extension
+### Can wait
+
+- (if necessary) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
+- (if necessary) add test suite
+- (maybe) implement internationalization
+- (maybe) cater for more browsers eg. by adding more entries to the `newTabUrls` array
+- (maybe) implement theme switcher
+
+### Store listing
 
 - Upload better screenshots and photos
 - Upload better description and summary
@@ -57,3 +55,4 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 - Add reference to video
 - Popups not supported
+- Don't mind errors unless they affect the way you use the extension

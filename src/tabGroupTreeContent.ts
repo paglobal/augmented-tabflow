@@ -8,7 +8,6 @@ import {
   closeTabGroup,
   collapseTabGroup,
   expandTabGroup,
-  setFirstTabInNewTabGroup,
   tabGroupTreeData,
 } from "./sessionService";
 import {
@@ -16,10 +15,12 @@ import {
   addTabGroupSelectRef,
   editTabGroupDialogRefs,
   moveOrCopyTabGroupToSessionTreeDialogRef,
+  moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEditedTabGroupId,
   setCurrentlyEjectedTabOrTabGroup,
+  setFirstTabInNewTabGroup,
 } from "./App";
 import { newTabUrls, tabGroupTypes } from "../constants";
 import {
@@ -251,6 +252,8 @@ export async function tabGroupTreeContent() {
                         // @handled
                         try {
                           e.stopPropagation();
+                          setCurrentMovedOrCopiedTabOrTabGroup(tab);
+                          await moveOrCopyTabToSessionTreeDialogRef.value?.show();
                         } catch (error) {
                           console.error(error);
                           notifyWithErrorMessageAndReloadButton();
@@ -303,8 +306,7 @@ export async function tabGroupTreeContent() {
     // TODO: doesn't seem to take effect when used with `until` and a fallback. investigate
   } catch (error) {
     console.error(error);
-    notifyWithErrorMessageAndReloadButton();
 
-    return fallbackTreeContent(true);
+    return fallbackTreeContent();
   }
 }

@@ -168,7 +168,7 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
-async function initSessionTabs(
+async function openNewSession(
   newSessionData?: chrome.bookmarks.BookmarkTreeNode,
 ) {
   // @maybe
@@ -189,11 +189,6 @@ async function initSessionTabs(
     }
     await setStorageData(sessionStorageKeys.currentSessionData, "");
     await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
-    await setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, false);
-    await setStorageData(
-      sessionStorageKeys.recentlyClosedTabGroupsCollapsed,
-      true,
-    );
     await setStorageData(sessionStorageKeys.recentlyClosedTabGroups, []);
     const stubTabId = (await chrome.tabs.create({ active: false })).id;
     for (const tabGroup of tabGroupTreeData) {
@@ -340,9 +335,9 @@ async function initSessionTabs(
   });
 }
 
-subscribeToMessage(messageTypes.initSessionTabs, async (newSessionData) => {
+subscribeToMessage(messageTypes.openNewSession, async (newSessionData) => {
   // @error
-  await initSessionTabs(newSessionData);
+  await openNewSession(newSessionData);
 });
 
 subscribeToMessage(messageTypes.restoreTab, async (_, sender) => {
@@ -351,11 +346,11 @@ subscribeToMessage(messageTypes.restoreTab, async (_, sender) => {
 });
 
 chrome.windows.onRemoved.addListener(async (windowId) => {
-  const tabGroupTreeData =
-    (await getStorageData<TabGroupTreeData>(
-      sessionStorageKeys.tabGroupTreeData,
-    )) ?? [];
   await navigator.locks.request(lockNames.applyUpdates, async () => {
+    const tabGroupTreeData =
+      (await getStorageData<TabGroupTreeData>(
+        sessionStorageKeys.tabGroupTreeData,
+      )) ?? [];
     const currentSessionData =
       await getStorageData<chrome.bookmarks.BookmarkTreeNode>(
         sessionStorageKeys.currentSessionData,
@@ -378,11 +373,15 @@ chrome.windows.onRemoved.addListener(async (windowId) => {
           const url = `/stubPage.html?title=${encodeURIComponent(
             oldTab.title ?? "",
           )}&url=${encodeURIComponent(oldTab.url ?? "")}`;
-          const tab = await chrome.tabs.create({
-            url,
-            active: false,
-          });
-          tabIds.push(tab.id);
+          try {
+            await chrome.tabs.get(oldTab.id!);
+          } catch (error) {
+            const tab = await chrome.tabs.create({
+              url,
+              active: false,
+            });
+            tabIds.push(tab.id);
+          }
         }
         if (!ungrouped && tabIds.length) {
           const { title, color } = tabGroup;
@@ -398,4 +397,52 @@ chrome.windows.onRemoved.addListener(async (windowId) => {
       }
     }
   });
+});
+
+export async function moveTabOrTabGroupToWindow(
+  currentlyEjectedTabOrTabGroup:
+    | chrome.tabs.Tab
+    | chrome.tabGroups.TabGroup
+    | null,
+  windowId?: chrome.windows.Window["id"],
+) {
+  let stubTabId: chrome.tabs.Tab["id"] | undefined;
+  if (!windowId) {
+    const window = await chrome.windows.create();
+    stubTabId = (await chrome.tabs.query({ windowId: window?.id }))[0].id;
+    windowId = window?.id;
+  }
+  if ((currentlyEjectedTabOrTabGroup as chrome.tabs.Tab).url) {
+    await chrome.tabs.move(currentlyEjectedTabOrTabGroup?.id!, {
+      windowId,
+      index: -1,
+    });
+    await chrome.tabs.update(currentlyEjectedTabOrTabGroup?.id!, {
+      pinned: (currentlyEjectedTabOrTabGroup as chrome.tabs.Tab).pinned,
+    });
+  } else if ((currentlyEjectedTabOrTabGroup as TabGroupTreeData[number]).tabs) {
+    const tabIds = (
+      currentlyEjectedTabOrTabGroup as TabGroupTreeData[number]
+    ).tabs.map((tab) => tab.id);
+    await chrome.tabs.move(tabIds as number[], {
+      windowId,
+      index: -1,
+    });
+    const newTabGroupId = await chrome.tabs.group({
+      tabIds: tabIds as [number, ...number[]],
+      createProperties: {
+        windowId,
+      },
+    });
+    const { color, title, collapsed } =
+      currentlyEjectedTabOrTabGroup as TabGroupTreeData[number];
+    await chrome.tabGroups.update(newTabGroupId, { color, title, collapsed });
+  }
+  if (stubTabId) {
+    await chrome.tabs.remove(stubTabId);
+  }
+}
+
+subscribeToMessage(messageTypes.moveTabOrTabGroupToWindow, (data) => {
+  moveTabOrTabGroupToWindow(data.currentlyEjectedTabOrTabGroup, data.windowId);
 });

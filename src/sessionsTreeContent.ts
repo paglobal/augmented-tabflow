@@ -149,8 +149,7 @@ export async function sessionsTreeContent() {
     return sessionsTreeContent;
   } catch (error) {
     console.error(error);
-    notifyWithErrorMessageAndReloadButton();
 
-    return fallbackTreeContent(true);
+    return fallbackTreeContent();
   }
 }

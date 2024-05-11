@@ -65,8 +65,7 @@ export async function sessionWindowsTreeContent() {
     return sessionWindowsTreeContent;
   } catch (error) {
     console.error(error);
-    notifyWithErrorMessageAndReloadButton();
 
-    return fallbackTreeContent(true);
+    return fallbackTreeContent();
   }
 }

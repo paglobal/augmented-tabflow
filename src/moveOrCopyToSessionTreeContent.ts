@@ -134,8 +134,7 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
     }
   } catch (error) {
     console.error(error);
-    notifyWithErrorMessageAndReloadButton();
 
-    return fallbackTreeContent(true);
+    return fallbackTreeContent();
   }
 }
