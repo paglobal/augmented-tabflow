@@ -2,6 +2,7 @@ export type AreaName = "sync" | "session";
 
 export type SessionStorageKey = `session-${number}`;
 
+export type SessionData = chrome.bookmarks.BookmarkTreeNode | null;
 export const sessionStorageKeys = {
   tabGroupTreeData: "session-1",
   currentSessionData: "session-2",
@@ -13,6 +14,8 @@ export const sessionStorageKeys = {
   recentlyClosedTabGroupsCollapsed: "session-9",
   readyToUpdateCurrentSessionData: "session-10",
   pinnedTabGroupCollapsed: "session-11",
+  sessionLoading: "session-12",
+  currentlyRemovedTabId: "session-13",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;

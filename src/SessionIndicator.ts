@@ -1,23 +1,24 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { until } from "lit/directives/until.js";
-import { currentSessionData } from "./sessionService";
-import { titles } from "../constants";
+import { SessionData, sessionStorageKeys, titles } from "../constants";
 import { sessionsTreeDialogRef } from "./App";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
+import { getStorageData } from "../sharedUtils";
 
 export function SessionIndicator() {
   async function currentSessionTitle() {
     // @handled
     try {
-      const _currentSessionData = await currentSessionData();
+      const currentSessionData = await getStorageData<SessionData>(
+        sessionStorageKeys.currentSessionData,
+      );
 
-      return _currentSessionData
-        ? _currentSessionData.title
+      return currentSessionData
+        ? currentSessionData.title
         : titles.unsavedSession;
     } catch (error) {
       console.error(error);
-      notifyWithErrorMessageAndReloadButton();
 
       return "Error!";
     }
@@ -26,12 +27,13 @@ export function SessionIndicator() {
   async function buttonVariant() {
     // @handled
     try {
-      const _currentSessionData = await currentSessionData();
+      const currentSessionData = await getStorageData<SessionData>(
+        sessionStorageKeys.currentSessionData,
+      );
 
-      return _currentSessionData ? "primary" : "default";
+      return currentSessionData ? "primary" : "default";
     } catch (error) {
       console.error(error);
-      notifyWithErrorMessageAndReloadButton();
 
       return "danger";
     }

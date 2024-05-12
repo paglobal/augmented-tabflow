@@ -22,6 +22,7 @@ import {
   moveOrCopyTabGroupToSessionTreeDialogRef,
   moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,
+  sessionsTreeDialogRef,
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEjectedTabOrTabGroup,
   setFirstTabInNewTabGroup,
@@ -166,36 +167,15 @@ export function updateTabGroup(
   }
 }
 
-export const [currentSessionData, setCurrentSessionData] = adaptState<
-  | Promise<chrome.bookmarks.BookmarkTreeNode | undefined | null>
-  | chrome.bookmarks.BookmarkTreeNode
-  | undefined
-  | null
-  | ""
->(async () => {
-  // @handled
-  try {
-    const currentSessionData =
-      await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-        sessionStorageKeys.currentSessionData,
-      );
-
-    return currentSessionData;
-  } catch (error) {
-    console.error(error);
-    notifyWithErrorMessageAndReloadButton();
-  }
+subscribeToStorageData(sessionStorageKeys.currentSessionData, () => {
+  // @error
+  location.reload();
 });
 
-subscribeToStorageData(
-  sessionStorageKeys.currentSessionData,
-  ({ oldValue }) => {
-    // @error
-    if (oldValue === null || oldValue === "") {
-      location.reload();
-    }
-  },
-);
+subscribeToStorageData(sessionStorageKeys.sessionLoading, () => {
+  // @error
+  location.reload();
+});
 
 export const [sessionsTreeData, setSessionsTreeData] = adaptState<
   | chrome.bookmarks.BookmarkTreeNode[]
@@ -378,6 +358,7 @@ export async function openNewSession(
   newSessionData: chrome.bookmarks.BookmarkTreeNode | null,
 ) {
   // @maybe
+  sessionsTreeDialogRef.value?.hide();
   sendMessage({ type: messageTypes.openNewSession, data: newSessionData });
 }
 

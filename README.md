@@ -12,6 +12,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 - implement loading fallback for session and tab group trees which provide a way to exit loading of current session (eg. for when user interrupts session switching
   loading continues indefinitely)
+- optimize tree for performance
 - implement drag-and-drop for tabs, tab groups and sessions
 - implement recently closed tab groups feature
 

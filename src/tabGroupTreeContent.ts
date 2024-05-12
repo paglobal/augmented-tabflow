@@ -22,17 +22,18 @@ import {
   setCurrentlyEjectedTabOrTabGroup,
   setFirstTabInNewTabGroup,
 } from "./App";
-import { newTabUrls, tabGroupTypes } from "../constants";
+import { newTabUrls, sessionStorageKeys, tabGroupTypes } from "../constants";
 import {
   notifyWithErrorMessageAndReloadButton,
   randomTabGroupColorValue,
 } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
+import { getStorageData } from "../sharedUtils";
 
 export async function tabGroupTreeContent() {
   // @handled
   try {
-    return (await tabGroupTreeData()).map((tabGroup) => {
+    const tabGroupTreeContent = (await tabGroupTreeData()).map((tabGroup) => {
       return html`
         ${h(TreeItem, {
           tooltipContent: tabGroup.title as string,
@@ -119,8 +120,8 @@ export async function tabGroupTreeContent() {
                       sessionWindowsTreeDialogRef.value?.show();
                     } catch (error) {
                       console.error(error);
-                      notifyWithErrorMessageAndReloadButton();
                     }
+                    notifyWithErrorMessageAndReloadButton();
                   }}
                 ></sl-icon-button>`
               : null}
@@ -303,10 +304,12 @@ export async function tabGroupTreeContent() {
         })}
       `;
     });
-    // TODO: doesn't seem to take effect when used with `until` and a fallback. investigate
+
+    return tabGroupTreeContent;
   } catch (error) {
     console.error(error);
 
+    // TODO: doesn't seem to take effect. investigate
     return fallbackTreeContent();
   }
 }

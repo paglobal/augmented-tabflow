@@ -1,17 +1,14 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { until } from "lit/directives/until.js";
-import {
-  currentSessionData,
-  groupUngroupedTabsInWindow,
-} from "./sessionService";
+import { groupUngroupedTabsInWindow } from "./sessionService";
 import {
   notify,
   notifyWithErrorMessageAndReloadButton,
   randomTabGroupColorValue,
 } from "./utils";
 import { getStorageData } from "../sharedUtils";
-import { sessionStorageKeys } from "../constants";
+import { SessionData, sessionStorageKeys } from "../constants";
 import {
   helpDialogRef,
   addTabGroupDialogRef,
@@ -29,9 +26,11 @@ export function Toolbar() {
   async function tabGroupTreeButton() {
     // @handled
     try {
-      const _currentSessionData = await currentSessionData();
+      const currentSessionData = await getStorageData<SessionData>(
+        sessionStorageKeys.currentSessionData,
+      );
 
-      return _currentSessionData
+      return currentSessionData
         ? null
         : html`<sl-icon-button
             name="list-ul"

@@ -5,17 +5,28 @@ import { Tree } from "./Tree";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { sessionsTreeContent } from "./sessionsTreeContent";
 import { fallbackTreeContent } from "./fallbackTreeContent";
-import { currentSessionData } from "./sessionService";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
+import { SessionData, sessionStorageKeys } from "../constants";
+import { getStorageData } from "../sharedUtils";
 
 export function SessionView() {
   async function sessionViewTree() {
     // @handled
     try {
-      const _currentSessionData = await currentSessionData();
+      const currentSessionData = await getStorageData<SessionData>(
+        sessionStorageKeys.currentSessionData,
+      );
+      const sessionLoading = await getStorageData<SessionData>(
+        sessionStorageKeys.sessionLoading,
+      );
+      if (sessionLoading) {
+        return html`${h(Tree, {
+          contentFn: () => html`${fallbackTreeContent()}`,
+        })}`;
+      }
 
       return html`
-        ${_currentSessionData
+        ${currentSessionData
           ? html`${h(Tree, {
               contentFn: () =>
                 html`${until(tabGroupTreeContent(), fallbackTreeContent())}`,

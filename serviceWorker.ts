@@ -1,4 +1,5 @@
 import {
+  SessionData,
   lockNames,
   messageTypes,
   sessionStorageKeys,
@@ -168,15 +169,175 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
-async function openNewSession(
-  newSessionData?: chrome.bookmarks.BookmarkTreeNode,
+async function createPinnedTabs({
+  oldSessionData,
+  newSessionData,
+}: {
+  oldSessionData?: SessionData;
+  newSessionData?: SessionData;
+}) {
+  if (!oldSessionData && newSessionData) {
+    const pinnedTabGroupBookmarkNodeId = await getStorageData<
+      chrome.bookmarks.BookmarkTreeNode["id"]
+    >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
+    if (pinnedTabGroupBookmarkNodeId) {
+      const pinnedTabGroupBookmarkNodeChildren =
+        await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
+      for (const tabData of pinnedTabGroupBookmarkNodeChildren.reverse()) {
+        const url = `/stubPage.html?title=${encodeURIComponent(
+          tabData.title,
+        )}&url=${encodeURIComponent(tabData.url ?? "")}`;
+        await chrome.tabs.create({
+          url,
+          pinned: true,
+          active: false,
+        });
+      }
+    } else {
+      // @error
+    }
+  }
+}
+
+async function removeOldSessionTabs({
+  oldSessionData,
+  newSessionData,
+  tabGroupTreeData,
+}: {
+  oldSessionData?: SessionData;
+  newSessionData?: SessionData;
+  tabGroupTreeData: TabGroupTreeData;
+}) {
+  for (const tabGroup of tabGroupTreeData) {
+    if (
+      oldSessionData &&
+      newSessionData &&
+      tabGroup.type === tabGroupTypes.pinned
+    ) {
+      continue;
+    }
+    for (const tab of tabGroup.tabs) {
+      try {
+        await setStorageData(sessionStorageKeys.currentlyRemovedTabId, tab.id);
+        await chrome.tabs.remove(tab.id!);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    await setStorageData(sessionStorageKeys.currentlyRemovedTabId, null);
+  }
+}
+
+async function createSessionTabsFromSessionData(
+  sessionData: chrome.bookmarks.BookmarkTreeNode,
 ) {
+  const sessionDataChildren =
+    (await chrome.bookmarks.getSubTree(sessionData.id))[0].children ?? [];
+  if (!sessionDataChildren?.length) {
+    await chrome.tabs.create({ active: false });
+  }
+  for (let i = 0; i < sessionDataChildren.length; i++) {
+    const tabGroupData = sessionDataChildren[i];
+    const tabGroupColor = tabGroupData.title.split(
+      "-",
+    )[0] as chrome.tabGroups.Color;
+    const ungrouped = tabGroupData.title === titles.ungroupedTabGroup;
+    if (tabGroupData.url) {
+      continue;
+    }
+    if (!tabGroupColorList.includes(tabGroupColor) && !ungrouped) {
+      continue;
+    }
+    const tabIds: chrome.tabs.Tab["id"][] = [];
+    const tabGroupDataChildren = tabGroupData.children ?? [];
+    for (let j = 0; j < tabGroupDataChildren.length; j++) {
+      const tabData = tabGroupDataChildren[j];
+      const active = i === 0 && j === 0 ? true : false;
+      const url = `/stubPage.html?title=${encodeURIComponent(
+        tabData.title,
+      )}&url=${encodeURIComponent(tabData.url ?? "")}${
+        active ? "&active=true" : ""
+      }`;
+      const tab = await chrome.tabs.create({
+        url,
+        active,
+      });
+      tabIds.push(tab.id);
+    }
+    if (!ungrouped && tabIds.length) {
+      const tabGroupTitle = tabGroupData.title.split("-").slice(1).join("-");
+      const tabGroupId = await chrome.tabs.group({
+        tabIds: tabIds as [number, ...number[]],
+      });
+      await chrome.tabGroups.update(tabGroupId, {
+        color: tabGroupColor,
+        collapsed: i === 0 ? false : true,
+        title: tabGroupTitle,
+      });
+    }
+  }
+}
+
+async function createSessionTabsFromPreviousUnsavedSessionTabGroupTreeData() {
+  const previousUnsavedSessionTabGroupTreeData =
+    (await getStorageData<TabGroupTreeData>(
+      sessionStorageKeys.previousUnsavedSessionTabGroupTreeData,
+    )) ?? [];
+  if (!previousUnsavedSessionTabGroupTreeData?.length) {
+    await chrome.tabs.create({ active: false });
+  }
+  for (let i = 0; i < previousUnsavedSessionTabGroupTreeData.length; i++) {
+    const tabGroup = previousUnsavedSessionTabGroupTreeData[i];
+    const pinned = tabGroup.type === tabGroupTypes.pinned;
+    if (pinned) {
+      tabGroup.tabs.reverse();
+    }
+    const ungrouped = tabGroup.id === chrome.tabGroups.TAB_GROUP_ID_NONE;
+    const tabIds: chrome.tabs.Tab["id"][] = [];
+    const tabs = tabGroup.tabs;
+    for (let j = 0; j < tabs.length; j++) {
+      const oldTab = tabs[j];
+      const active =
+        (previousUnsavedSessionTabGroupTreeData.length === 1 && j === 0) ||
+        (i === 0 && j === 0 && tabGroup.type !== tabGroupTypes.pinned) ||
+        (i === 1 &&
+          j === 0 &&
+          previousUnsavedSessionTabGroupTreeData[0].type ===
+            tabGroupTypes.pinned)
+          ? true
+          : false;
+      const url = `/stubPage.html?title=${encodeURIComponent(
+        oldTab.title ?? "",
+      )}&url=${encodeURIComponent(oldTab.url ?? "")}${
+        active ? "&active=true" : ""
+      }`;
+      const tab = await chrome.tabs.create({
+        url,
+        active,
+        pinned,
+      });
+      tabIds.push(tab.id);
+    }
+    if (!ungrouped && tabIds.length) {
+      const { title, color } = tabGroup;
+      const tabGroupId = await chrome.tabs.group({
+        tabIds: tabIds as [number, ...number[]],
+      });
+      await chrome.tabGroups.update(tabGroupId, {
+        color,
+        collapsed: i === 0 ? false : true,
+        title,
+      });
+    }
+  }
+}
+
+async function openNewSession(newSessionData?: SessionData) {
   // @maybe
   await navigator.locks.request(lockNames.applyUpdates, async () => {
-    const oldSessionData =
-      await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-        sessionStorageKeys.currentSessionData,
-      );
+    const oldSessionData = await getStorageData<SessionData>(
+      sessionStorageKeys.currentSessionData,
+    );
     const tabGroupTreeData =
       (await getStorageData<TabGroupTreeData>(
         sessionStorageKeys.tabGroupTreeData,
@@ -187,151 +348,28 @@ async function openNewSession(
         tabGroupTreeData,
       );
     }
-    await setStorageData(sessionStorageKeys.currentSessionData, "");
     await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
+    await setStorageData(sessionStorageKeys.sessionLoading, true);
     await setStorageData(sessionStorageKeys.recentlyClosedTabGroups, []);
     const stubTabId = (await chrome.tabs.create({ active: false })).id;
-    for (const tabGroup of tabGroupTreeData) {
-      if (
-        oldSessionData &&
-        newSessionData &&
-        tabGroup.type === tabGroupTypes.pinned
-      ) {
-        continue;
-      }
-      for (const tab of tabGroup.tabs) {
-        await chrome.tabs.remove(tab.id!);
-      }
-    }
-    if (!oldSessionData && newSessionData) {
-      const pinnedTabGroupBookmarkNodeId = await getStorageData<
-        chrome.bookmarks.BookmarkTreeNode["id"]
-      >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
-      if (pinnedTabGroupBookmarkNodeId) {
-        const pinnedTabGroupBookmarkNodeChildren =
-          await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
-        for (const tabData of pinnedTabGroupBookmarkNodeChildren.reverse()) {
-          const url = `/stubPage.html?title=${encodeURIComponent(
-            tabData.title,
-          )}&url=${encodeURIComponent(tabData.url ?? "")}`;
-          await chrome.tabs.create({
-            url,
-            pinned: true,
-            active: false,
-          });
-        }
-      } else {
-        // @error
-      }
-    }
+    await removeOldSessionTabs({
+      oldSessionData,
+      newSessionData,
+      tabGroupTreeData,
+    });
+    await createPinnedTabs({ oldSessionData, newSessionData });
     if (newSessionData) {
-      const sessionData = (
-        await chrome.bookmarks.getSubTree(newSessionData.id)
-      )[0];
-      const sessionDataChildren = sessionData.children ?? [];
-      if (!sessionDataChildren?.length) {
-        await chrome.tabs.create({ active: false });
-      }
-      for (let i = 0; i < sessionDataChildren.length; i++) {
-        const tabGroupData = sessionDataChildren[i];
-        const tabGroupColor = tabGroupData.title.split(
-          "-",
-        )[0] as chrome.tabGroups.Color;
-        const ungrouped = tabGroupData.title === titles.ungroupedTabGroup;
-        if (tabGroupData.url) {
-          continue;
-        }
-        if (!tabGroupColorList.includes(tabGroupColor) && !ungrouped) {
-          continue;
-        }
-        const tabIds: chrome.tabs.Tab["id"][] = [];
-        const tabGroupDataChildren = tabGroupData.children ?? [];
-        for (let j = 0; j < tabGroupDataChildren.length; j++) {
-          const tabData = tabGroupDataChildren[j];
-          const active = i === 0 && j === 0 ? true : false;
-          const url = `/stubPage.html?title=${encodeURIComponent(
-            tabData.title,
-          )}&url=${encodeURIComponent(tabData.url ?? "")}${
-            active ? "&active=true" : ""
-          }`;
-          const tab = await chrome.tabs.create({
-            url,
-            active,
-          });
-          tabIds.push(tab.id);
-        }
-        if (!ungrouped && tabIds.length) {
-          const tabGroupTitle = tabGroupData.title
-            .split("-")
-            .slice(1)
-            .join("-");
-          const tabGroupId = await chrome.tabs.group({
-            tabIds: tabIds as [number, ...number[]],
-          });
-          await chrome.tabGroups.update(tabGroupId, {
-            color: tabGroupColor,
-            collapsed: i === 0 ? false : true,
-            title: tabGroupTitle,
-          });
-        }
-      }
+      await createSessionTabsFromSessionData(newSessionData);
     } else {
-      const previousUnsavedSessionTabGroupTreeData =
-        (await getStorageData<TabGroupTreeData>(
-          sessionStorageKeys.previousUnsavedSessionTabGroupTreeData,
-        )) ?? [];
-      if (!previousUnsavedSessionTabGroupTreeData?.length) {
-        await chrome.tabs.create({ active: false });
-      }
-      for (let i = 0; i < previousUnsavedSessionTabGroupTreeData.length; i++) {
-        const tabGroup = previousUnsavedSessionTabGroupTreeData[i];
-        const pinned = tabGroup.type === tabGroupTypes.pinned;
-        if (pinned) {
-          tabGroup.tabs.reverse();
-        }
-        const ungrouped = tabGroup.id === chrome.tabGroups.TAB_GROUP_ID_NONE;
-        const tabIds: chrome.tabs.Tab["id"][] = [];
-        const tabs = tabGroup.tabs;
-        for (let j = 0; j < tabs.length; j++) {
-          const oldTab = tabs[j];
-          const active =
-            (previousUnsavedSessionTabGroupTreeData.length === 1 && j === 0) ||
-            (i === 0 && j === 0 && tabGroup.type !== tabGroupTypes.pinned) ||
-            (i === 1 &&
-              j === 0 &&
-              previousUnsavedSessionTabGroupTreeData[0].type ===
-                tabGroupTypes.pinned)
-              ? true
-              : false;
-          const url = `/stubPage.html?title=${encodeURIComponent(
-            oldTab.title ?? "",
-          )}&url=${encodeURIComponent(oldTab.url ?? "")}${
-            active ? "&active=true" : ""
-          }`;
-          const tab = await chrome.tabs.create({
-            url,
-            active,
-            pinned,
-          });
-          tabIds.push(tab.id);
-        }
-        if (!ungrouped && tabIds.length) {
-          const { title, color } = tabGroup;
-          const tabGroupId = await chrome.tabs.group({
-            tabIds: tabIds as [number, ...number[]],
-          });
-          await chrome.tabGroups.update(tabGroupId, {
-            color,
-            collapsed: i === 0 ? false : true,
-            title,
-          });
-        }
-      }
+      await createSessionTabsFromPreviousUnsavedSessionTabGroupTreeData();
     }
-    const sessionTabs = await chrome.tabs.query({ windowType: "normal" });
+    const sessionTabs = await chrome.tabs.query({
+      windowType: "normal",
+    });
     if (sessionTabs.length > 1) {
       await chrome.tabs.remove(stubTabId!);
     }
+    await setStorageData(sessionStorageKeys.sessionLoading, false);
   });
 }
 

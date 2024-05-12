@@ -9,6 +9,7 @@ import {
 import { titles, syncStorageKeys } from "./constants";
 
 (async function () {
+  // @error
   await createBookmarkNodeAndSyncId(
     syncStorageKeys.rootBookmarkNodeId,
     titles.rootBookmarkNode,
@@ -19,7 +20,6 @@ import { titles, syncStorageKeys } from "./constants";
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 })();
-
 // auto light/dark mode based on user preferences
 if (window.matchMedia) {
   if (window.matchMedia("(prefers-color-scheme: dark)").matches) {

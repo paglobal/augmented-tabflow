@@ -122,7 +122,7 @@ async function getTabGroupTreeData() {
       windowId: null as unknown as NonNullable<chrome.windows.Window["id"]>,
       title: titles.ungroupedTabGroup,
       icon: "MaterialSymbolsFolderOpenOutlineRounded",
-      collapsed: !!ungroupedTabGroupCollapsed,
+      collapsed: ungroupedTabGroupCollapsed ?? false,
       tabs: ungroupedTabs,
     });
   }
@@ -156,7 +156,7 @@ async function getTabGroupTreeData() {
       windowId: null as unknown as NonNullable<chrome.windows.Window["id"]>,
       title: titles.pinnedTabGroup,
       icon: "pin-fill",
-      collapsed: !!pinnedTabGroupCollapsed,
+      collapsed: pinnedTabGroupCollapsed ?? false,
       tabs: pinnedTabs,
     });
   }
