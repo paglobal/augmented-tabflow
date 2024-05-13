@@ -14,6 +14,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - implement drag-and-drop for sessions
 - implement recently closed tab groups feature
 - implement import from session
+- implement ability to ungroup tabs
 
 ### Important
 
