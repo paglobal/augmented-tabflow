@@ -29,6 +29,7 @@ import {
 } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { TabGroupTreeData } from "../sharedUtils";
 
 export async function tabGroupTreeContent() {
   // @handled
@@ -66,8 +67,7 @@ export async function tabGroupTreeContent() {
                   getInitialData() {
                     return {
                       type: "tabGroup",
-                      index: tabGroup.tabs[0].index,
-                      id: tabGroup.id,
+                      tabGroup: tabGroup,
                     };
                   },
                 },
@@ -81,34 +81,52 @@ export async function tabGroupTreeContent() {
                   async onDrop({ self, source }) {
                     const closestEdgeOfTarget = extractClosestEdge(self.data);
                     let index = -1;
-                    // i honestly don't yet understand why we need to do this but somehow it works. too tired to investigate now though. please investigate when you get the time
+                    const tabGroupIndex = tabGroup.tabs[0].index;
+                    const otherTabGroupIndex = (
+                      source.data.tabGroup as TabGroupTreeData[number]
+                    ).tabs[0].index;
+                    const {
+                      title: otherTabGroupTitle,
+                      color: otherTabGroupColor,
+                      collapsed: otherTabGroupCollapsed,
+                      tabs: otherTabGroupTabs,
+                    } = source.data.tabGroup as TabGroupTreeData[number];
+                    const otherTabGroupTabIds = otherTabGroupTabs.map(
+                      (tab) => tab.id,
+                    ) as [number, ...number[]];
                     if (
                       closestEdgeOfTarget === "top" &&
-                      (source.data.index as number) > tabGroup.tabs[0].index
+                      otherTabGroupIndex > tabGroupIndex
                     ) {
-                      index = tabGroup.tabs[0].index;
+                      index = tabGroupIndex;
                     } else if (
                       closestEdgeOfTarget === "bottom" &&
-                      (source.data.index as number) > tabGroup.tabs[0].index
+                      otherTabGroupIndex > tabGroupIndex
                     ) {
-                      index = tabGroup.tabs[0].index + tabGroup.tabs.length;
+                      index = tabGroupIndex + 1;
                     } else if (
                       closestEdgeOfTarget === "top" &&
-                      (source.data.index as number) < tabGroup.tabs[0].index
+                      otherTabGroupIndex < tabGroupIndex
                     ) {
-                      index = tabGroup.tabs[0].index - 1;
+                      index = tabGroupIndex - 1;
                     } else if (
                       closestEdgeOfTarget === "bottom" &&
-                      (source.data.index as number) < tabGroup.tabs[0].index
+                      otherTabGroupIndex < tabGroupIndex
                     ) {
-                      index = tabGroup.tabs[0].index + tabGroup.tabs.length - 1;
+                      index = tabGroupIndex;
                     }
-                    await chrome.tabGroups.move(
-                      source.data.id as NonNullable<
-                        chrome.tabGroups.TabGroup["id"]
-                      >,
-                      {
-                        index,
+                    await navigator.locks.request(
+                      lockNames.applyUpdates,
+                      async () => {
+                        await chrome.tabs.move(otherTabGroupTabIds, { index });
+                        const newTabGroupId = await chrome.tabs.group({
+                          tabIds: otherTabGroupTabIds,
+                        });
+                        await chrome.tabGroups.update(newTabGroupId, {
+                          title: otherTabGroupTitle,
+                          color: otherTabGroupColor,
+                          collapsed: otherTabGroupCollapsed,
+                        });
                       },
                     );
                   },
