@@ -112,8 +112,23 @@ chrome.tabs.onAttached.addListener(async () => {
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
-chrome.tabs.onCreated.addListener(async () => {
+chrome.tabs.onCreated.addListener(async (tab) => {
   // @error
+  await navigator.locks.request(lockNames.removingOldSessionTabs, async () => {
+    // @error
+    const removingOldSessionTabs = await getStorageData<boolean>(
+      sessionStorageKeys.removingOldSessionTabs,
+    );
+    if (removingOldSessionTabs) {
+      const tabWindowType = (await chrome.windows.get(tab.windowId)).type;
+      const stubTabId = await getStorageData<chrome.tabs.Tab["id"] | null>(
+        sessionStorageKeys.stubTabId,
+      );
+      if (tabWindowType === "normal" && tab.id !== stubTabId) {
+        await chrome.tabs.remove(tab.id!);
+      }
+    }
+  });
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -208,6 +223,9 @@ async function removeOldSessionTabs({
   newSessionData?: SessionData;
   tabGroupTreeData: TabGroupTreeData;
 }) {
+  await navigator.locks.request(lockNames.removingOldSessionTabs, async () => {
+    await setStorageData(sessionStorageKeys.removingOldSessionTabs, true);
+  });
   for (const tabGroup of tabGroupTreeData) {
     if (
       oldSessionData &&
@@ -218,14 +236,34 @@ async function removeOldSessionTabs({
     }
     for (const tab of tabGroup.tabs) {
       try {
+        const stubTabId = await getStorageData<chrome.tabs.Tab["id"] | null>(
+          sessionStorageKeys.stubTabId,
+        );
+        // this has to error if stub tab doesn't exist
+        await chrome.tabs.get(stubTabId!);
+      } catch (error) {
+        await navigator.locks.request(
+          lockNames.removingOldSessionTabs,
+          async () => {
+            const newStubTabId = (
+              await chrome.tabs.create({ url: "/stubPage.html", active: false })
+            ).id;
+            await setStorageData(sessionStorageKeys.stubTabId, newStubTabId);
+          },
+        );
+      }
+      try {
         await setStorageData(sessionStorageKeys.currentlyRemovedTabId, tab.id);
         await chrome.tabs.remove(tab.id!);
       } catch (error) {
         console.error(error);
       }
     }
-    await setStorageData(sessionStorageKeys.currentlyRemovedTabId, null);
   }
+  await setStorageData(sessionStorageKeys.currentlyRemovedTabId, null);
+  await navigator.locks.request(lockNames.removingOldSessionTabs, async () => {
+    await setStorageData(sessionStorageKeys.removingOldSessionTabs, false);
+  });
 }
 
 async function createSessionTabsFromSessionData(
@@ -351,7 +389,10 @@ async function openNewSession(newSessionData?: SessionData) {
     await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
     await setStorageData(sessionStorageKeys.sessionLoading, true);
     await setStorageData(sessionStorageKeys.recentlyClosedTabGroups, []);
-    const stubTabId = (await chrome.tabs.create({ active: false })).id;
+    const initialStubTabId = (
+      await chrome.tabs.create({ url: "/stubPage.html", active: false })
+    ).id;
+    await setStorageData(sessionStorageKeys.stubTabId, initialStubTabId);
     await removeOldSessionTabs({
       oldSessionData,
       newSessionData,
@@ -366,8 +407,11 @@ async function openNewSession(newSessionData?: SessionData) {
     const sessionTabs = await chrome.tabs.query({
       windowType: "normal",
     });
-    if (sessionTabs.length > 1) {
-      await chrome.tabs.remove(stubTabId!);
+    const stubTabId = await getStorageData<chrome.tabs.Tab["id"] | null>(
+      sessionStorageKeys.stubTabId,
+    );
+    if (sessionTabs.length > 1 && stubTabId) {
+      await chrome.tabs.remove(stubTabId);
     }
     await setStorageData(sessionStorageKeys.sessionLoading, false);
   });
@@ -418,6 +462,7 @@ chrome.windows.onRemoved.addListener(async (windowId) => {
               url,
               active: false,
             });
+            await chrome.tabs.update(tab.id!, { pinned: oldTab.pinned });
             tabIds.push(tab.id);
           }
         }

@@ -155,7 +155,7 @@ async function getTabGroupTreeData() {
       color: null as unknown as chrome.tabGroups.Color,
       windowId: null as unknown as NonNullable<chrome.windows.Window["id"]>,
       title: titles.pinnedTabGroup,
-      icon: "pin-fill",
+      icon: "pin",
       collapsed: pinnedTabGroupCollapsed ?? false,
       tabs: pinnedTabs,
     });

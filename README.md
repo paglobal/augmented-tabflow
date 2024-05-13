@@ -12,12 +12,13 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 - implement loading fallback for session and tab group trees which provide a way to exit loading of current session (eg. for when user interrupts session switching
   loading continues indefinitely)
-- optimize tree for performance
 - implement drag-and-drop for tabs, tab groups and sessions
-- implement recently closed tab groups feature
 
 ### Important
 
+- implement recently closed tab groups feature
+- optimize tree for performance
+- implement import from session
 - resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. try to retry and timeout a couple of times
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 - (if necessary) add alerts for action start and action complete
@@ -57,3 +58,4 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - Add reference to video
 - Popups not supported
 - Don't mind errors unless they affect the way you use the extension
+- You can't create any new windows or tabs in the beginning stages of switching to a new session

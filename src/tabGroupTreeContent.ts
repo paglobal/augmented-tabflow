@@ -22,13 +22,12 @@ import {
   setCurrentlyEjectedTabOrTabGroup,
   setFirstTabInNewTabGroup,
 } from "./App";
-import { newTabUrls, sessionStorageKeys, tabGroupTypes } from "../constants";
+import { newTabUrls, tabGroupTypes } from "../constants";
 import {
   notifyWithErrorMessageAndReloadButton,
   randomTabGroupColorValue,
 } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
-import { getStorageData } from "../sharedUtils";
 
 export async function tabGroupTreeContent() {
   // @handled
@@ -73,8 +72,9 @@ export async function tabGroupTreeContent() {
                 }
               }}
             ></sl-icon-button>
-            ${tabGroup.type === tabGroupTypes.normal
-              ? html`<sl-icon-button
+            ${tabGroup.type !== tabGroupTypes.normal
+              ? null
+              : html`<sl-icon-button
                   name="pen"
                   title="Edit"
                   @click=${(e: Event) => {
@@ -106,10 +106,10 @@ export async function tabGroupTreeContent() {
                       notifyWithErrorMessageAndReloadButton();
                     }
                   }}
-                ></sl-icon-button>`
-              : null}
-            ${tabGroup.type === tabGroupTypes.normal
-              ? html`<sl-icon-button
+                ></sl-icon-button>`}
+            ${tabGroup.type !== tabGroupTypes.normal
+              ? null
+              : html`<sl-icon-button
                   name="box-arrow-in-up-right"
                   title="Move To Window"
                   @click=${async (e: Event) => {
@@ -120,13 +120,13 @@ export async function tabGroupTreeContent() {
                       sessionWindowsTreeDialogRef.value?.show();
                     } catch (error) {
                       console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
                     }
-                    notifyWithErrorMessageAndReloadButton();
                   }}
-                ></sl-icon-button>`
-              : null}
-            ${tabGroup.type === tabGroupTypes.normal
-              ? html`<sl-icon-button
+                ></sl-icon-button>`}
+            ${tabGroup.type !== tabGroupTypes.normal
+              ? null
+              : html`<sl-icon-button
                   name="arrow-90deg-right"
                   title="Move Or Copy To Session"
                   @click=${async (e: Event) => {
@@ -140,8 +140,7 @@ export async function tabGroupTreeContent() {
                       notifyWithErrorMessageAndReloadButton();
                     }
                   }}
-                ></sl-icon-button>`
-              : null}
+                ></sl-icon-button>`}
             <sl-icon-button
               name="x-lg"
               title="Close"
@@ -188,7 +187,9 @@ export async function tabGroupTreeContent() {
                               // @handled
                               try {
                                 e.stopPropagation();
-                                chrome.tabs.update(tab.id!, { pinned: false });
+                                chrome.tabs.update(tab.id!, {
+                                  pinned: false,
+                                });
                               } catch (error) {
                                 console.error(error);
                                 notifyWithErrorMessageAndReloadButton();
@@ -204,7 +205,9 @@ export async function tabGroupTreeContent() {
                               // @handled
                               try {
                                 e.stopPropagation();
-                                chrome.tabs.update(tab.id!, { pinned: true });
+                                chrome.tabs.update(tab.id!, {
+                                  pinned: true,
+                                });
                               } catch (error) {
                                 console.error(error);
                                 notifyWithErrorMessageAndReloadButton();
@@ -304,7 +307,6 @@ export async function tabGroupTreeContent() {
         })}
       `;
     });
-
     return tabGroupTreeContent;
   } catch (error) {
     console.error(error);

@@ -33,11 +33,26 @@ export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
 >(async () => {
   // @handled
   try {
-    const tabGroupTreeData = await getStorageData<TabGroupTreeData>(
-      sessionStorageKeys.tabGroupTreeData,
+    let tabGroupTreeData =
+      (await getStorageData<TabGroupTreeData>(
+        sessionStorageKeys.tabGroupTreeData,
+      )) ?? [];
+    // filter out any tabs or tab groups that are not in this window
+    const currentWindowId = (await chrome.windows.getCurrent()).id;
+    tabGroupTreeData.forEach((tabGroup) => {
+      if (!tabGroup.windowId) {
+        tabGroup.tabs = tabGroup.tabs.filter(
+          (tab) => !(tab.windowId !== currentWindowId),
+        );
+      }
+    });
+    tabGroupTreeData = tabGroupTreeData.filter(
+      (tabGroup) =>
+        !(tabGroup.windowId && tabGroup.windowId !== currentWindowId) &&
+        tabGroup.tabs.length,
     );
 
-    return tabGroupTreeData ?? [];
+    return tabGroupTreeData;
   } catch (error) {
     console.error(error);
     notifyWithErrorMessageAndReloadButton();
@@ -48,11 +63,24 @@ export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
 
 subscribeToStorageData<TabGroupTreeData>(
   sessionStorageKeys.tabGroupTreeData,
-  ({ newValue }) => {
+  async ({ newValue: tabGroupTreeData }) => {
     // @error
-    if (newValue) {
-      setTabGroupTreeData(newValue);
-    }
+    tabGroupTreeData = tabGroupTreeData ?? [];
+    // filter out any tabs or tab groups that are not in this window
+    const currentWindowId = (await chrome.windows.getCurrent()).id;
+    tabGroupTreeData.forEach((tabGroup) => {
+      if (!tabGroup.windowId) {
+        tabGroup.tabs = tabGroup.tabs.filter(
+          (tab) => !(tab.windowId !== currentWindowId),
+        );
+      }
+    });
+    tabGroupTreeData = tabGroupTreeData.filter(
+      (tabGroup) =>
+        !(tabGroup.windowId && tabGroup.windowId !== currentWindowId) &&
+        tabGroup.tabs.length,
+    );
+    setTabGroupTreeData(tabGroupTreeData);
   },
 );
 

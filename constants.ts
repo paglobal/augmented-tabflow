@@ -16,6 +16,8 @@ export const sessionStorageKeys = {
   pinnedTabGroupCollapsed: "session-11",
   sessionLoading: "session-12",
   currentlyRemovedTabId: "session-13",
+  stubTabId: "session-14",
+  removingOldSessionTabs: "session-15",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;
@@ -38,6 +40,7 @@ type LockName = `lock-${number}`;
 export const lockNames = {
   applyUpdates: "lock-1",
   createBookmarkNode: "lock-2",
+  removingOldSessionTabs: "lock-3",
 } as const satisfies Record<string, LockName>;
 
 export const titles = {
