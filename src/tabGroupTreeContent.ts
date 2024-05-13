@@ -22,17 +22,19 @@ import {
   setCurrentlyEjectedTabOrTabGroup,
   setFirstTabInNewTabGroup,
 } from "./App";
-import { newTabUrls, tabGroupTypes } from "../constants";
+import { lockNames, newTabUrls, tabGroupTypes } from "../constants";
 import {
   notifyWithErrorMessageAndReloadButton,
   randomTabGroupColorValue,
 } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
+import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 
 export async function tabGroupTreeContent() {
   // @handled
   try {
-    const tabGroupTreeContent = (await tabGroupTreeData()).map((tabGroup) => {
+    const _tabGroupTreeData = await tabGroupTreeData();
+    const tabGroupTreeContent = _tabGroupTreeData.map((tabGroup) => {
       return html`
         ${h(TreeItem, {
           tooltipContent: tabGroup.title as string,
@@ -57,6 +59,60 @@ export async function tabGroupTreeContent() {
               notifyWithErrorMessageAndReloadButton();
             }
           },
+          draggableOptions:
+            tabGroup.type !== tabGroupTypes.normal
+              ? undefined
+              : {
+                  getInitialData() {
+                    return {
+                      type: "tabGroup",
+                      index: tabGroup.tabs[0].index,
+                      id: tabGroup.id,
+                    };
+                  },
+                },
+          dropTargetOptions:
+            tabGroup.type !== tabGroupTypes.normal
+              ? undefined
+              : {
+                  getData() {
+                    return { type: "tabGroup" };
+                  },
+                  async onDrop({ self, source }) {
+                    const closestEdgeOfTarget = extractClosestEdge(self.data);
+                    let index = -1;
+                    // i honestly don't yet understand why we need to do this but somehow it works. too tired to investigate now though. please investigate when you get the time
+                    if (
+                      closestEdgeOfTarget === "top" &&
+                      (source.data.index as number) > tabGroup.tabs[0].index
+                    ) {
+                      index = tabGroup.tabs[0].index;
+                    } else if (
+                      closestEdgeOfTarget === "bottom" &&
+                      (source.data.index as number) > tabGroup.tabs[0].index
+                    ) {
+                      index = tabGroup.tabs[0].index + tabGroup.tabs.length;
+                    } else if (
+                      closestEdgeOfTarget === "top" &&
+                      (source.data.index as number) < tabGroup.tabs[0].index
+                    ) {
+                      index = tabGroup.tabs[0].index - 1;
+                    } else if (
+                      closestEdgeOfTarget === "bottom" &&
+                      (source.data.index as number) < tabGroup.tabs[0].index
+                    ) {
+                      index = tabGroup.tabs[0].index + tabGroup.tabs.length - 1;
+                    }
+                    await chrome.tabGroups.move(
+                      source.data.id as NonNullable<
+                        chrome.tabGroups.TabGroup["id"]
+                      >,
+                      {
+                        index,
+                      },
+                    );
+                  },
+                },
           actionButtons: html`
             <sl-icon-button
               name="plus-lg"
@@ -176,6 +232,65 @@ export async function tabGroupTreeContent() {
                       console.error(error);
                       notifyWithErrorMessageAndReloadButton();
                     }
+                  },
+                  draggableOptions: {
+                    getInitialData() {
+                      return { type: "tab", index: tab.index, id: tab.id };
+                    },
+                  },
+                  dropTargetOptions: {
+                    getData() {
+                      return { type: "tab" };
+                    },
+                    async onDrop({ self, source }) {
+                      const closestEdgeOfTarget = extractClosestEdge(self.data);
+                      let index = -1;
+                      // i honestly don't yet understand why we need to do this but somehow it works. too tired to investigate now though. please investigate when you get the time
+                      if (
+                        closestEdgeOfTarget === "top" &&
+                        (source.data.index as number) > tab.index
+                      ) {
+                        index = tab.index;
+                      } else if (
+                        closestEdgeOfTarget === "bottom" &&
+                        (source.data.index as number) > tab.index
+                      ) {
+                        index = tab.index + 1;
+                      } else if (
+                        closestEdgeOfTarget === "top" &&
+                        (source.data.index as number) < tab.index
+                      ) {
+                        index = tab.index - 1;
+                      } else if (
+                        closestEdgeOfTarget === "bottom" &&
+                        (source.data.index as number) < tab.index
+                      ) {
+                        index = tab.index;
+                      }
+                      await navigator.locks.request(
+                        lockNames.applyUpdates,
+                        async () => {
+                          if (
+                            tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE
+                          ) {
+                            await chrome.tabs.group({
+                              tabIds: source.data.id as NonNullable<
+                                chrome.tabs.Tab["id"]
+                              >,
+                              groupId: tab.groupId,
+                            });
+                          }
+                          await chrome.tabs.move(
+                            source.data.id as NonNullable<
+                              chrome.tabs.Tab["id"]
+                            >,
+                            {
+                              index,
+                            },
+                          );
+                        },
+                      );
+                    },
                   },
                   actionButtons: html`
                     ${tabGroup.type === tabGroupTypes.pinned

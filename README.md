@@ -10,19 +10,19 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Urgent
 
-- implement loading fallback for session and tab group trees which provide a way to exit loading of current session (eg. for when user interrupts session switching
-  loading continues indefinitely)
-- implement drag-and-drop for tabs, tab groups and sessions
+- optimize tree for performance and ease of working with
+- implement drag-and-drop for sessions
+- implement recently closed tab groups feature
+- implement import from session
 
 ### Important
 
-- implement recently closed tab groups feature
-- optimize tree for performance
-- implement import from session
+- type drag-and-drop code
+- general code inspection and refactoring
 - resolve unloaded tab status thing with `TreeItemColorPatchOrIcon` component. try to retry and timeout a couple of times
+- refine fallback code
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 - (if necessary) add alerts for action start and action complete
-- general code inspection and refactoring
 - inspect and verify types across entire codebase
 - refine and organise text. look for anything in quotation marks like "Error!" and such. make use of full stops
 - remove all unused imports
@@ -32,12 +32,12 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 - type `sendMessage` and `subscribeToMessage` for automatic inference
 - implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
+- have a go at the `invalid weakmap key` and `closed message channel before response` errors
 - handle errors in timeouts as well
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - notify users of errors that happen in service workers through message `chrome.runtime.message`
 - create `TreeDialog` and `ConfirmationDialog`
 - use early returns anywhere you can
-- refine fallback code
 
 ### Can wait
 
@@ -59,3 +59,4 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - Popups not supported
 - Don't mind errors unless they affect the way you use the extension
 - You can't create any new windows or tabs in the beginning stages of switching to a new session
+- When you close a window, all it's tabs move to another session window if any is available

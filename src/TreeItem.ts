@@ -1,6 +1,19 @@
 import { TemplateResult, html } from "lit";
 import "@shoelace-style/shoelace/dist/components/tree-item/tree-item.js";
 import { styleMap } from "lit/directives/style-map.js";
+import { adaptEffect, adaptState } from "promethium-js";
+import { createRef, ref } from "lit/directives/ref.js";
+import { draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
+import {
+  attachClosestEdge,
+  extractClosestEdge,
+  type Edge,
+} from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+
+type DraggableOptions = Parameters<typeof draggable>[0];
+type DropTargetOptions = Parameters<typeof dropTargetForElements>[0];
 
 export function TreeItem(props: {
   content: TemplateResult;
@@ -11,42 +24,110 @@ export function TreeItem(props: {
   onExpand?: (e: Event) => void;
   onCollapse?: (e: Event) => void;
   onSelect?: (e: Event) => void;
+  draggableOptions?: Partial<DraggableOptions>;
+  dropTargetOptions?: Partial<DropTargetOptions>;
 }) {
-  return () => html`
-    <sl-tree-item
-      title=${props.tooltipContent}
-      style=${styleMap({
-        overflow: "hidden",
-        whiteSpace: "noWrap",
-        position: "relative",
-      })}
-      ?expanded=${props.expanded}
-      ?selected=${props.selected}
-      @sl-expand=${props.onExpand}
-      @sl-collapse=${props.onCollapse}
-      @click=${props.onSelect}
-    >
-      <div
-        class="actions-container"
+  const [draggedOverEdge, setDraggedOverEdge] = adaptState<Edge | null>(null);
+  const [dragging, setDragging] = adaptState(false);
+  const treeItemRef = createRef<HTMLElement>();
+  adaptEffect(() => {
+    if (props.draggableOptions && props.dropTargetOptions) {
+      props.draggableOptions.element = treeItemRef.value;
+      props.draggableOptions.onDragStart = () => setDragging(true);
+      props.draggableOptions.onDrop = () => setDragging(false);
+      props.dropTargetOptions.element = treeItemRef.value;
+      const previousGetDataFn = props.dropTargetOptions.getData;
+      props.dropTargetOptions.getData = ({ input, element, source }) => {
+        const data =
+          previousGetDataFn?.({
+            input,
+            element,
+            source,
+          }) ?? {};
+
+        return attachClosestEdge(data, {
+          input,
+          element,
+          // you can specify what edges you want to allow the user to be closest to
+          allowedEdges: ["top", "bottom"],
+        });
+      };
+      props.dropTargetOptions.onDrag = ({ self, source }) => {
+        const closestEdgeOfTarget = extractClosestEdge(self.data);
+        if (
+          self.element === source.element ||
+          self.data.type !== source.data.type
+        ) {
+          setDraggedOverEdge(null);
+        } else {
+          setDraggedOverEdge(closestEdgeOfTarget);
+        }
+      };
+      props.dropTargetOptions.onDragLeave = () => {
+        setDraggedOverEdge(null);
+      };
+      const previousOnDropFunction = props.dropTargetOptions.onDrop;
+      props.dropTargetOptions.onDrop = ({ self, location, source }) => {
+        if (self.data.type === source.data.type) {
+          previousOnDropFunction?.({ self, location, source });
+        }
+        setDraggedOverEdge(null);
+      };
+
+      return combine(
+        draggable(props.draggableOptions as DraggableOptions),
+        dropTargetForElements(props.dropTargetOptions as DropTargetOptions),
+      );
+    }
+  }, []);
+
+  return () => {
+    const draggedOverStyles = draggedOverEdge()
+      ? {
+          [`border-${draggedOverEdge()}`]:
+            "0.2rem solid var(--sl-color-primary-500)",
+        }
+      : {};
+
+    return html`
+      <sl-tree-item
+        ${ref(treeItemRef)}
+        title=${props.tooltipContent}
         style=${styleMap({
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: "100%",
-          minHeight: "2rem",
-          textAlign: "right",
+          overflow: "hidden",
+          whiteSpace: "noWrap",
+          position: "relative",
+          opacity: dragging() ? 0.5 : 1,
+          ...draggedOverStyles,
         })}
+        ?expanded=${props.expanded}
+        ?selected=${props.selected}
+        @sl-expand=${props.onExpand}
+        @sl-collapse=${props.onCollapse}
+        @click=${props.onSelect}
       >
-        <sl-button-group
-          label="Actions"
+        <div
+          class="actions-container"
           style=${styleMap({
-            padding: "0 0.4rem",
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: "100%",
+            minHeight: "2rem",
+            textAlign: "right",
           })}
         >
-          ${props.actionButtons}
-        </sl-button-group>
-      </div>
-      ${props.content}
-    </sl-tree-item>
-  `;
+          <sl-button-group
+            label="Actions"
+            style=${styleMap({
+              padding: "0 0.4rem",
+            })}
+          >
+            ${props.actionButtons}
+          </sl-button-group>
+        </div>
+        ${props.content}
+      </sl-tree-item>
+    `;
+  };
 }

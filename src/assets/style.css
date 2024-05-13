@@ -55,7 +55,7 @@ sl-tree-item:focus-visible > div.actions-container {
 }
 
 div.actions-container sl-button-group {
-  opacity: 0.001;
+  opacity: 0;
 }
 
 div.actions-container:hover sl-button-group,
