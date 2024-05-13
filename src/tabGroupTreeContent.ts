@@ -297,6 +297,13 @@ export async function tabGroupTreeContent() {
                               >,
                               groupId: tab.groupId,
                             });
+                          } else if (tabGroup.type === tabGroupTypes.pinned) {
+                            await chrome.tabs.update(
+                              source.data.id as NonNullable<
+                                chrome.tabs.Tab["id"]
+                              >,
+                              { pinned: true },
+                            );
                           }
                           await chrome.tabs.move(
                             source.data.id as NonNullable<
