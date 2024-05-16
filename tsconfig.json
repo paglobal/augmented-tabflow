@@ -8,6 +8,8 @@
       {
         "name": "ts-lit-plugin"
       }
-    ]
+    ],
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
   }
 }

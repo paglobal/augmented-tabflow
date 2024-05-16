@@ -21,8 +21,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       promethium-js:
-        specifier: ^0.9.5
-        version: 0.9.5
+        specifier: ^0.9.6
+        version: 0.9.6
     devDependencies:
       chrome-types:
         specifier: ^0.1.250
@@ -562,8 +562,8 @@ packages:
     resolution: {integrity: sha512-u5U8qYpBCpN13BsiEB0CbR1Hhh4Gc0zLFuedrHJKMctHCHAGrMdG0PRM/KErzAL3CU6/eckEtmHNB3x6e3c0vA==}
     engines: {node: ^10 || ^12 || >=14}
 
-  promethium-js@0.9.5:
-    resolution: {integrity: sha512-G/nWoBxVyktx+MU1nBSlwONe9PaOT8g7NoEw6XT2Tu096AL4E3hap5MZbA3XT0IHtu8HN6aQQpt5182CCQ9Pgw==}
+  promethium-js@0.9.6:
+    resolution: {integrity: sha512-C9aanDG1ZjY+oVUL7NRobceKZTYVwJ5ZV3uxMpuzzyVniJAaZin9N42Kz6asD95CdpTiLZZMYeEn7leJuRjDyA==}
 
   pstree.remy@1.1.8:
     resolution: {integrity: sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w==}
@@ -1205,7 +1205,7 @@ snapshots:
       picocolors: 1.0.0
       source-map-js: 1.0.2
 
-  promethium-js@0.9.5:
+  promethium-js@0.9.6:
     dependencies:
       lit: 3.1.2
 

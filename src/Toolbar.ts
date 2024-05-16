@@ -70,45 +70,6 @@ export function Toolbar() {
           paddingBottom: "0.75rem",
         })}
       >
-        <sl-icon-button
-          name="arrow-left"
-          title="Go Back One Page In Current Tab"
-          @click=${() => {
-            // @handled
-            try {
-              chrome.tabs.goBack();
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          }}
-        ></sl-icon-button>
-        <sl-icon-button
-          name="arrow-right"
-          title="Go Forward One Page In Current Tab"
-          @click=${() => {
-            // @handled
-            try {
-              chrome.tabs.goForward();
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          }}
-        ></sl-icon-button>
-        <sl-icon-button
-          name="arrow-clockwise"
-          title="Reload Current Tab"
-          @click=${() => {
-            // @handled
-            try {
-              chrome.tabs.reload();
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          }}
-        ></sl-icon-button>
         ${until(tabGroupTreeButton(), null)}
         <sl-icon-button
           name="plus-circle"

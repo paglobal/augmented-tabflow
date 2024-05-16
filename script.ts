@@ -19,26 +19,26 @@ import { titles, syncStorageKeys } from "./constants";
     titles.pinnedTabGroup,
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
-})();
-// auto light/dark mode based on user preferences
-if (window.matchMedia) {
-  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    setThemeMode("dark");
-    document.documentElement.classList.add("sl-theme-dark");
-  } else {
-    setThemeMode("light");
-    document.documentElement.classList.remove("sl-theme-dark");
+  // auto light/dark mode based on user preferences
+  if (window.matchMedia) {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setThemeMode("dark");
+      document.documentElement.classList.add("sl-theme-dark");
+    } else {
+      setThemeMode("light");
+      document.documentElement.classList.remove("sl-theme-dark");
+    }
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", () => {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          setThemeMode("dark");
+          document.documentElement.classList.add("sl-theme-dark");
+        } else {
+          setThemeMode("light");
+          document.documentElement.classList.remove("sl-theme-dark");
+        }
+      });
   }
-  window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", () => {
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        setThemeMode("dark");
-        document.documentElement.classList.add("sl-theme-dark");
-      } else {
-        setThemeMode("light");
-        document.documentElement.classList.remove("sl-theme-dark");
-      }
-    });
-}
-renderTemplateFn(() => html`${h(App)}`, { renderContainer: "body" });
+  renderTemplateFn(() => html`${h(App)}`, { renderContainer: "body" });
+})();

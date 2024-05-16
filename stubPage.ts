@@ -14,3 +14,9 @@ if (url !== null) {
 if (active) {
   sendMessage({ type: messageTypes.restoreTab });
 }
+document.addEventListener("click", () => {
+  sendMessage({ type: messageTypes.restoreTab });
+});
+document.addEventListener("keypress", () => {
+  sendMessage({ type: messageTypes.restoreTab });
+});

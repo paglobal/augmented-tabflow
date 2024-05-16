@@ -28,8 +28,7 @@ export function SessionView() {
       return html`
         ${currentSessionData
           ? html`${h(Tree, {
-              contentFn: () =>
-                html`${until(tabGroupTreeContent(), fallbackTreeContent())}`,
+              contentFn: tabGroupTreeContent,
               fullHeight: true,
             })}`
           : html`${h(Tree, {

@@ -4,6 +4,7 @@ import {
   sessionStorageKeys,
   syncStorageKeys,
   tabGroupTypes,
+  titles,
 } from "../constants";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -28,58 +29,42 @@ import {
   setFirstTabInNewTabGroup,
 } from "./App";
 
-export const [tabGroupTreeData, setTabGroupTreeData] = adaptState<
-  Promise<TabGroupTreeData> | TabGroupTreeData
->(async () => {
-  // @handled
-  try {
-    let tabGroupTreeData =
+export const [tabGroupTreeData, setTabGroupTreeData] =
+  adaptState<TabGroupTreeData>([]);
+
+updateTabGroupTreeData(null);
+
+async function updateTabGroupTreeData(
+  tabGroupTreeData: TabGroupTreeData | null,
+) {
+  if (!tabGroupTreeData) {
+    tabGroupTreeData =
       (await getStorageData<TabGroupTreeData>(
         sessionStorageKeys.tabGroupTreeData,
       )) ?? [];
-    // filter out any tabs or tab groups that are not in this window
-    const currentWindowId = (await chrome.windows.getCurrent()).id;
-    tabGroupTreeData.forEach((tabGroup) => {
-      if (!tabGroup.windowId) {
-        tabGroup.tabs = tabGroup.tabs.filter(
-          (tab) => !(tab.windowId !== currentWindowId),
-        );
-      }
-    });
-    tabGroupTreeData = tabGroupTreeData.filter(
-      (tabGroup) =>
-        !(tabGroup.windowId && tabGroup.windowId !== currentWindowId) &&
-        tabGroup.tabs.length,
-    );
-
-    return tabGroupTreeData;
-  } catch (error) {
-    console.error(error);
-    notifyWithErrorMessageAndReloadButton();
-
-    return [];
   }
-});
+  // filter out any tabs or tab groups that are not in this window
+  const currentWindowId = (await chrome.windows.getCurrent()).id;
+  tabGroupTreeData.forEach((tabGroup) => {
+    if (!tabGroup.windowId) {
+      tabGroup.tabs = tabGroup.tabs.filter(
+        (tab) => !(tab.windowId !== currentWindowId),
+      );
+    }
+  });
+  tabGroupTreeData = tabGroupTreeData.filter(
+    (tabGroup) =>
+      !(tabGroup.windowId && tabGroup.windowId !== currentWindowId) &&
+      tabGroup.tabs.length,
+  );
+  setTabGroupTreeData(tabGroupTreeData);
+}
 
 subscribeToStorageData<TabGroupTreeData>(
   sessionStorageKeys.tabGroupTreeData,
   async ({ newValue: tabGroupTreeData }) => {
     // @error
     tabGroupTreeData = tabGroupTreeData ?? [];
-    // filter out any tabs or tab groups that are not in this window
-    const currentWindowId = (await chrome.windows.getCurrent()).id;
-    tabGroupTreeData.forEach((tabGroup) => {
-      if (!tabGroup.windowId) {
-        tabGroup.tabs = tabGroup.tabs.filter(
-          (tab) => !(tab.windowId !== currentWindowId),
-        );
-      }
-    });
-    tabGroupTreeData = tabGroupTreeData.filter(
-      (tabGroup) =>
-        !(tabGroup.windowId && tabGroup.windowId !== currentWindowId) &&
-        tabGroup.tabs.length,
-    );
     setTabGroupTreeData(tabGroupTreeData);
   },
 );
@@ -329,6 +314,10 @@ export async function createSession(
     const sessionData = await chrome.bookmarks.create({
       title,
       parentId: rootBookmarkNodeId,
+    });
+    await chrome.bookmarks.create({
+      title: titles.ungroupedTabGroup,
+      parentId: sessionData.id,
     });
     if (useCurrentSessionData) {
       await saveCurrentSessionDataIntoBookmarkNode(sessionData.id);

@@ -2,6 +2,7 @@ import { html } from "lit";
 import { getFaviconUrl } from "../sharedUtils";
 import { tabGroupColors } from "./utils";
 import { styleMap } from "lit/directives/style-map.js";
+import { createRef, ref } from "lit/directives/ref.js";
 
 export function TreeItemColorPatchOrIcon(props: {
   color?: chrome.tabGroups.TabGroup["color"];
@@ -9,8 +10,10 @@ export function TreeItemColorPatchOrIcon(props: {
   pageUrl?: string;
   showSpinner?: boolean;
 }) {
-  return () =>
-    props.color
+  const imageRef = createRef<HTMLImageElement>();
+
+  return () => {
+    return props.color
       ? html`<span
           style=${styleMap({
             background: tabGroupColors()[props.color],
@@ -41,20 +44,26 @@ export function TreeItemColorPatchOrIcon(props: {
                 marginRight: "0.7rem",
                 outline: `0.15rem solid ${tabGroupColors()["grey"]}`,
                 borderRadius: "50%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               })}
             >
               ${props.showSpinner
-                ? html`<sl-spinner
-                    style=${styleMap({
-                      marginTop: "0.17rem",
-                      marginLeft: "0.16rem",
-                    })}
-                  ></sl-spinner>`
+                ? html`<sl-spinner></sl-spinner>`
                 : html`<img
+                    ${ref(imageRef)}
                     src=${getFaviconUrl(props.pageUrl)}
-                    @error=${(e: Event) =>
-                      ((e.target as HTMLImageElement).src =
-                        getFaviconUrl(null))}
+                    @error=${(e: Event) => {
+                      (e.target as HTMLImageElement).src = getFaviconUrl(
+                        props.pageUrl,
+                      );
+                    }}
+                    @load=${(e: Event) => {
+                      (e.target as HTMLImageElement).src = `${getFaviconUrl(
+                        props.pageUrl,
+                      )}&t=${new Date().getTime()}`;
+                    }}
                     style=${styleMap({
                       width: "1.3rem",
                       padding: "0.2rem",
@@ -62,4 +71,5 @@ export function TreeItemColorPatchOrIcon(props: {
                   /> `}
             </div>
           `;
+  };
 }

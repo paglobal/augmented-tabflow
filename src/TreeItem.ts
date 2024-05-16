@@ -38,6 +38,7 @@ export function TreeItem(props: {
       props.dropTargetOptions.element = treeItemRef.value;
       const previousGetDataFn = props.dropTargetOptions.getData;
       props.dropTargetOptions.getData = ({ input, element, source }) => {
+        // @maybe
         const data =
           previousGetDataFn?.({
             input,
@@ -53,6 +54,7 @@ export function TreeItem(props: {
         });
       };
       props.dropTargetOptions.onDrag = ({ self, source }) => {
+        // @maybe
         const closestEdgeOfTarget = extractClosestEdge(self.data);
         if (
           self.element === source.element ||
@@ -64,11 +66,16 @@ export function TreeItem(props: {
         }
       };
       props.dropTargetOptions.onDragLeave = () => {
+        // @maybe
         setDraggedOverEdge(null);
       };
       const previousOnDropFunction = props.dropTargetOptions.onDrop;
       props.dropTargetOptions.onDrop = ({ self, location, source }) => {
-        if (self.data.type === source.data.type) {
+        // @maybe
+        if (
+          self.data.type === source.data.type &&
+          self.element !== source.element
+        ) {
           previousOnDropFunction?.({ self, location, source });
         }
         setDraggedOverEdge(null);
@@ -85,7 +92,7 @@ export function TreeItem(props: {
     const draggedOverStyles = draggedOverEdge()
       ? {
           [`border-${draggedOverEdge()}`]:
-            "0.2rem solid var(--sl-color-primary-500)",
+            "0.15rem solid var(--sl-color-primary-500)",
         }
       : {};
 
