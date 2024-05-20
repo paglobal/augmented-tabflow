@@ -2,6 +2,7 @@ import { html } from "lit";
 import { h } from "promethium-js";
 import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
+import { fallbackTreeContent } from "./fallbackTreeContent";
 import {
   currentSessionData,
   currentSessionDataNotAvailable,
@@ -19,7 +20,7 @@ import {
   setCurrentlyEditedSessionId,
 } from "./App";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
-import { fallbackTreeContent } from "./fallbackTreeContent";
+import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 
 export function sessionsTreeContent() {
   // @handled
@@ -43,6 +44,37 @@ export function sessionsTreeContent() {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
             }
+          },
+          draggableOptions: {
+            getInitialData() {
+              return {
+                type: "bookmark",
+                sessionData: sessionData,
+              };
+            },
+          },
+          dropTargetOptions: {
+            getData() {
+              return { type: "bookmark" };
+            },
+            async onDrop({ self, source }) {
+              const closestEdgeOfTarget = extractClosestEdge(self.data);
+              let index = -1;
+              const otherSessionData = source.data
+                .sessionData as chrome.bookmarks.BookmarkTreeNode;
+              if (closestEdgeOfTarget === "top") {
+                index = sessionData.index ?? -1;
+              } else if (closestEdgeOfTarget === "bottom") {
+                index = (sessionData.index ?? 0) + 1;
+              }
+              if (index === -1) {
+                return;
+              }
+              await chrome.bookmarks.move(otherSessionData.id, {
+                parentId: otherSessionData.parentId,
+                index,
+              });
+            },
           },
           actionButtons: html`
             <sl-icon-button

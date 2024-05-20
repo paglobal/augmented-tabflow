@@ -11,20 +11,15 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Urgent
 
-- implement drag-and-drop for sessions
 - implement recently closed tab groups feature
 - implement import from session
-- implement ability to ungroup tabs
-- implement ability to sort sessions alphabetically or by date
-- fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
-- focus window after transferring tabs from closed window to it
-- display edit and delete session buttons conditionally
-- always show ungrouped in the "move to session dialog" for tabs
-- don't automatically hide "move to session dialogs"
-- handle file urls
+- experiment with closing window on session switch
 
 ### Important
 
+- implement ability to sort sessions alphabetically or by date added
+- fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
+- always show ungrouped in the "move to session dialog" for tabs
 - type drag-and-drop code
 - general code inspection and refactoring
 - refine fallback code
@@ -40,7 +35,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - create `TreeDialog` and `ConfirmationDialog`
 - implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - notify users of errors that happen in service workers through message `chrome.runtime.message`
-- have a go at the `invalid weakmap key` and `closed message channel before response` errors
+- have a go at the `closed message channel before response`
 - handle errors in timeouts as well
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - use early returns anywhere it makes sense
