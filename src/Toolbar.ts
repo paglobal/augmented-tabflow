@@ -1,14 +1,16 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
-import { until } from "lit/directives/until.js";
-import { groupUngroupedTabsInWindow } from "./sessionService";
+import {
+  currentSessionData,
+  groupUngroupedTabsInWindow,
+} from "./sessionService";
 import {
   notify,
   notifyWithErrorMessageAndReloadButton,
   randomTabGroupColorValue,
 } from "./utils";
 import { getStorageData } from "../sharedUtils";
-import { SessionData, sessionStorageKeys } from "../constants";
+import { sessionStorageKeys } from "../constants";
 import {
   helpDialogRef,
   addTabGroupDialogRef,
@@ -23,34 +25,23 @@ import {
 } from "./App";
 
 export function Toolbar() {
-  async function tabGroupTreeButton() {
-    // @handled
-    try {
-      const currentSessionData = await getStorageData<SessionData>(
-        sessionStorageKeys.currentSessionData,
-      );
-
-      return currentSessionData
-        ? null
-        : html`<sl-icon-button
-            name="list-ul"
-            title="Show Tab Group Tree"
-            @click=${() => {
-              // @handled
-              try {
-                tabGroupTreeDialogRef.value?.show();
-              } catch (error) {
-                console.error(error);
-                notifyWithErrorMessageAndReloadButton();
-              }
-            }}
-          ></sl-icon-button>`;
-    } catch (error) {
-      console.error(error);
-      notifyWithErrorMessageAndReloadButton();
-
-      return null;
-    }
+  function tabGroupTreeButton() {
+    const _currentSessionData = currentSessionData();
+    return _currentSessionData
+      ? null
+      : html`<sl-icon-button
+          name="list-ul"
+          title="Show Tab Group Tree"
+          @click=${() => {
+            // @handled
+            try {
+              tabGroupTreeDialogRef.value?.show();
+            } catch (error) {
+              console.error(error);
+              notifyWithErrorMessageAndReloadButton();
+            }
+          }}
+        ></sl-icon-button>`;
   }
 
   return () =>
@@ -70,7 +61,7 @@ export function Toolbar() {
           paddingBottom: "0.75rem",
         })}
       >
-        ${until(tabGroupTreeButton(), null)}
+        ${tabGroupTreeButton()}
         <sl-icon-button
           name="plus-circle"
           title="Add Tab Group"

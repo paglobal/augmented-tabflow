@@ -11,6 +11,7 @@ import {
   extractClosestEdge,
   type Edge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item.js";
 
 type DraggableOptions = Parameters<typeof draggable>[0];
 type DropTargetOptions = Parameters<typeof dropTargetForElements>[0];
@@ -29,7 +30,7 @@ export function TreeItem(props: {
 }) {
   const [draggedOverEdge, setDraggedOverEdge] = adaptState<Edge | null>(null);
   const [dragging, setDragging] = adaptState(false);
-  const treeItemRef = createRef<HTMLElement>();
+  const treeItemRef = createRef<SlTreeItem>();
   adaptEffect(() => {
     if (props.draggableOptions && props.dropTargetOptions) {
       props.draggableOptions.element = treeItemRef.value;

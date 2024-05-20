@@ -5,7 +5,7 @@
   "description": "Augment your tab workflow with extended tab group managment",
   "scripts": {
     "build": "cp manifest-dev.json public/manifest.json && vite build --outDir dist-dev --sourcemap true --minify false",
-    "dev": "concurrently \"nodemon --watch public --ext js,json,png,svg,html --exec 'cp manifest-dev.json public/manifest.json && vite build --outDir dist-dev --watch --sourcemap true --minify false'\" \"tsc --watch\"",
+    "dev": "concurrently \"cp manifest-dev.json public/manifest.json && vite build --outDir dist-dev --watch --sourcemap true --minify false\" \"tsc --watch\"",
     "package": "cp manifest-prod.json public/manifest.json && vite build && zip -r augmented-tabflow.zip dist/ && rm -rf dist"
   },
   "author": "Paul Amoah",
@@ -13,7 +13,6 @@
   "devDependencies": {
     "chrome-types": "^0.1.250",
     "concurrently": "^8.2.2",
-    "nodemon": "^3.1.0",
     "ts-lit-plugin": "^2.0.2",
     "typescript": "^5.3.3",
     "vite": "^5.1.5"
@@ -22,7 +21,7 @@
     "@atlaskit/pragmatic-drag-and-drop": "^1.1.7",
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
     "@shoelace-style/shoelace": "^2.15.0",
-    "lit": "^3.1.2",
-    "promethium-js": "^0.9.6"
+    "lit": "^3.1.3",
+    "promethium-js": "^0.9.5"
   }
 }

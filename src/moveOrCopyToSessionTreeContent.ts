@@ -2,21 +2,21 @@ import { html } from "lit";
 import { h } from "promethium-js";
 import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
-import { moveOrCopyToSession, sessionsTreeData } from "./sessionService";
-import { getStorageData } from "../sharedUtils";
-import { sessionStorageKeys, titles } from "../constants";
+import {
+  currentSessionData,
+  moveOrCopyToSession,
+  sessionsTreeData,
+} from "./sessionService";
+import { titles } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 
 export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
   // @handled
   try {
-    const currentSessionData =
-      await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-        sessionStorageKeys.currentSessionData,
-      );
-    const _sessionsTreeData = (await sessionsTreeData()).filter(
-      (sessionData) => sessionData.id !== currentSessionData?.id,
+    const _currentSessionData = currentSessionData();
+    const _sessionsTreeData = sessionsTreeData().filter(
+      (sessionData) => sessionData.id !== _currentSessionData?.id,
     );
     if (type === "tab") {
       const sessionsTreeContent = _sessionsTreeData.map(async (sessionData) => {

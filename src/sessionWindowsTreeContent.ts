@@ -23,7 +23,7 @@ export async function sessionWindowsTreeContent() {
           await chrome.tabs.query({ windowId: window.id, active: true })
         )[0];
 
-        return html`${h(TreeItem, {
+        return h(TreeItem, {
           tooltipContent: `${activeTab.title}`,
           async onSelect(e: Event) {
             // @handled
@@ -38,7 +38,7 @@ export async function sessionWindowsTreeContent() {
           content: html` ${h(TreeItemColorPatchOrIcon, {
             pageUrl: activeTab.url,
           })}${activeTab.title}`,
-        })}`;
+        });
       }),
     );
 

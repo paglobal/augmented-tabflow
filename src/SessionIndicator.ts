@@ -1,42 +1,21 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
-import { until } from "lit/directives/until.js";
-import { SessionData, sessionStorageKeys, titles } from "../constants";
+import { titles } from "../constants";
 import { sessionsTreeDialogRef } from "./App";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
-import { getStorageData } from "../sharedUtils";
+import { currentSessionData } from "./sessionService";
 
 export function SessionIndicator() {
-  async function currentSessionTitle() {
-    // @handled
-    try {
-      const currentSessionData = await getStorageData<SessionData>(
-        sessionStorageKeys.currentSessionData,
-      );
-
-      return currentSessionData
-        ? currentSessionData.title
-        : titles.unsavedSession;
-    } catch (error) {
-      console.error(error);
-
-      return "Error!";
-    }
+  function currentSessionTitle() {
+    const _currentSessionData = currentSessionData();
+    return _currentSessionData
+      ? _currentSessionData.title
+      : titles.unsavedSession;
   }
 
-  async function buttonVariant() {
-    // @handled
-    try {
-      const currentSessionData = await getStorageData<SessionData>(
-        sessionStorageKeys.currentSessionData,
-      );
-
-      return currentSessionData ? "primary" : "default";
-    } catch (error) {
-      console.error(error);
-
-      return "danger";
-    }
+  function buttonVariant() {
+    const _currentSessionData = currentSessionData();
+    return _currentSessionData ? "primary" : "default";
   }
 
   return () =>
@@ -47,7 +26,7 @@ export function SessionIndicator() {
       })}
     >
       <sl-button
-        variant=${until(buttonVariant(), "default")}
+        variant=${buttonVariant()}
         outline
         style=${styleMap({ width: "100%" })}
         @click=${() => {
@@ -60,7 +39,7 @@ export function SessionIndicator() {
           }
         }}
         title="Show Sessions"
-        >${until(currentSessionTitle(), titles.unsavedSession)}</sl-button
+        >${currentSessionTitle()}</sl-button
       >
     </div>`;
 }

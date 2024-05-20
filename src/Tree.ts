@@ -1,9 +1,9 @@
-import { TemplateResult, html } from "lit";
+import { type TemplateResult, html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import "@shoelace-style/shoelace/dist/components/tree/tree.js";
 import { type SlSelectionChangeEvent } from "@shoelace-style/shoelace/dist/events/sl-selection-change";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
-import { DirectiveResult } from "lit/async-directive";
+import { type DirectiveResult } from "lit/async-directive";
 
 export function Tree(props: {
   contentFn: () => TemplateResult | DirectiveResult;

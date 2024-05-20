@@ -5,6 +5,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 ## Note
 
 - Whenever you change [manifest-dev.json](manifest-dev.json), change [manifest-prod.json](manifest-prod.json) accordingly.
+- Restart dev server whenever you change [manifest-dev.json](manifest-dev.json), [manifest-prod.json](manifest-prod.json) or anything in [public](public).
 
 ## Task List
 
@@ -17,10 +18,10 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - implement ability to sort sessions alphabetically or by date
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 - focus window after transferring tabs from closed window to it
-- (dev) segregate nodemon watching from vite watching
 - display edit and delete session buttons conditionally
 - always show ungrouped in the "move to session dialog" for tabs
 - don't automatically hide "move to session dialogs"
+- handle file urls
 
 ### Important
 

@@ -3,16 +3,24 @@ import { getFaviconUrl } from "../sharedUtils";
 import { tabGroupColors } from "./utils";
 import { styleMap } from "lit/directives/style-map.js";
 import { createRef, ref } from "lit/directives/ref.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 
 export function TreeItemColorPatchOrIcon(props: {
   color?: chrome.tabGroups.TabGroup["color"];
   icon?: string;
+  faviconUrl?: string;
   pageUrl?: string;
   showSpinner?: boolean;
 }) {
   const imageRef = createRef<HTMLImageElement>();
 
   return () => {
+    setTimeout(() => {
+      if (imageRef.value) {
+        imageRef.value.src = getFaviconUrl(props.pageUrl);
+      }
+    }, 200);
+
     return props.color
       ? html`<span
           style=${styleMap({
@@ -53,16 +61,9 @@ export function TreeItemColorPatchOrIcon(props: {
                 ? html`<sl-spinner></sl-spinner>`
                 : html`<img
                     ${ref(imageRef)}
-                    src=${getFaviconUrl(props.pageUrl)}
+                    src=${ifDefined(props.faviconUrl)}
                     @error=${(e: Event) => {
-                      (e.target as HTMLImageElement).src = getFaviconUrl(
-                        props.pageUrl,
-                      );
-                    }}
-                    @load=${(e: Event) => {
-                      (e.target as HTMLImageElement).src = `${getFaviconUrl(
-                        props.pageUrl,
-                      )}&t=${new Date().getTime()}`;
+                      (e.target as HTMLImageElement).src = getFaviconUrl(null);
                     }}
                     style=${styleMap({
                       width: "1.3rem",

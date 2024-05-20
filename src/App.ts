@@ -117,8 +117,7 @@ export function App() {
             ${h(Dialog, {
               label: "Sessions",
               content: html`${h(Tree, {
-                contentFn: () =>
-                  html`${until(sessionsTreeContent(), fallbackTreeContent())}`,
+                contentFn: sessionsTreeContent,
               })}`,
               ref: sessionsTreeDialogRef,
               fullWidth: true,
@@ -127,8 +126,7 @@ export function App() {
             ${h(Dialog, {
               label: "Tab Group Tree",
               content: html`${h(Tree, {
-                contentFn: () =>
-                  html`${until(tabGroupTreeContent(), fallbackTreeContent())}`,
+                contentFn: tabGroupTreeContent,
               })}`,
               fullWidth: true,
               noTopBodyMargin: true,
@@ -138,10 +136,7 @@ export function App() {
               label: "Move To Window",
               content: html`${h(Tree, {
                 contentFn: () =>
-                  html`${until(
-                    sessionWindowsTreeContent(),
-                    fallbackTreeContent(),
-                  )}`,
+                  until(sessionWindowsTreeContent(), fallbackTreeContent()),
               })}`,
               fullWidth: true,
               noTopBodyMargin: true,
@@ -151,10 +146,10 @@ export function App() {
               label: "Move Or Copy Tab To Session",
               content: html`${h(Tree, {
                 contentFn: () =>
-                  html`${until(
+                  until(
                     moveOrCopyToSessionTreeContent("tab"),
                     fallbackTreeContent(),
-                  )}`,
+                  ),
               })}`,
               fullWidth: true,
               noTopBodyMargin: true,
@@ -164,10 +159,10 @@ export function App() {
               label: "Move Or Copy Tab Group To Session",
               content: html`${h(Tree, {
                 contentFn: () =>
-                  html`${until(
+                  until(
                     moveOrCopyToSessionTreeContent("tabGroup"),
                     fallbackTreeContent(),
-                  )}`,
+                  ),
               })}`,
               fullWidth: true,
               noTopBodyMargin: true,

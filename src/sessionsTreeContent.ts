@@ -2,7 +2,11 @@ import { html } from "lit";
 import { h } from "promethium-js";
 import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
-import { openNewSession, sessionsTreeData } from "./sessionService";
+import {
+  currentSessionData,
+  openNewSession,
+  sessionsTreeData,
+} from "./sessionService";
 import {
   deleteSessionDialogRef,
   editSessionDialogRef,
@@ -13,20 +17,15 @@ import {
   setCurrentlyDeletedSessionIsCurrentSession,
   setCurrentlyEditedSessionId,
 } from "./App";
-import { getStorageData } from "../sharedUtils";
-import { sessionStorageKeys } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 
-export async function sessionsTreeContent() {
+export function sessionsTreeContent() {
   // @handled
   try {
-    const currentSessionData =
-      await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-        sessionStorageKeys.currentSessionData,
-      );
-    const _sessionsTreeData = (await sessionsTreeData()).filter(
-      (sessionData) => sessionData.id !== currentSessionData?.id,
+    const _currentSessionData = currentSessionData();
+    const _sessionsTreeData = sessionsTreeData().filter(
+      (sessionData) => sessionData.id !== _currentSessionData?.id,
     );
     const sessionsTreeContent = _sessionsTreeData.map((sessionData) => {
       return html`
@@ -88,7 +87,7 @@ export async function sessionsTreeContent() {
         })}
       `;
     });
-    if (currentSessionData) {
+    if (_currentSessionData) {
       sessionsTreeContent.unshift(
         html`${h(TreeItem, {
           tooltipContent: "Exit Current Session",
