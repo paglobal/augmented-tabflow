@@ -2,15 +2,13 @@ import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import {
   currentSessionData,
+  currentSessionDataNotAvailable,
   groupUngroupedTabsInWindow,
 } from "./sessionService";
 import {
-  notify,
   notifyWithErrorMessageAndReloadButton,
   randomTabGroupColorValue,
 } from "./utils";
-import { getStorageData } from "../sharedUtils";
-import { sessionStorageKeys } from "../constants";
 import {
   helpDialogRef,
   addTabGroupDialogRef,
@@ -25,25 +23,6 @@ import {
 } from "./App";
 
 export function Toolbar() {
-  function tabGroupTreeButton() {
-    const _currentSessionData = currentSessionData();
-    return _currentSessionData
-      ? null
-      : html`<sl-icon-button
-          name="list-ul"
-          title="Show Tab Group Tree"
-          @click=${() => {
-            // @handled
-            try {
-              tabGroupTreeDialogRef.value?.show();
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          }}
-        ></sl-icon-button>`;
-  }
-
   return () =>
     html` <div
       style=${styleMap({
@@ -61,7 +40,22 @@ export function Toolbar() {
           paddingBottom: "0.75rem",
         })}
       >
-        ${tabGroupTreeButton()}
+        ${currentSessionData() &&
+        currentSessionData() !== currentSessionDataNotAvailable
+          ? null
+          : html`<sl-icon-button
+              name="list-ul"
+              title="Show Tab Group Tree"
+              @click=${() => {
+                // @handled
+                try {
+                  tabGroupTreeDialogRef.value?.show();
+                } catch (error) {
+                  console.error(error);
+                  notifyWithErrorMessageAndReloadButton();
+                }
+              }}
+            ></sl-icon-button>`}
         <sl-icon-button
           name="plus-circle"
           title="Add Tab Group"
@@ -91,6 +85,70 @@ export function Toolbar() {
             }
           }}
         ></sl-icon-button>
+        ${!(
+          currentSessionData() &&
+          currentSessionData() !== currentSessionDataNotAvailable
+        )
+          ? null
+          : html`
+              <sl-icon-button
+                name="pen"
+                title="Edit Current Session Title"
+                @click=${async () => {
+                  // @handled
+                  try {
+                    if (editSessionInputRef.value) {
+                      const _currentSessionData = currentSessionData();
+                      if (
+                        _currentSessionData &&
+                        _currentSessionData !== currentSessionDataNotAvailable
+                      ) {
+                        editSessionDialogRef.value?.show();
+                        setTimeout(() => {
+                          // @handled
+                          try {
+                            if (editSessionInputRef.value) {
+                              editSessionInputRef.value.value =
+                                _currentSessionData.title;
+                            }
+                          } catch (error) {
+                            console.error(error);
+                          }
+                        });
+                      } else {
+                        notifyWithErrorMessageAndReloadButton();
+                      }
+                    }
+                  } catch (error) {
+                    console.error(error);
+                    notifyWithErrorMessageAndReloadButton();
+                  }
+                }}
+              ></sl-icon-button>
+              <sl-icon-button
+                name="trash"
+                title="Delete Current Session"
+                @click=${async () => {
+                  // @handled
+                  try {
+                    const _currentSessionData = currentSessionData();
+                    if (
+                      _currentSessionData &&
+                      _currentSessionData !== currentSessionDataNotAvailable
+                    ) {
+                      setCurrentlyDeletedSessionId(_currentSessionData.id);
+                      setCurrentlyDeletedSessionIsCurrentSession(true);
+                      deleteSessionDialogRef.value?.show();
+                    } else {
+                      notifyWithErrorMessageAndReloadButton();
+                    }
+                  } catch (error) {
+                    console.error(error);
+                    notifyWithErrorMessageAndReloadButton();
+                  }
+                }}
+              ></sl-icon-button>
+            `}
         <sl-icon-button
           name="window-plus"
           title="Create Empty Session"
@@ -98,63 +156,6 @@ export function Toolbar() {
             // @handled
             try {
               newSessionDialogRef.value?.show();
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          }}
-        ></sl-icon-button>
-        <sl-icon-button
-          name="pen"
-          title="Edit Current Session Title"
-          @click=${async () => {
-            // @handled
-            try {
-              if (editSessionInputRef.value) {
-                const currentSessionData =
-                  await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-                    sessionStorageKeys.currentSessionData,
-                  );
-                if (currentSessionData) {
-                  editSessionDialogRef.value?.show();
-                  setTimeout(() => {
-                    // @handled
-                    try {
-                      if (editSessionInputRef.value) {
-                        editSessionInputRef.value.value =
-                          currentSessionData.title;
-                      }
-                    } catch (error) {
-                      console.error(error);
-                    }
-                  });
-                } else {
-                  notify("Current session is unsaved.", "warning");
-                }
-              }
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          }}
-        ></sl-icon-button>
-        <sl-icon-button
-          name="trash"
-          title="Delete Current Session"
-          @click=${async () => {
-            // @handled
-            try {
-              const currentSessionData =
-                await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-                  sessionStorageKeys.currentSessionData,
-                );
-              if (currentSessionData) {
-                setCurrentlyDeletedSessionId(currentSessionData.id);
-                setCurrentlyDeletedSessionIsCurrentSession(true);
-                deleteSessionDialogRef.value?.show();
-              } else {
-                notify("Current session is unsaved.", "warning");
-              }
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();

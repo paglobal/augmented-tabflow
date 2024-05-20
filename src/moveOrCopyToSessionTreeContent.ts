@@ -4,6 +4,7 @@ import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import {
   currentSessionData,
+  currentSessionDataNotAvailable,
   moveOrCopyToSession,
   sessionsTreeData,
 } from "./sessionService";
@@ -15,8 +16,10 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
   // @handled
   try {
     const _currentSessionData = currentSessionData();
-    const _sessionsTreeData = sessionsTreeData().filter(
-      (sessionData) => sessionData.id !== _currentSessionData?.id,
+    const _sessionsTreeData = sessionsTreeData().filter((sessionData) =>
+      _currentSessionData !== currentSessionDataNotAvailable
+        ? sessionData.id !== _currentSessionData?.id
+        : true,
     );
     if (type === "tab") {
       const sessionsTreeContent = _sessionsTreeData.map(async (sessionData) => {

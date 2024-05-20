@@ -4,12 +4,17 @@ import { Tree } from "./Tree";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { sessionsTreeContent } from "./sessionsTreeContent";
 import { fallbackTreeContent } from "./fallbackTreeContent";
-import { currentSessionData, sessionLoading } from "./sessionService";
+import {
+  currentSessionData,
+  currentSessionDataNotAvailable,
+  sessionLoading,
+} from "./sessionService";
 
 export function SessionView() {
   function sessionViewTree() {
     return html`
-      ${sessionLoading()
+      ${sessionLoading() ||
+      currentSessionData() === currentSessionDataNotAvailable
         ? h(Tree, {
             contentFn: fallbackTreeContent,
           })

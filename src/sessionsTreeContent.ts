@@ -4,6 +4,7 @@ import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import {
   currentSessionData,
+  currentSessionDataNotAvailable,
   openNewSession,
   sessionsTreeData,
 } from "./sessionService";
@@ -24,8 +25,10 @@ export function sessionsTreeContent() {
   // @handled
   try {
     const _currentSessionData = currentSessionData();
-    const _sessionsTreeData = sessionsTreeData().filter(
-      (sessionData) => sessionData.id !== _currentSessionData?.id,
+    const _sessionsTreeData = sessionsTreeData().filter((sessionData) =>
+      _currentSessionData !== currentSessionDataNotAvailable
+        ? sessionData.id !== _currentSessionData?.id
+        : true,
     );
     const sessionsTreeContent = _sessionsTreeData.map((sessionData) => {
       return html`

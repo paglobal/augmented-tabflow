@@ -1,7 +1,7 @@
 import { TemplateResult, html } from "lit";
 import "@shoelace-style/shoelace/dist/components/tree-item/tree-item.js";
 import { styleMap } from "lit/directives/style-map.js";
-import { adaptEffect, adaptState } from "promethium-js";
+import { adaptState } from "promethium-js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
@@ -31,65 +31,72 @@ export function TreeItem(props: {
   const [draggedOverEdge, setDraggedOverEdge] = adaptState<Edge | null>(null);
   const [dragging, setDragging] = adaptState(false);
   const treeItemRef = createRef<SlTreeItem>();
-  adaptEffect(() => {
-    if (props.draggableOptions && props.dropTargetOptions) {
-      props.draggableOptions.element = treeItemRef.value;
-      props.draggableOptions.onDragStart = () => setDragging(true);
-      props.draggableOptions.onDrop = () => setDragging(false);
-      props.dropTargetOptions.element = treeItemRef.value;
-      const previousGetDataFn = props.dropTargetOptions.getData;
-      props.dropTargetOptions.getData = ({ input, element, source }) => {
-        // @maybe
-        const data =
-          previousGetDataFn?.({
-            input,
-            element,
-            source,
-          }) ?? {};
-
-        return attachClosestEdge(data, {
-          input,
-          element,
-          // you can specify what edges you want to allow the user to be closest to
-          allowedEdges: ["top", "bottom"],
-        });
-      };
-      props.dropTargetOptions.onDrag = ({ self, source }) => {
-        // @maybe
-        const closestEdgeOfTarget = extractClosestEdge(self.data);
-        if (
-          self.element === source.element ||
-          self.data.type !== source.data.type
-        ) {
-          setDraggedOverEdge(null);
-        } else {
-          setDraggedOverEdge(closestEdgeOfTarget);
-        }
-      };
-      props.dropTargetOptions.onDragLeave = () => {
-        // @maybe
-        setDraggedOverEdge(null);
-      };
-      const previousOnDropFunction = props.dropTargetOptions.onDrop;
-      props.dropTargetOptions.onDrop = ({ self, location, source }) => {
-        // @maybe
-        if (
-          self.data.type === source.data.type &&
-          self.element !== source.element
-        ) {
-          previousOnDropFunction?.({ self, location, source });
-        }
-        setDraggedOverEdge(null);
-      };
-
-      return combine(
-        draggable(props.draggableOptions as DraggableOptions),
-        dropTargetForElements(props.dropTargetOptions as DropTargetOptions),
-      );
-    }
-  }, []);
+  let cleanup: (() => void) | undefined;
 
   return () => {
+    setTimeout(() => {
+      cleanup?.();
+      if (
+        props.draggableOptions &&
+        props.dropTargetOptions &&
+        treeItemRef.value
+      ) {
+        props.draggableOptions.element = treeItemRef.value;
+        props.draggableOptions.onDragStart = () => setDragging(true);
+        props.draggableOptions.onDrop = () => setDragging(false);
+        props.dropTargetOptions.element = treeItemRef.value;
+        const previousGetDataFn = props.dropTargetOptions.getData;
+        props.dropTargetOptions.getData = ({ input, element, source }) => {
+          // @maybe
+          const data =
+            previousGetDataFn?.({
+              input,
+              element,
+              source,
+            }) ?? {};
+
+          return attachClosestEdge(data, {
+            input,
+            element,
+            // you can specify what edges you want to allow the user to be closest to
+            allowedEdges: ["top", "bottom"],
+          });
+        };
+        props.dropTargetOptions.onDrag = ({ self, source }) => {
+          // @maybe
+          const closestEdgeOfTarget = extractClosestEdge(self.data);
+          if (
+            self.element === source.element ||
+            self.data.type !== source.data.type
+          ) {
+            setDraggedOverEdge(null);
+          } else {
+            setDraggedOverEdge(closestEdgeOfTarget);
+          }
+        };
+        props.dropTargetOptions.onDragLeave = () => {
+          // @maybe
+          setDraggedOverEdge(null);
+        };
+        const previousOnDropFunction = props.dropTargetOptions.onDrop;
+        props.dropTargetOptions.onDrop = ({ self, location, source }) => {
+          // @maybe
+          if (
+            self.data.type === source.data.type &&
+            self.element !== source.element
+          ) {
+            previousOnDropFunction?.({ self, location, source });
+          }
+          setDraggedOverEdge(null);
+        };
+
+        cleanup = combine(
+          draggable(props.draggableOptions as DraggableOptions),
+          dropTargetForElements(props.dropTargetOptions as DropTargetOptions),
+        );
+      }
+    });
+
     const draggedOverStyles = draggedOverEdge()
       ? {
           [`border-${draggedOverEdge()}`]:

@@ -3,30 +3,33 @@ import { styleMap } from "lit/directives/style-map.js";
 import { titles } from "../constants";
 import { sessionsTreeDialogRef } from "./App";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
-import { currentSessionData } from "./sessionService";
+import {
+  currentSessionData,
+  currentSessionDataNotAvailable,
+} from "./sessionService";
 
 export function SessionIndicator() {
-  function currentSessionTitle() {
+  return () => {
     const _currentSessionData = currentSessionData();
-    return _currentSessionData
-      ? _currentSessionData.title
-      : titles.unsavedSession;
-  }
+    const currentSessionTitle =
+      _currentSessionData &&
+      _currentSessionData !== currentSessionDataNotAvailable
+        ? _currentSessionData?.title
+        : titles.unsavedSession;
+    const buttonVariant =
+      _currentSessionData &&
+      _currentSessionData !== currentSessionDataNotAvailable
+        ? "primary"
+        : "default";
 
-  function buttonVariant() {
-    const _currentSessionData = currentSessionData();
-    return _currentSessionData ? "primary" : "default";
-  }
-
-  return () =>
-    html`<div
+    return html`<div
       style=${styleMap({
         paddingTop: "1.5rem",
         paddingBottom: "0.5rem",
       })}
     >
       <sl-button
-        variant=${buttonVariant()}
+        variant=${buttonVariant}
         outline
         style=${styleMap({ width: "100%" })}
         @click=${() => {
@@ -39,7 +42,8 @@ export function SessionIndicator() {
           }
         }}
         title="Show Sessions"
-        >${currentSessionTitle()}</sl-button
+        >${currentSessionTitle}</sl-button
       >
     </div>`;
+  };
 }

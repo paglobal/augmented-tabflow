@@ -478,6 +478,7 @@ chrome.windows.onRemoved.addListener(async (windowId) => {
           });
         }
       }
+      await chrome.windows.update(currentWindow.id!, { focused: true });
     }
   });
 });

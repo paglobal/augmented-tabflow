@@ -1,5 +1,5 @@
-import { html } from "lit";
-import { h, renderTemplateFn } from "promethium-js";
+import { render } from "lit";
+import { h } from "promethium-js";
 import { App } from "./src/App";
 import { setThemeMode } from "./src/utils";
 import {
@@ -40,5 +40,5 @@ import { titles, syncStorageKeys } from "./constants";
         }
       });
   }
-  renderTemplateFn(() => html`${h(App)}`, { renderContainer: "body" });
+  render(h(App), document.body);
 })();

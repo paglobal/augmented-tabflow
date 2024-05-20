@@ -179,8 +179,14 @@ export function updateTabGroup(
   }
 }
 
-export const [currentSessionData, setCurrentSessionData] =
-  adaptState<chrome.bookmarks.BookmarkTreeNode | null>(null);
+export const currentSessionDataNotAvailable = Symbol(
+  "currentSessionDataNotAvailable",
+);
+export const [currentSessionData, setCurrentSessionData] = adaptState<
+  | chrome.bookmarks.BookmarkTreeNode
+  | null
+  | typeof currentSessionDataNotAvailable
+>(currentSessionDataNotAvailable);
 updateCurrentSessionData();
 
 async function updateCurrentSessionData(
