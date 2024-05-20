@@ -9,15 +9,14 @@ export const sessionStorageKeys = {
   debounceTabGroupTreeDataUpdates: "session-3",
   tabGroupTreeDataUpdateTimeoutId: "session-4",
   ungroupedTabGroupCollapsed: "session-5",
-  previousUnsavedSessionTabGroupTreeData: "session-7",
-  recentlyClosedTabGroups: "session-8",
-  recentlyClosedTabGroupsCollapsed: "session-9",
-  readyToUpdateCurrentSessionData: "session-10",
-  pinnedTabGroupCollapsed: "session-11",
-  sessionLoading: "session-12",
-  currentlyRemovedTabId: "session-13",
-  stubTabId: "session-14",
-  removingOldSessionTabs: "session-15",
+  previousUnsavedSessionTabGroupTreeData: "session-6",
+  recentlyClosedTabGroups: "session-7",
+  readyToUpdateCurrentSessionData: "session-8",
+  pinnedTabGroupCollapsed: "session-9",
+  sessionLoading: "session-10",
+  currentlyRemovedTabId: "session-11",
+  stubTabId: "session-12",
+  removingOldSessionTabs: "session-13",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;

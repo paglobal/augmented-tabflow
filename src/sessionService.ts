@@ -21,8 +21,6 @@ import {
   currentlyMovedOrCopiedTabOrTabGroup,
   deleteSessionDialogRef,
   firstTabInNewTabGroup,
-  moveOrCopyTabGroupToSessionTreeDialogRef,
-  moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,
   sessionsTreeDialogRef,
   setCurrentMovedOrCopiedTabOrTabGroup,
@@ -187,6 +185,7 @@ export const [currentSessionData, setCurrentSessionData] = adaptState<
   | null
   | typeof currentSessionDataNotAvailable
 >(currentSessionDataNotAvailable);
+
 updateCurrentSessionData();
 
 async function updateCurrentSessionData(
@@ -220,6 +219,7 @@ async function updateSessionLoading(sessionLoading?: boolean) {
       (await getStorageData<boolean>(sessionStorageKeys.sessionLoading)) ??
       false;
   }
+  console.log(sessionLoading);
   setSessionLoading(sessionLoading);
 }
 
@@ -419,12 +419,12 @@ export async function moveOrCopyToSession(
       url: (_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabs.Tab).url,
       title: _currentlyMovedOrCopiedTabOrTabGroup.title,
     });
-    if (copy) {
+    if (copy === false) {
       notify("Tab copied successfully.", "success");
     } else {
       await chrome.tabs.remove(_currentlyMovedOrCopiedTabOrTabGroup.id!);
+      notify("Tab moved successfully.", "success");
     }
-    moveOrCopyTabToSessionTreeDialogRef.value?.hide();
   } else if (
     (_currentlyMovedOrCopiedTabOrTabGroup as TabGroupTreeData[number]).tabs
   ) {
@@ -450,8 +450,8 @@ export async function moveOrCopyToSession(
     } else {
       await chrome.tabs.ungroup(tabIds as [number, ...number[]]);
       await chrome.tabs.remove(tabIds as number[]);
+      notify("Tab group moved successfully.", "success");
     }
-    moveOrCopyTabGroupToSessionTreeDialogRef.value?.hide();
   }
   setCurrentMovedOrCopiedTabOrTabGroup(null);
 }

@@ -32,99 +32,97 @@ export function sessionsTreeContent() {
         : true,
     );
     const sessionsTreeContent = _sessionsTreeData.map((sessionData) => {
-      return html`
-        ${h(TreeItem, {
-          tooltipContent: sessionData.title,
-          async onSelect(e: Event) {
-            // @handled
-            try {
-              e.stopPropagation();
-              await openNewSession(sessionData);
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
+      return h(TreeItem, {
+        tooltipContent: sessionData.title,
+        async onSelect(e: Event) {
+          // @handled
+          try {
+            e.stopPropagation();
+            await openNewSession(sessionData);
+          } catch (error) {
+            console.error(error);
+            notifyWithErrorMessageAndReloadButton();
+          }
+        },
+        draggableOptions: {
+          getInitialData() {
+            return {
+              type: "bookmark",
+              sessionData: sessionData,
+            };
+          },
+        },
+        dropTargetOptions: {
+          getData() {
+            return { type: "bookmark" };
+          },
+          async onDrop({ self, source }) {
+            const closestEdgeOfTarget = extractClosestEdge(self.data);
+            let index = -1;
+            const otherSessionData = source.data
+              .sessionData as chrome.bookmarks.BookmarkTreeNode;
+            if (closestEdgeOfTarget === "top") {
+              index = sessionData.index ?? -1;
+            } else if (closestEdgeOfTarget === "bottom") {
+              index = (sessionData.index ?? 0) + 1;
             }
+            if (index === -1) {
+              return;
+            }
+            await chrome.bookmarks.move(otherSessionData.id, {
+              parentId: otherSessionData.parentId,
+              index,
+            });
           },
-          draggableOptions: {
-            getInitialData() {
-              return {
-                type: "bookmark",
-                sessionData: sessionData,
-              };
-            },
-          },
-          dropTargetOptions: {
-            getData() {
-              return { type: "bookmark" };
-            },
-            async onDrop({ self, source }) {
-              const closestEdgeOfTarget = extractClosestEdge(self.data);
-              let index = -1;
-              const otherSessionData = source.data
-                .sessionData as chrome.bookmarks.BookmarkTreeNode;
-              if (closestEdgeOfTarget === "top") {
-                index = sessionData.index ?? -1;
-              } else if (closestEdgeOfTarget === "bottom") {
-                index = (sessionData.index ?? 0) + 1;
-              }
-              if (index === -1) {
-                return;
-              }
-              await chrome.bookmarks.move(otherSessionData.id, {
-                parentId: otherSessionData.parentId,
-                index,
-              });
-            },
-          },
-          actionButtons: html`
-            <sl-icon-button
-              name="pen"
-              title="Edit Session Title"
-              @click=${async (e: Event) => {
-                // @handled
-                try {
-                  e.stopPropagation();
-                  if (editSessionInputRef.value) {
-                    setCurrentlyEditedSessionId(sessionData.id);
-                    editSessionDialogRef.value?.show();
-                    setTimeout(() => {
-                      if (editSessionInputRef.value) {
-                        editSessionInputRef.value.value = sessionData.title;
-                      }
-                    });
-                  }
-                } catch (error) {
-                  console.error(error);
-                  notifyWithErrorMessageAndReloadButton();
+        },
+        actionButtons: html`
+          <sl-icon-button
+            name="pen"
+            title="Edit Session Title"
+            @click=${async (e: Event) => {
+              // @handled
+              try {
+                e.stopPropagation();
+                if (editSessionInputRef.value) {
+                  setCurrentlyEditedSessionId(sessionData.id);
+                  editSessionDialogRef.value?.show();
+                  setTimeout(() => {
+                    if (editSessionInputRef.value) {
+                      editSessionInputRef.value.value = sessionData.title;
+                    }
+                  });
                 }
-              }}
-            ></sl-icon-button>
-            <sl-icon-button
-              name="trash"
-              title="Delete Session"
-              @click=${async (e: Event) => {
-                // @handled
-                try {
-                  e.stopPropagation();
-                  setCurrentlyDeletedSessionId(sessionData.id);
-                  setCurrentlyDeletedSessionIsCurrentSession(false);
-                  deleteSessionDialogRef.value?.show();
-                } catch (error) {
-                  console.error(error);
-                  notifyWithErrorMessageAndReloadButton();
-                }
-              }}
-            ></sl-icon-button>
-          `,
-          content: html`${h(TreeItemColorPatchOrIcon, {
-            icon: "window",
-          })}${sessionData.title}`,
-        })}
-      `;
+              } catch (error) {
+                console.error(error);
+                notifyWithErrorMessageAndReloadButton();
+              }
+            }}
+          ></sl-icon-button>
+          <sl-icon-button
+            name="trash"
+            title="Delete Session"
+            @click=${async (e: Event) => {
+              // @handled
+              try {
+                e.stopPropagation();
+                setCurrentlyDeletedSessionId(sessionData.id);
+                setCurrentlyDeletedSessionIsCurrentSession(false);
+                deleteSessionDialogRef.value?.show();
+              } catch (error) {
+                console.error(error);
+                notifyWithErrorMessageAndReloadButton();
+              }
+            }}
+          ></sl-icon-button>
+        `,
+        content: html`${h(TreeItemColorPatchOrIcon, {
+          icon: "window",
+        })}${sessionData.title}`,
+      });
     });
     if (_currentSessionData) {
       sessionsTreeContent.unshift(
-        html`${h(TreeItem, {
+        h(TreeItem, {
           tooltipContent: "Exit Current Session",
           content: html`${h(TreeItemColorPatchOrIcon, {
             icon: "window-x",
@@ -140,11 +138,11 @@ export function sessionsTreeContent() {
               notifyWithErrorMessageAndReloadButton();
             }
           },
-        })}`,
+        }),
       );
     }
     sessionsTreeContent.unshift(
-      html`${h(TreeItem, {
+      h(TreeItem, {
         tooltipContent: "Help",
         content: html`${h(TreeItemColorPatchOrIcon, {
           icon: "question-circle",
@@ -160,8 +158,8 @@ export function sessionsTreeContent() {
             notifyWithErrorMessageAndReloadButton();
           }
         },
-      })}`,
-      html`${h(TreeItem, {
+      }),
+      h(TreeItem, {
         tooltipContent: "Save Current Session",
         content: html`${h(TreeItemColorPatchOrIcon, {
           icon: "window-plus",
@@ -177,7 +175,7 @@ export function sessionsTreeContent() {
             notifyWithErrorMessageAndReloadButton();
           }
         },
-      })}`,
+      }),
     );
 
     return sessionsTreeContent;

@@ -43,7 +43,7 @@ export async function sessionWindowsTreeContent() {
     );
 
     sessionWindowsTreeContent.unshift(
-      html`${h(TreeItem, {
+      h(TreeItem, {
         tooltipContent: "New Window",
         content: html`${h(TreeItemColorPatchOrIcon, {
           icon: "MaterialSymbolsTabOutlineRounded",
@@ -59,7 +59,7 @@ export async function sessionWindowsTreeContent() {
             notifyWithErrorMessageAndReloadButton();
           }
         },
-      })}`,
+      }),
     );
 
     return sessionWindowsTreeContent;

@@ -13,10 +13,10 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 - implement recently closed tab groups feature
 - implement import from session
-- experiment with closing window on session switch
 
 ### Important
 
+- show tab group tree at the right time after session switch
 - implement ability to sort sessions alphabetically or by date added
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 - always show ungrouped in the "move to session dialog" for tabs
