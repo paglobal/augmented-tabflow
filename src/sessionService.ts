@@ -21,6 +21,9 @@ import {
   currentlyMovedOrCopiedTabOrTabGroup,
   deleteSessionDialogRef,
   firstTabInNewTabGroup,
+  importTabGroupFromSessionTreeDialogRef,
+  moveOrCopyTabGroupToSessionTreeDialogRef,
+  moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,
   sessionsTreeDialogRef,
   setCurrentMovedOrCopiedTabOrTabGroup,
@@ -37,7 +40,7 @@ async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
   if (tabGroupTreeData === undefined) {
     tabGroupTreeData =
       (await getStorageData<TabGroupTreeData>(
-        sessionStorageKeys.tabGroupTreeData,
+        sessionStorageKeys.tabGroupTreeData
       )) ?? [];
   }
   // filter out any tabs or tab groups that are not in this window
@@ -45,14 +48,14 @@ async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
   tabGroupTreeData.forEach((tabGroup) => {
     if (!tabGroup.windowId) {
       tabGroup.tabs = tabGroup.tabs.filter(
-        (tab) => !(tab.windowId !== currentWindowId),
+        (tab) => !(tab.windowId !== currentWindowId)
       );
     }
   });
   tabGroupTreeData = tabGroupTreeData.filter(
     (tabGroup) =>
       !(tabGroup.windowId && tabGroup.windowId !== currentWindowId) &&
-      tabGroup.tabs.length,
+      tabGroup.tabs.length
   );
   setTabGroupTreeData(tabGroupTreeData);
 }
@@ -63,7 +66,7 @@ subscribeToStorageData<TabGroupTreeData>(
     // @error
     tabGroupTreeData = tabGroupTreeData ?? [];
     updateTabGroupTreeData(tabGroupTreeData);
-  },
+  }
 );
 
 export async function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
@@ -112,10 +115,7 @@ export async function addTabToTabGroup(tabGroup: TabGroupTreeData[number]) {
 export async function closeTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
   const tabIds = tabGroup.tabs.map((tab) => tab.id) as [number, ...number[]];
-  await chrome.tabs.ungroup(tabIds);
-  tabGroup.tabs.forEach(async (tab) => {
-    await chrome.tabs.remove(tab.id as number);
-  });
+  await chrome.tabs.remove(tabIds);
 }
 
 export function activateTab(tab: chrome.tabs.Tab) {
@@ -166,7 +166,7 @@ export function updateTabGroup(
   options: {
     title: chrome.tabGroups.TabGroup["title"];
     color: chrome.tabGroups.Color;
-  },
+  }
 ) {
   // @maybe
   if (tabId) {
@@ -178,7 +178,7 @@ export function updateTabGroup(
 }
 
 export const currentSessionDataNotAvailable = Symbol(
-  "currentSessionDataNotAvailable",
+  "currentSessionDataNotAvailable"
 );
 export const [currentSessionData, setCurrentSessionData] = adaptState<
   | chrome.bookmarks.BookmarkTreeNode
@@ -189,12 +189,12 @@ export const [currentSessionData, setCurrentSessionData] = adaptState<
 updateCurrentSessionData();
 
 async function updateCurrentSessionData(
-  currentSessionData?: chrome.bookmarks.BookmarkTreeNode | null,
+  currentSessionData?: chrome.bookmarks.BookmarkTreeNode | null
 ) {
   if (currentSessionData === undefined) {
     currentSessionData =
       (await getStorageData<chrome.bookmarks.BookmarkTreeNode>(
-        sessionStorageKeys.currentSessionData,
+        sessionStorageKeys.currentSessionData
       )) ?? null;
   }
   setCurrentSessionData(currentSessionData);
@@ -207,7 +207,7 @@ subscribeToStorageData<chrome.bookmarks.BookmarkTreeNode>(
     if (currentSessionData !== undefined) {
       updateCurrentSessionData(currentSessionData);
     }
-  },
+  }
 );
 
 export const [sessionLoading, setSessionLoading] = adaptState<boolean>(false);
@@ -219,7 +219,6 @@ async function updateSessionLoading(sessionLoading?: boolean) {
       (await getStorageData<boolean>(sessionStorageKeys.sessionLoading)) ??
       false;
   }
-  console.log(sessionLoading);
   setSessionLoading(sessionLoading);
 }
 
@@ -229,7 +228,7 @@ subscribeToStorageData<boolean>(
     // @error
     sessionLoading = sessionLoading ?? false;
     updateSessionLoading(sessionLoading);
-  },
+  }
 );
 
 export const [sessionsTreeData, setSessionsTreeData] = adaptState<
@@ -241,7 +240,7 @@ updateSessionsTreeData();
 async function updateSessionsTreeData(
   bookmarkIdOrBookmarkInfo?:
     | chrome.bookmarks.BookmarkTreeNode["id"]
-    | { parentId?: chrome.bookmarks.BookmarkTreeNode["id"] },
+    | { parentId?: chrome.bookmarks.BookmarkTreeNode["id"] }
 ) {
   // @error
   const rootBookmarkNodeId = await getStorageData<
@@ -331,7 +330,7 @@ chrome.bookmarks.onRemoved.addListener((_, removeInfo) => {
 
 export async function createSession(
   title: string,
-  useCurrentSessionData?: boolean,
+  useCurrentSessionData?: boolean
 ) {
   // @maybe
   const rootBookmarkNodeId = await getStorageData<
@@ -356,22 +355,22 @@ export async function createSession(
 
 export async function updateSessionTitle(
   sesssionIdOrIsCurrentSession: chrome.bookmarks.BookmarkTreeNode["id"] | true,
-  title: string,
+  title: string
 ) {
   // @maybe
   if (sesssionIdOrIsCurrentSession === true) {
     const currentSessionData =
       await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
-        sessionStorageKeys.currentSessionData,
+        sessionStorageKeys.currentSessionData
       );
     if (currentSessionData) {
       const newSessionData = await chrome.bookmarks.update(
         currentSessionData.id,
-        { title },
+        { title }
       );
       await setStorageData(
         sessionStorageKeys.currentSessionData,
-        newSessionData,
+        newSessionData
       );
     } else {
       notify("Session does not exist", "danger");
@@ -385,7 +384,7 @@ export async function updateSessionTitle(
 
 export async function deleteSession(
   sessionId: chrome.bookmarks.BookmarkTreeNode["id"],
-  isCurrentSession?: boolean,
+  isCurrentSession?: boolean
 ) {
   // @maybe
   await chrome.bookmarks.removeTree(sessionId);
@@ -396,7 +395,7 @@ export async function deleteSession(
 }
 
 export async function openNewSession(
-  newSessionData: chrome.bookmarks.BookmarkTreeNode | null,
+  newSessionData: chrome.bookmarks.BookmarkTreeNode | null
 ) {
   // @maybe
   sessionsTreeDialogRef.value?.hide();
@@ -405,12 +404,13 @@ export async function openNewSession(
 
 export async function moveOrCopyToSession(
   sessionOrTabGroupDataId: chrome.bookmarks.BookmarkTreeNode["id"],
-  copy: boolean = false,
+  copy: boolean = false
 ) {
   // @maybe
   const _currentlyMovedOrCopiedTabOrTabGroup =
     currentlyMovedOrCopiedTabOrTabGroup();
   if (!_currentlyMovedOrCopiedTabOrTabGroup) {
+    notifyWithErrorMessageAndReloadButton();
     return;
   }
   if ((_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabs.Tab).url) {
@@ -419,12 +419,13 @@ export async function moveOrCopyToSession(
       url: (_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabs.Tab).url,
       title: _currentlyMovedOrCopiedTabOrTabGroup.title,
     });
-    if (copy === false) {
+    if (copy === true) {
       notify("Tab copied successfully.", "success");
     } else {
       await chrome.tabs.remove(_currentlyMovedOrCopiedTabOrTabGroup.id!);
       notify("Tab moved successfully.", "success");
     }
+    moveOrCopyTabToSessionTreeDialogRef.value?.hide();
   } else if (
     (_currentlyMovedOrCopiedTabOrTabGroup as TabGroupTreeData[number]).tabs
   ) {
@@ -439,25 +440,78 @@ export async function moveOrCopyToSession(
     });
     const tabIds = tabs.map((tab) => tab.id);
     for (const tab of tabs) {
+      let url: URL | undefined;
+      if (tab.url) {
+        url = new URL(tab.url);
+      }
+      if (
+        url?.hostname === chrome.runtime.id &&
+        url?.pathname === "/stubPage.html"
+      ) {
+        const params = new URLSearchParams(url.search);
+        tab.url = params.get("url") ?? undefined;
+      }
       await chrome.bookmarks.create({
         parentId: tabGroupData.id,
         url: tab.url,
         title: tab.title,
       });
     }
-    if (copy) {
+    if (copy === true) {
       notify("Tab group copied successfully.", "success");
     } else {
-      await chrome.tabs.ungroup(tabIds as [number, ...number[]]);
       await chrome.tabs.remove(tabIds as number[]);
       notify("Tab group moved successfully.", "success");
     }
+    moveOrCopyTabGroupToSessionTreeDialogRef.value?.hide();
   }
   setCurrentMovedOrCopiedTabOrTabGroup(null);
+  updateSessionsTreeData();
+}
+
+export async function importTabGroupFromSession(
+  tabGroupData: chrome.bookmarks.BookmarkTreeNode,
+  copy: boolean = false
+) {
+  const tabGroupDataChildren = await chrome.bookmarks.getChildren(
+    tabGroupData.id
+  );
+  const ungrouped = tabGroupData.title === titles.ungroupedTabGroup;
+  const tabIds: Array<chrome.tabs.Tab["id"]> = [];
+  for (const tabData of tabGroupDataChildren) {
+    const url = `/stubPage.html?title=${encodeURIComponent(
+      tabData.title
+    )}&url=${encodeURIComponent(tabData.url ?? "")}`;
+    const tab = await chrome.tabs.create({
+      url,
+      active: false,
+    });
+    tabIds.push(tab.id);
+  }
+  if (!ungrouped && tabIds.length) {
+    const tabGroupTitle = tabGroupData.title.split("-").slice(1).join("-");
+    const tabGroupColor = tabGroupData.title.split(
+      "-"
+    )[0] as chrome.tabGroups.Color;
+    const tabGroupId = await chrome.tabs.group({
+      tabIds: tabIds as [number, ...number[]],
+    });
+    await chrome.tabGroups.update(tabGroupId, {
+      color: tabGroupColor,
+      collapsed: true,
+      title: tabGroupTitle,
+    });
+  }
+  if (copy === false) {
+    await chrome.bookmarks.removeTree(tabGroupData.id);
+  }
+  importTabGroupFromSessionTreeDialogRef.value?.hide();
+  updateSessionsTreeData();
+  notify("Tab group imported successfully.", "success");
 }
 
 export async function moveTabOrTabGroupToWindow(
-  windowId?: chrome.windows.Window["id"],
+  windowId?: chrome.windows.Window["id"]
 ) {
   sendMessage({
     type: messageTypes.moveTabOrTabGroupToWindow,

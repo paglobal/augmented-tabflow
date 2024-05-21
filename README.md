@@ -9,13 +9,13 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ## Task List
 
-### Urgent
-
-- implement recently closed tab groups feature
-- implement import from session
-
 ### Important
 
+- consider hiding dialogs at the beginning of actions
+- work on focus states for tree items after dialog interactions
+- try removing all old session tabs at once when switching sessions
+- experiment in promethium-js with a state watcher mixin instead of the h function. try rewriting in solid if attempts prove futile
+- implement recently closed tab groups feature
 - show tab group tree at the right time after session switch
 - implement ability to sort sessions alphabetically or by date added
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
@@ -39,9 +39,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - handle errors in timeouts as well
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - use early returns anywhere it makes sense
-
-### Can wait
-
 - (if necessary) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
 - (if necessary) add test suite
 - (maybe) implement internationalization

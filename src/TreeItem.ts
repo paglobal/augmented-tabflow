@@ -1,7 +1,7 @@
 import { TemplateResult, html } from "lit";
 import "@shoelace-style/shoelace/dist/components/tree-item/tree-item.js";
 import { styleMap } from "lit/directives/style-map.js";
-import { adaptState } from "promethium-js";
+import { adaptEffect, adaptState } from "promethium-js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
@@ -32,6 +32,10 @@ export function TreeItem(props: {
   const [dragging, setDragging] = adaptState(false);
   const treeItemRef = createRef<SlTreeItem>();
   let cleanup: (() => void) | undefined;
+
+  adaptEffect(() => {
+    return cleanup;
+  }, []);
 
   return () => {
     setTimeout(() => {
@@ -92,7 +96,7 @@ export function TreeItem(props: {
 
         cleanup = combine(
           draggable(props.draggableOptions as DraggableOptions),
-          dropTargetForElements(props.dropTargetOptions as DropTargetOptions),
+          dropTargetForElements(props.dropTargetOptions as DropTargetOptions)
         );
       }
     });

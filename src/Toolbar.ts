@@ -20,6 +20,7 @@ import {
   setCurrentlyDeletedSessionIsCurrentSession,
   deleteSessionDialogRef,
   addTabGroupSelectRef,
+  importTabGroupFromSessionTreeDialogRef,
 } from "./App";
 
 export function Toolbar() {
@@ -56,6 +57,19 @@ export function Toolbar() {
                 }
               }}
             ></sl-icon-button>`}
+        <sl-icon-button
+          name="arrow-90deg-down"
+          title="Import Tab Group"
+          @click=${() => {
+            // @handled
+            try {
+              importTabGroupFromSessionTreeDialogRef.value?.show();
+            } catch (error) {
+              console.error(error);
+              notifyWithErrorMessageAndReloadButton();
+            }
+          }}
+        ></sl-icon-button>
         <sl-icon-button
           name="plus-circle"
           title="Add Tab Group"

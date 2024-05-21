@@ -25,11 +25,11 @@ chrome.runtime.onInstalled.addListener(async () => {
   // @error
   await createBookmarkNodeAndSyncId(
     syncStorageKeys.rootBookmarkNodeId,
-    titles.rootBookmarkNode,
+    titles.rootBookmarkNode
   );
   await createBookmarkNodeAndSyncId(
     syncStorageKeys.pinnedTabGroupBookmarkNodeId,
-    titles.pinnedTabGroup,
+    titles.pinnedTabGroup
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -38,11 +38,11 @@ chrome.runtime.onStartup.addListener(async () => {
   // @error
   await createBookmarkNodeAndSyncId(
     syncStorageKeys.rootBookmarkNodeId,
-    titles.rootBookmarkNode,
+    titles.rootBookmarkNode
   );
   await createBookmarkNodeAndSyncId(
     syncStorageKeys.pinnedTabGroupBookmarkNodeId,
-    titles.pinnedTabGroup,
+    titles.pinnedTabGroup
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -51,7 +51,7 @@ chrome.tabGroups.onCreated.addListener(async () => {
   // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
+    true
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -60,7 +60,7 @@ chrome.tabGroups.onRemoved.addListener(async () => {
   // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
+    true
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -69,7 +69,7 @@ chrome.tabGroups.onUpdated.addListener(async () => {
   // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
+    true
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -107,7 +107,7 @@ chrome.tabs.onAttached.addListener(async () => {
   // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
+    true
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -117,12 +117,12 @@ chrome.tabs.onCreated.addListener(async (tab) => {
   await navigator.locks.request(lockNames.removingOldSessionTabs, async () => {
     // @error
     const removingOldSessionTabs = await getStorageData<boolean>(
-      sessionStorageKeys.removingOldSessionTabs,
+      sessionStorageKeys.removingOldSessionTabs
     );
     if (removingOldSessionTabs) {
       const tabWindowType = (await chrome.windows.get(tab.windowId)).type;
       const stubTabId = await getStorageData<chrome.tabs.Tab["id"] | null>(
-        sessionStorageKeys.stubTabId,
+        sessionStorageKeys.stubTabId
       );
       if (tabWindowType === "normal" && tab.id !== stubTabId) {
         await chrome.tabs.remove(tab.id!);
@@ -131,7 +131,7 @@ chrome.tabs.onCreated.addListener(async (tab) => {
   });
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
+    true
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -140,7 +140,7 @@ chrome.tabs.onDetached.addListener(async () => {
   // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
+    true
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -150,7 +150,7 @@ chrome.tabs.onMoved.addListener(async () => {
   // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
+    true
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -159,7 +159,7 @@ chrome.tabs.onRemoved.addListener(async () => {
   // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
+    true
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -168,7 +168,7 @@ chrome.tabs.onReplaced.addListener(async () => {
   // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
+    true
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
@@ -178,7 +178,7 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
   if (changeInfo.title || changeInfo.url) {
     await setStorageData(
       sessionStorageKeys.readyToUpdateCurrentSessionData,
-      true,
+      true
     );
   }
   await updateTabGroupTreeDataAndCurrentSessionData();
@@ -200,7 +200,7 @@ async function createPinnedTabs({
         await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
       for (const tabData of pinnedTabGroupBookmarkNodeChildren.reverse()) {
         const url = `/stubPage.html?title=${encodeURIComponent(
-          tabData.title,
+          tabData.title
         )}&url=${encodeURIComponent(tabData.url ?? "")}`;
         await chrome.tabs.create({
           url,
@@ -237,7 +237,7 @@ async function removeOldSessionTabs({
     for (const tab of tabGroup.tabs) {
       try {
         const stubTabId = await getStorageData<chrome.tabs.Tab["id"] | null>(
-          sessionStorageKeys.stubTabId,
+          sessionStorageKeys.stubTabId
         );
         // this has to error if stub tab doesn't exist
         await chrome.tabs.get(stubTabId!);
@@ -249,7 +249,7 @@ async function removeOldSessionTabs({
               await chrome.tabs.create({ url: "/stubPage.html", active: false })
             ).id;
             await setStorageData(sessionStorageKeys.stubTabId, newStubTabId);
-          },
+          }
         );
       }
       try {
@@ -267,7 +267,7 @@ async function removeOldSessionTabs({
 }
 
 async function createSessionTabsFromSessionData(
-  sessionData: chrome.bookmarks.BookmarkTreeNode,
+  sessionData: chrome.bookmarks.BookmarkTreeNode
 ) {
   const sessionDataChildren =
     (await chrome.bookmarks.getSubTree(sessionData.id))[0].children ?? [];
@@ -277,7 +277,7 @@ async function createSessionTabsFromSessionData(
   for (let i = 0; i < sessionDataChildren.length; i++) {
     const tabGroupData = sessionDataChildren[i];
     const tabGroupColor = tabGroupData.title.split(
-      "-",
+      "-"
     )[0] as chrome.tabGroups.Color;
     const ungrouped = tabGroupData.title === titles.ungroupedTabGroup;
     if (tabGroupData.url) {
@@ -292,7 +292,7 @@ async function createSessionTabsFromSessionData(
       const tabData = tabGroupDataChildren[j];
       const active = i === 0 && j === 0 ? true : false;
       const url = `/stubPage.html?title=${encodeURIComponent(
-        tabData.title,
+        tabData.title
       )}&url=${encodeURIComponent(tabData.url ?? "")}${
         active ? "&active=true" : ""
       }`;
@@ -319,7 +319,7 @@ async function createSessionTabsFromSessionData(
 async function createSessionTabsFromPreviousUnsavedSessionTabGroupTreeData() {
   const previousUnsavedSessionTabGroupTreeData =
     (await getStorageData<TabGroupTreeData>(
-      sessionStorageKeys.previousUnsavedSessionTabGroupTreeData,
+      sessionStorageKeys.previousUnsavedSessionTabGroupTreeData
     )) ?? [];
   if (!previousUnsavedSessionTabGroupTreeData?.length) {
     await chrome.tabs.create({ active: false });
@@ -345,7 +345,7 @@ async function createSessionTabsFromPreviousUnsavedSessionTabGroupTreeData() {
           ? true
           : false;
       const url = `/stubPage.html?title=${encodeURIComponent(
-        oldTab.title ?? "",
+        oldTab.title ?? ""
       )}&url=${encodeURIComponent(oldTab.url ?? "")}${
         active ? "&active=true" : ""
       }`;
@@ -374,16 +374,16 @@ async function openNewSession(newSessionData?: SessionData) {
   // @maybe
   await navigator.locks.request(lockNames.applyUpdates, async () => {
     const oldSessionData = await getStorageData<SessionData>(
-      sessionStorageKeys.currentSessionData,
+      sessionStorageKeys.currentSessionData
     );
     const tabGroupTreeData =
       (await getStorageData<TabGroupTreeData>(
-        sessionStorageKeys.tabGroupTreeData,
+        sessionStorageKeys.tabGroupTreeData
       )) ?? [];
     if (!oldSessionData) {
       await setStorageData<TabGroupTreeData>(
         sessionStorageKeys.previousUnsavedSessionTabGroupTreeData,
-        tabGroupTreeData,
+        tabGroupTreeData
       );
     }
     await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
@@ -408,12 +408,11 @@ async function openNewSession(newSessionData?: SessionData) {
       windowType: "normal",
     });
     const stubTabId = await getStorageData<chrome.tabs.Tab["id"] | null>(
-      sessionStorageKeys.stubTabId,
+      sessionStorageKeys.stubTabId
     );
     if (sessionTabs.length > 1 && stubTabId) {
       await chrome.tabs.remove(stubTabId);
     }
-    await setStorageData(sessionStorageKeys.sessionLoading, false);
   });
 }
 
@@ -431,11 +430,11 @@ chrome.windows.onRemoved.addListener(async (windowId) => {
   await navigator.locks.request(lockNames.applyUpdates, async () => {
     const tabGroupTreeData =
       (await getStorageData<TabGroupTreeData>(
-        sessionStorageKeys.tabGroupTreeData,
+        sessionStorageKeys.tabGroupTreeData
       )) ?? [];
     const currentSessionData =
       await getStorageData<chrome.bookmarks.BookmarkTreeNode>(
-        sessionStorageKeys.currentSessionData,
+        sessionStorageKeys.currentSessionData
       );
     const currentWindow = await chrome.windows.getCurrent({
       windowTypes: ["normal"],
@@ -453,7 +452,7 @@ chrome.windows.onRemoved.addListener(async (windowId) => {
             continue;
           }
           const url = `/stubPage.html?title=${encodeURIComponent(
-            oldTab.title ?? "",
+            oldTab.title ?? ""
           )}&url=${encodeURIComponent(oldTab.url ?? "")}`;
           try {
             await chrome.tabs.get(oldTab.id!);
@@ -488,7 +487,7 @@ export async function moveTabOrTabGroupToWindow(
     | chrome.tabs.Tab
     | chrome.tabGroups.TabGroup
     | null,
-  windowId?: chrome.windows.Window["id"],
+  windowId?: chrome.windows.Window["id"]
 ) {
   let stubTabId: chrome.tabs.Tab["id"] | undefined;
   if (!windowId) {

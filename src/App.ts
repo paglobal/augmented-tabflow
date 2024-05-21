@@ -41,6 +41,7 @@ import { sessionsTreeContent } from "./sessionsTreeContent";
 import { moveOrCopyToSessionTreeContent } from "./moveOrCopyToSessionTreeContent";
 import { sessionWindowsTreeContent } from "./sessionWindowsTreeContent";
 import { TabGroupTreeData } from "../sharedUtils";
+import { importTabGroupFromSessionTreeContent } from "./importTabGroupFromSession";
 
 // disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -65,6 +66,7 @@ export const deleteSessionDialogRef = createRef<SlDialog>();
 export const moveOrCopyTabToSessionTreeDialogRef = createRef<SlDialog>();
 export const moveOrCopyTabGroupToSessionTreeDialogRef = createRef<SlDialog>();
 export const sessionWindowsTreeDialogRef = createRef<SlDialog>();
+export const importTabGroupFromSessionTreeDialogRef = createRef<SlDialog>();
 
 export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
@@ -143,12 +145,25 @@ export function App() {
               ref: sessionWindowsTreeDialogRef,
             })}
             ${h(Dialog, {
+              label: "Import Tab Group",
+              content: html`${h(Tree, {
+                contentFn: () =>
+                  until(
+                    importTabGroupFromSessionTreeContent(),
+                    fallbackTreeContent()
+                  ),
+              })}`,
+              fullWidth: true,
+              noTopBodyMargin: true,
+              ref: importTabGroupFromSessionTreeDialogRef,
+            })}
+            ${h(Dialog, {
               label: "Move Or Copy Tab To Session",
               content: html`${h(Tree, {
                 contentFn: () =>
                   until(
                     moveOrCopyToSessionTreeContent("tab"),
-                    fallbackTreeContent(),
+                    fallbackTreeContent()
                   ),
               })}`,
               fullWidth: true,
@@ -161,7 +176,7 @@ export function App() {
                 contentFn: () =>
                   until(
                     moveOrCopyToSessionTreeContent("tabGroup"),
-                    fallbackTreeContent(),
+                    fallbackTreeContent()
                   ),
               })}`,
               fullWidth: true,
@@ -210,7 +225,7 @@ export function App() {
                         ></span
                         >${colorName}</sl-option
                       >
-                    `,
+                    `
                   )}
                 </sl-select>
               `,
@@ -252,7 +267,7 @@ export function App() {
                         ></span
                         >${colorName}</sl-option
                       >
-                    `,
+                    `
                   )}
                 </sl-select>
               `,
@@ -351,7 +366,7 @@ export function App() {
                         if (_currentlyDeletedSessionId) {
                           deleteSession(
                             _currentlyDeletedSessionId,
-                            currentlyDeletedSessionIsCurrentSession(),
+                            currentlyDeletedSessionIsCurrentSession()
                           );
                         }
                         setCurrentlyDeletedSessionId(null);

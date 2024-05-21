@@ -5,6 +5,7 @@ import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import {
   currentSessionData,
   currentSessionDataNotAvailable,
+  importTabGroupFromSession,
   moveOrCopyToSession,
   sessionsTreeData,
 } from "./sessionService";
@@ -19,12 +20,12 @@ export async function importTabGroupFromSessionTreeContent() {
     const _sessionsTreeData = sessionsTreeData().filter((sessionData) =>
       _currentSessionData !== currentSessionDataNotAvailable
         ? sessionData.id !== _currentSessionData?.id
-        : true,
+        : true
     );
     const importTabGroupFromSessionTreeContent = _sessionsTreeData.map(
       async (sessionData) => {
         const sessionDataChildren = await chrome.bookmarks.getChildren(
-          sessionData.id,
+          sessionData.id
         );
         if (!sessionDataChildren.length) {
           return null;
@@ -40,7 +41,7 @@ export async function importTabGroupFromSessionTreeContent() {
               tabGroupDataTitleSegments[0] as chrome.tabGroups.Color;
             const tabGroupTitle = tabGroupDataTitleSegments.slice(1).join("-");
 
-            return html`${h(TreeItem, {
+            return h(TreeItem, {
               tooltipContent:
                 tabGroupData.title === titles.ungroupedTabGroup
                   ? titles.ungroupedTabGroup
@@ -49,7 +50,7 @@ export async function importTabGroupFromSessionTreeContent() {
                 // @handled
                 try {
                   e.stopPropagation();
-                  await moveOrCopyToSession(tabGroupData.id);
+                  await importTabGroupFromSession(tabGroupData);
                 } catch (error) {
                   console.error(error);
                   notifyWithErrorMessageAndReloadButton();
@@ -63,7 +64,7 @@ export async function importTabGroupFromSessionTreeContent() {
                     // @handled
                     try {
                       e.stopPropagation();
-                      await moveOrCopyToSession(tabGroupData.id, true);
+                      await importTabGroupFromSession(tabGroupData, true);
                     } catch (error) {
                       console.error(error);
                       notifyWithErrorMessageAndReloadButton();
@@ -83,10 +84,10 @@ export async function importTabGroupFromSessionTreeContent() {
               })}${tabGroupData.title === titles.ungroupedTabGroup
                 ? titles.ungroupedTabGroup
                 : tabGroupTitle}`,
-            })}`;
+            });
           })}`,
         });
-      },
+      }
     );
 
     return await Promise.all(importTabGroupFromSessionTreeContent);

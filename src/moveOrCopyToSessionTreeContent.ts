@@ -19,12 +19,12 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
     const _sessionsTreeData = sessionsTreeData().filter((sessionData) =>
       _currentSessionData !== currentSessionDataNotAvailable
         ? sessionData.id !== _currentSessionData?.id
-        : true,
+        : true
     );
     if (type === "tab") {
       const sessionsTreeContent = _sessionsTreeData.map(async (sessionData) => {
         const sessionDataChildren = await chrome.bookmarks.getChildren(
-          sessionData.id,
+          sessionData.id
         );
         if (!sessionDataChildren.length) {
           return null;
@@ -40,7 +40,7 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
               tabGroupDataTitleSegments[0] as chrome.tabGroups.Color;
             const tabGroupTitle = tabGroupDataTitleSegments.slice(1).join("-");
 
-            return html`${h(TreeItem, {
+            return h(TreeItem, {
               tooltipContent:
                 tabGroupData.title === titles.ungroupedTabGroup
                   ? titles.ungroupedTabGroup
@@ -83,7 +83,7 @@ export async function moveOrCopyToSessionTreeContent(type: "tab" | "tabGroup") {
               })}${tabGroupData.title === titles.ungroupedTabGroup
                 ? titles.ungroupedTabGroup
                 : tabGroupTitle}`,
-            })}`;
+            });
           })}`,
         });
       });
