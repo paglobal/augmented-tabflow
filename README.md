@@ -11,12 +11,19 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
-- consider hiding dialogs at the beginning of actions
+- preserve state of session trees after use
+- consider making stub tab page the new tab page
+- always create new ungrouped tab group data for sessions if unavailable in `importTabGroupFreeSessionTreeContent` and `moveOrCopyToSessionTreeContent`. show only one at a time
+- add more info on stub page. eg. "Your page is loading... Click here to reload"
+- fix perpetual loading states of tab icons
+- fix favicon nonsense
+- support moving pinned and ungrouped tab groups to new windows
+- allow moving ungrouped tab group data to other sessions
+- consider hiding dialogs at the beginning of actions or not hiding some of them at all
 - work on focus states for tree items after dialog interactions
 - try removing all old session tabs at once when switching sessions
-- experiment in promethium-js with a state watcher mixin instead of the h function. try rewriting in solid if attempts prove futile
+- experiment in promethium-js with a state watcher mixin instead of the h function
 - implement recently closed tab groups feature
-- show tab group tree at the right time after session switch
 - implement ability to sort sessions alphabetically or by date added
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 - always show ungrouped in the "move to session dialog" for tabs
@@ -35,7 +42,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - create `TreeDialog` and `ConfirmationDialog`
 - implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - notify users of errors that happen in service workers through message `chrome.runtime.message`
-- have a go at the `closed message channel before response`
+- have a go at the `closed message channel before response` error
 - handle errors in timeouts as well
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - use early returns anywhere it makes sense

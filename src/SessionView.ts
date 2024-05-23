@@ -17,13 +17,13 @@ export function SessionView() {
           contentFn: fallbackTreeContent,
         })
       : currentSessionData()
-        ? h(Tree, {
-            contentFn: tabGroupTreeContent,
-            fullHeight: true,
-          })
-        : h(Tree, {
-            contentFn: sessionsTreeContent,
-            fullHeight: true,
-          });
+      ? h(Tree, {
+          contentFn: tabGroupTreeContent,
+          fullHeight: true,
+        })
+      : h(Tree, {
+          contentFn: sessionsTreeContent,
+          fullHeight: true,
+        });
   };
 }

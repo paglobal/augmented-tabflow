@@ -6,7 +6,6 @@ import {
   currentSessionData,
   currentSessionDataNotAvailable,
   importTabGroupFromSession,
-  moveOrCopyToSession,
   sessionsTreeData,
 } from "./sessionService";
 import { titles } from "../constants";
