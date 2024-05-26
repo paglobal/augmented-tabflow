@@ -32,45 +32,45 @@ export function TreeItemColorPatchOrIcon(props: {
           })}
         ></span>`
       : props.icon
-        ? html`
-            <sl-icon
-              name=${props.icon}
-              style=${styleMap({
-                width: "1.4rem",
-                height: "1.4rem",
-                marginRight: "0.8rem",
-                borderRadius: "0.3rem",
-              })}
-            ></sl-icon>
-          `
-        : html`
-            <div
-              style=${styleMap({
-                width: "1.3rem",
-                height: "1.3rem",
-                position: "relative",
-                marginRight: "0.7rem",
-                outline: `0.15rem solid ${tabGroupColors()["grey"]}`,
-                borderRadius: "50%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              })}
-            >
-              ${props.showSpinner
-                ? html`<sl-spinner></sl-spinner>`
-                : html`<img
-                    ${ref(imageRef)}
-                    src=${ifDefined(props.faviconUrl)}
-                    @error=${(e: Event) => {
-                      (e.target as HTMLImageElement).src = getFaviconUrl(null);
-                    }}
-                    style=${styleMap({
-                      width: "1.3rem",
-                      padding: "0.2rem",
-                    })}
-                  /> `}
-            </div>
-          `;
+      ? html`
+          <sl-icon
+            name=${props.icon}
+            style=${styleMap({
+              width: "1.4rem",
+              height: "1.4rem",
+              marginRight: "0.8rem",
+              borderRadius: "0.3rem",
+            })}
+          ></sl-icon>
+        `
+      : html`
+          <div
+            style=${styleMap({
+              width: "1.3rem",
+              height: "1.3rem",
+              position: "relative",
+              marginRight: "0.7rem",
+              outline: `0.15rem solid ${tabGroupColors()["grey"]}`,
+              borderRadius: "50%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            })}
+          >
+            ${props.showSpinner
+              ? html`<sl-spinner></sl-spinner>`
+              : html`<img
+                  ${ref(imageRef)}
+                  src=${ifDefined(props.faviconUrl)}
+                  @error=${(e: Event) => {
+                    (e.target as HTMLImageElement).src = getFaviconUrl(null);
+                  }}
+                  style=${styleMap({
+                    width: "1.3rem",
+                    padding: "0.2rem",
+                  })}
+                /> `}
+          </div>
+        `;
   };
 }

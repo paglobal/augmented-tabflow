@@ -11,22 +11,27 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
-- preserve state of session trees after use
-- consider making stub tab page the new tab page
+- always show ungrouped in the "move to session dialog" for tabs
 - always create new ungrouped tab group data for sessions if unavailable in `importTabGroupFreeSessionTreeContent` and `moveOrCopyToSessionTreeContent`. show only one at a time
+- add close all session windows button
+- reconcile pinned tabs functionality to work with unsaved sessions
 - add more info on stub page. eg. "Your page is loading... Click here to reload"
-- fix perpetual loading states of tab icons
-- fix favicon nonsense
 - support moving pinned and ungrouped tab groups to new windows
 - allow moving ungrouped tab group data to other sessions
-- consider hiding dialogs at the beginning of actions or not hiding some of them at all
-- work on focus states for tree items after dialog interactions
+
+- add onUpdated changelog page
+- add button in window to move whole window to another window
 - try removing all old session tabs at once when switching sessions
-- experiment in promethium-js with a state watcher mixin instead of the h function
+- collapsing and uncollapsing of tab groups shouldn't trigger `currentSessionData` updates
+- work on focus states for tree items after dialog interactions
+- fix favicon nonsense with `keyed` directive
+- fix perpetual loading states of tab icons
+- consider hiding dialogs at the beginning of actions or not hiding some of them at all
+- preserve state of session trees after modifications
+- make session trees and other dialog trees react to the necessary app state changes
 - implement recently closed tab groups feature
 - implement ability to sort sessions alphabetically or by date added
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
-- always show ungrouped in the "move to session dialog" for tabs
 - type drag-and-drop code
 - general code inspection and refactoring
 - refine fallback code
@@ -54,9 +59,10 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Store listing
 
-- Upload better screenshots and photos
 - Upload better description and summary
-- Maybe upload a video
+- Upload a video
+- Link to website
+- Add changelog
 
 ### Docs
 
@@ -66,4 +72,5 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - You can't create any new windows or tabs in the beginning stages of switching to a new session
 - When you close a window, all it's tabs move to another session window if any is available
 - Tabs load when activated
+- Add changelog
 - Click page or press any button to reload. Don't try to reload using any other means

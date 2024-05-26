@@ -71,6 +71,19 @@ export function Toolbar() {
           }}
         ></sl-icon-button>
         <sl-icon-button
+          name="window-plus"
+          title="Create Empty Session"
+          @click=${() => {
+            // @handled
+            try {
+              newSessionDialogRef.value?.show();
+            } catch (error) {
+              console.error(error);
+              notifyWithErrorMessageAndReloadButton();
+            }
+          }}
+        ></sl-icon-button>
+        <sl-icon-button
           name="plus-circle"
           title="Add Tab Group"
           @click=${() => {
@@ -163,19 +176,6 @@ export function Toolbar() {
                 }}
               ></sl-icon-button>
             `}
-        <sl-icon-button
-          name="window-plus"
-          title="Create Empty Session"
-          @click=${() => {
-            // @handled
-            try {
-              newSessionDialogRef.value?.show();
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          }}
-        ></sl-icon-button>
         <sl-icon-button
           name="question-circle"
           title="Help"

@@ -94,7 +94,7 @@ export function tabGroupTreeContent() {
                     tabs: otherTabGroupTabs,
                   } = source.data.tabGroup as TabGroupTreeData[number];
                   const otherTabGroupTabIds = otherTabGroupTabs.map(
-                    (tab) => tab.id,
+                    (tab) => tab.id
                   ) as [number, ...number[]];
                   if (
                     closestEdgeOfTarget === "top" &&
@@ -133,7 +133,7 @@ export function tabGroupTreeContent() {
                         color: otherTabGroupColor,
                         collapsed: otherTabGroupCollapsed,
                       });
-                    },
+                    }
                   );
                 },
               },
@@ -200,8 +200,8 @@ export function tabGroupTreeContent() {
                       chrome.tabs.ungroup(
                         tabGroup.tabs.map((tab) => tab.id) as [
                           number,
-                          ...number[],
-                        ],
+                          ...number[]
+                        ]
                       );
                     } catch (error) {
                       console.error(error);
@@ -336,28 +336,26 @@ export function tabGroupTreeContent() {
                             source.data.id as NonNullable<
                               chrome.tabs.Tab["id"]
                             >,
-                            { pinned: true },
+                            { pinned: true }
                           );
                         } else {
                           await chrome.tabs.ungroup(
-                            source.data.id as NonNullable<
-                              chrome.tabs.Tab["id"]
-                            >,
+                            source.data.id as NonNullable<chrome.tabs.Tab["id"]>
                           );
                           await chrome.tabs.update(
                             source.data.id as NonNullable<
                               chrome.tabs.Tab["id"]
                             >,
-                            { pinned: false },
+                            { pinned: false }
                           );
                         }
                         await chrome.tabs.move(
                           source.data.id as NonNullable<chrome.tabs.Tab["id"]>,
                           {
                             index,
-                          },
+                          }
                         );
-                      },
+                      }
                     );
                   },
                 },
@@ -504,11 +502,11 @@ export function tabGroupTreeContent() {
                   ${tab.title}
                 `,
               });
-            },
+            }
           )}
         `,
       });
-    },
+    }
   );
 
   return tabGroupTreeContent;
