@@ -219,7 +219,12 @@ async function applyUpdates() {
     const tabGroupTreeData = await getTabGroupTreeData();
     await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
     await updateCurrentSessionData();
-    await setStorageData(sessionStorageKeys.sessionLoading, false);
+    const sessionLoading = await getStorageData<boolean>(
+      sessionStorageKeys.sessionLoading,
+    );
+    if (sessionLoading) {
+      await setStorageData(sessionStorageKeys.sessionLoading, false);
+    }
   });
 }
 

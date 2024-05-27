@@ -2,7 +2,6 @@ import {
   SessionData,
   lockNames,
   messageTypes,
-  newTabUrls,
   sessionStorageKeys,
   syncStorageKeys,
   tabGroupColorList,
@@ -66,8 +65,21 @@ chrome.tabGroups.onRemoved.addListener(async () => {
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
-chrome.tabGroups.onUpdated.addListener(async () => {
+chrome.tabGroups.onUpdated.addListener(async (tabGroup) => {
   // @error
+  const tabGroupTreeData =
+    (await getStorageData<TabGroupTreeData>(
+      sessionStorageKeys.tabGroupTreeData,
+    )) ?? [];
+  const oldTabGroup = tabGroupTreeData.find(
+    (_tabGroup) => _tabGroup.id === tabGroup.id,
+  );
+  if (
+    oldTabGroup?.title === tabGroup.title &&
+    oldTabGroup?.color === tabGroup.color
+  ) {
+    return;
+  }
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
@@ -262,7 +274,7 @@ async function removeOldSessionTabs({
       }
     }
   }
-  // await setStorageData(sessionStorageKeys.currentlyRemovedTabId, null);
+  await setStorageData(sessionStorageKeys.currentlyRemovedTabId, null);
   await navigator.locks.request(lockNames.removingOldSessionTabs, async () => {
     await setStorageData(sessionStorageKeys.removingOldSessionTabs, false);
   });
@@ -411,6 +423,7 @@ async function openNewSession(newSessionData?: SessionData) {
     if (sessionTabs.length > 1 && stubTabId) {
       await setStorageData(sessionStorageKeys.currentlyRemovedTabId, stubTabId);
       await chrome.tabs.remove(stubTabId);
+      await setStorageData(sessionStorageKeys.currentlyRemovedTabId, null);
     }
     await setStorageData(sessionStorageKeys.stubTabId, null);
   });
@@ -472,4 +485,25 @@ export async function moveTabOrTabGroupToWindow(
 
 subscribeToMessage(messageTypes.moveTabOrTabGroupToWindow, (data) => {
   moveTabOrTabGroupToWindow(data.currentlyEjectedTabOrTabGroup, data.windowId);
+});
+
+async function closeAllSessionWindows() {
+  await navigator.locks.request(lockNames.applyUpdates, async () => {
+    await setStorageData(sessionStorageKeys.sessionLoading, true);
+    const sessionTabs = await chrome.tabs.query({ windowType: "normal" });
+    for (const tab of sessionTabs) {
+      try {
+        await setStorageData(sessionStorageKeys.currentlyRemovedTabId, tab.id);
+        await chrome.tabs.remove(tab.id!);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    await setStorageData(sessionStorageKeys.currentlyRemovedTabId, null);
+  });
+}
+
+subscribeToMessage(messageTypes.closeAllSessionWindows, async () => {
+  // @error
+  await closeAllSessionWindows();
 });

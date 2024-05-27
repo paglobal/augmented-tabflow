@@ -11,24 +11,19 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
-- always show ungrouped in the "move to session dialog" for tabs
-- always create new ungrouped tab group data for sessions if unavailable in `importTabGroupFreeSessionTreeContent` and `moveOrCopyToSessionTreeContent`. show only one at a time
-- add close all session windows button
-- reconcile pinned tabs functionality to work with unsaved sessions
-- add more info on stub page. eg. "Your page is loading... Click here to reload"
-- support moving pinned and ungrouped tab groups to new windows
-- allow moving ungrouped tab group data to other sessions
-
+- consider adding ability to import tabs independent of tab groups
 - add onUpdated changelog page
 - add button in window to move whole window to another window
+- preserve state of session trees after modifications
+- show info alerts at the beginning of some actions and consider not hiding their modals
+- support moving pinned and ungrouped tab groups to new windows
+- add more info on stub page. eg. "Your page is loading... Click here to reload"
+- make session trees and other dialog trees react to the necessary app state changes
+- check to see if last session is equal to current unsaved session and/or reconcile pinned tabs functionality to work with unsaved sessions
 - try removing all old session tabs at once when switching sessions
-- collapsing and uncollapsing of tab groups shouldn't trigger `currentSessionData` updates
 - work on focus states for tree items after dialog interactions
 - fix favicon nonsense with `keyed` directive
 - fix perpetual loading states of tab icons
-- consider hiding dialogs at the beginning of actions or not hiding some of them at all
-- preserve state of session trees after modifications
-- make session trees and other dialog trees react to the necessary app state changes
 - implement recently closed tab groups feature
 - implement ability to sort sessions alphabetically or by date added
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)

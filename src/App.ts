@@ -41,7 +41,7 @@ import { sessionsTreeContent } from "./sessionsTreeContent";
 import { moveOrCopyToSessionTreeContent } from "./moveOrCopyToSessionTreeContent";
 import { sessionWindowsTreeContent } from "./sessionWindowsTreeContent";
 import { TabGroupTreeData } from "../sharedUtils";
-import { importTabGroupFromSessionTreeContent } from "./importTabGroupFromSession";
+import { importTabGroupFromSessionTreeContent } from "./importTabGroupFromSessionTreeContent";
 
 // disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -150,7 +150,7 @@ export function App() {
                 contentFn: () =>
                   until(
                     importTabGroupFromSessionTreeContent(),
-                    fallbackTreeContent()
+                    fallbackTreeContent(),
                   ),
               })}`,
               fullWidth: true,
@@ -163,7 +163,7 @@ export function App() {
                 contentFn: () =>
                   until(
                     moveOrCopyToSessionTreeContent("tab"),
-                    fallbackTreeContent()
+                    fallbackTreeContent(),
                   ),
               })}`,
               fullWidth: true,
@@ -176,7 +176,7 @@ export function App() {
                 contentFn: () =>
                   until(
                     moveOrCopyToSessionTreeContent("tabGroup"),
-                    fallbackTreeContent()
+                    fallbackTreeContent(),
                   ),
               })}`,
               fullWidth: true,
@@ -225,7 +225,7 @@ export function App() {
                         ></span
                         >${colorName}</sl-option
                       >
-                    `
+                    `,
                   )}
                 </sl-select>
               `,
@@ -267,7 +267,7 @@ export function App() {
                         ></span
                         >${colorName}</sl-option
                       >
-                    `
+                    `,
                   )}
                 </sl-select>
               `,
@@ -366,7 +366,7 @@ export function App() {
                         if (_currentlyDeletedSessionId) {
                           deleteSession(
                             _currentlyDeletedSessionId,
-                            currentlyDeletedSessionIsCurrentSession()
+                            currentlyDeletedSessionIsCurrentSession(),
                           );
                         }
                         setCurrentlyDeletedSessionId(null);

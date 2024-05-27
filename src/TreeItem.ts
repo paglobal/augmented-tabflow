@@ -96,7 +96,7 @@ export function TreeItem(props: {
 
         cleanup = combine(
           draggable(props.draggableOptions as DraggableOptions),
-          dropTargetForElements(props.dropTargetOptions as DropTargetOptions)
+          dropTargetForElements(props.dropTargetOptions as DropTargetOptions),
         );
       }
     });

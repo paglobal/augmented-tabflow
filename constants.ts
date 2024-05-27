@@ -69,6 +69,7 @@ export const messageTypes = {
   openNewSession: "message-1",
   restoreTab: "message-2",
   moveTabOrTabGroupToWindow: "message-3",
+  closeAllSessionWindows: "message-4",
 } as const satisfies Record<string, MessageType>;
 
 export const tabGroupTreeDataUpdateDebounceTimeout = 200;

@@ -8,7 +8,7 @@ import {
   importTabGroupFromSession,
   sessionsTreeData,
 } from "./sessionService";
-import { titles } from "../constants";
+import { tabGroupColorList, titles } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import { fallbackTreeContent } from "./fallbackTreeContent";
 
@@ -19,26 +19,44 @@ export async function importTabGroupFromSessionTreeContent() {
     const _sessionsTreeData = sessionsTreeData().filter((sessionData) =>
       _currentSessionData !== currentSessionDataNotAvailable
         ? sessionData.id !== _currentSessionData?.id
-        : true
+        : true,
     );
     const importTabGroupFromSessionTreeContent = _sessionsTreeData.map(
       async (sessionData) => {
-        const sessionDataChildren = await chrome.bookmarks.getChildren(
-          sessionData.id
+        let sessionDataChildren = await chrome.bookmarks.getChildren(
+          sessionData.id,
         );
-        if (!sessionDataChildren.length) {
-          return null;
-        }
+        sessionDataChildren = sessionDataChildren.filter((tabGroupData) => {
+          const ungrouped = tabGroupData.title === titles.ungroupedTabGroup;
+          if (tabGroupData.url) {
+            return false;
+          }
+          if (ungrouped) {
+            return false;
+          }
+
+          return true;
+        });
+        sessionDataChildren.push({
+          title: titles.ungroupedTabGroup,
+          id: titles.ungroupedTabGroup,
+          parentId: sessionData.id,
+        });
+
         return h(TreeItem, {
           tooltipContent: sessionData.title,
           content: html`${h(TreeItemColorPatchOrIcon, {
             icon: "window",
           })}${sessionData.title}
           ${sessionDataChildren.map((tabGroupData) => {
+            const ungrouped = tabGroupData.title === titles.ungroupedTabGroup;
             const tabGroupDataTitleSegments = tabGroupData.title.split("-");
             const tabGroupColor =
               tabGroupDataTitleSegments[0] as chrome.tabGroups.Color;
             const tabGroupTitle = tabGroupDataTitleSegments.slice(1).join("-");
+            if (!tabGroupColorList.includes(tabGroupColor) && !ungrouped) {
+              return null;
+            }
 
             return h(TreeItem, {
               tooltipContent:
@@ -86,7 +104,7 @@ export async function importTabGroupFromSessionTreeContent() {
             });
           })}`,
         });
-      }
+      },
     );
 
     return await Promise.all(importTabGroupFromSessionTreeContent);

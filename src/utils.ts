@@ -26,12 +26,13 @@ export function randomTabGroupColorValue() {
 // copied from "https://shoelace.style/components/alert" and slightly modified
 export function notify(
   message: string,
-  variant: Exclude<SlAlert["variant"], "primary" | "neutral"> = "danger",
+  variant: Exclude<SlAlert["variant"], "neutral"> = "danger",
   duration: number = 3000,
 ) {
   const icon = {
     danger: "exclamation-octagon",
     success: "check2-circle",
+    primary: "info-circle",
     warning: "exclamation-triangle",
   };
   const alert = Object.assign(document.createElement("sl-alert"), {
