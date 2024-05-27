@@ -17,6 +17,7 @@ export const sessionStorageKeys = {
   currentlyRemovedTabId: "session-11",
   stubTabId: "session-12",
   removingOldSessionTabs: "session-13",
+  startup: "session-14",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;
@@ -70,6 +71,7 @@ export const messageTypes = {
   restoreTab: "message-2",
   moveTabOrTabGroupToWindow: "message-3",
   closeAllSessionWindows: "message-4",
+  updateTabGroupTreeDataAndCurrentSessionData: "message-5",
 } as const satisfies Record<string, MessageType>;
 
 export const tabGroupTreeDataUpdateDebounceTimeout = 200;

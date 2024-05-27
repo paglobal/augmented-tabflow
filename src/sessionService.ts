@@ -12,7 +12,6 @@ import {
   getStorageData,
   setStorageData,
   subscribeToStorageData,
-  updateTabGroupTreeDataAndCurrentSessionData,
   sendMessage,
   saveCurrentSessionDataIntoBookmarkNode,
 } from "../sharedUtils";
@@ -73,10 +72,14 @@ export async function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
   if (tabGroup.type === tabGroupTypes.ungrouped) {
     await setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, false);
-    await updateTabGroupTreeDataAndCurrentSessionData();
+    await sendMessage({
+      type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
+    });
   } else if (tabGroup.type === tabGroupTypes.pinned) {
     await setStorageData(sessionStorageKeys.pinnedTabGroupCollapsed, false);
-    await updateTabGroupTreeDataAndCurrentSessionData();
+    await sendMessage({
+      type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
+    });
   } else if (tabGroup.type === tabGroupTypes.normal) {
     chrome.tabGroups.update(tabGroup.id, {
       collapsed: false,
@@ -88,10 +91,14 @@ export async function collapseTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
   if (tabGroup.type === tabGroupTypes.ungrouped) {
     await setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, true);
-    await updateTabGroupTreeDataAndCurrentSessionData();
+    await sendMessage({
+      type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
+    });
   } else if (tabGroup.type === tabGroupTypes.pinned) {
     await setStorageData(sessionStorageKeys.pinnedTabGroupCollapsed, true);
-    await updateTabGroupTreeDataAndCurrentSessionData();
+    await sendMessage({
+      type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
+    });
   } else if (tabGroup.type === tabGroupTypes.normal) {
     chrome.tabGroups.update(tabGroup.id, {
       collapsed: true,
@@ -148,7 +155,7 @@ export async function createTabGroup(options: {
   // @maybe
   let _firstTabInNewTabGroup = firstTabInNewTabGroup();
   if (!_firstTabInNewTabGroup) {
-    _firstTabInNewTabGroup = await chrome.tabs.create({ active: false });
+    _firstTabInNewTabGroup = await chrome.tabs.create({ active: true });
   }
   const groupId = await chrome.tabs.group({
     tabIds: _firstTabInNewTabGroup.id as number,
@@ -157,7 +164,6 @@ export async function createTabGroup(options: {
     },
   });
   await chrome.tabGroups.update(groupId, options);
-  await chrome.tabs.update(_firstTabInNewTabGroup.id!, { active: true });
   setFirstTabInNewTabGroup(null);
 }
 

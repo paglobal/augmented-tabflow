@@ -29,10 +29,10 @@ export function Help() {
         updated anytime you make a change to your current active saved session.
       </li>
       <li>
-        It is centered mostly around tab groups although if you save your tab
-        groups natively in Chrome, you can't edit them with this extension
-        because of the way saved tab groups currently work in Chrome. We hope
-        this gets fixed in the future.
+        Even though this tab integrates extremely well with tab groups, if you
+        save your tab groups natively in Chrome, you can't edit them in some
+        ways with this extension because of the way saved tab groups currently
+        work in Chrome. We hope this gets fixed in the future.
       </li>
       <li>
         Sessions normally consist of all tabs from all "normal" windows (no
@@ -44,18 +44,19 @@ export function Help() {
       </li>
       <li>
         In rare cases where session switching takes too long (eg. if you
-        interrupt the process unintentionally), the extension allows you to
-        restart the process or cancel it.
+        interrupt the process unintentionally), the extension provides you with
+        a reload button you can use to attempt to fix the problem.
       </li>
       <li>
         Extension pages (of other extensions) may be blocked by Chrome when
-        restored. You can manually reload them by clicking the search bar to
+        restored. You can manually reload them by clicking the address bar to
         focus it and pressing "Enter" immediately afterwards.
       </li>
       <li>
-        Your sessions are saved in the bookmark folder
+        Your sessions are saved in a bookmark folder named
         "${titles.rootBookmarkNode}" but you can change the title if you wish.
-        Be careful of how you and other extensions modify this folder.
+        Be careful of how you and other extensions modify this folder and its
+        contents.
       </li>
       <li>
         Please don't modify any session's bookmark folder while that session is

@@ -11,30 +11,28 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
-- consider adding ability to import tabs independent of tab groups
-- add onUpdated changelog page
-- add button in window to move whole window to another window
-- preserve state of session trees after modifications
+- preserve state of session trees after modifications (by replacing `until` with new custom directive)
 - show info alerts at the beginning of some actions and consider not hiding their modals
-- support moving pinned and ungrouped tab groups to new windows
-- add more info on stub page. eg. "Your page is loading... Click here to reload"
+- open changelog page on extension update
 - make session trees and other dialog trees react to the necessary app state changes
-- check to see if last session is equal to current unsaved session and/or reconcile pinned tabs functionality to work with unsaved sessions
-- try removing all old session tabs at once when switching sessions
-- work on focus states for tree items after dialog interactions
+- support moving pinned and ungrouped tab groups to new windows
 - fix favicon nonsense with `keyed` directive
 - fix perpetual loading states of tab icons
 - implement recently closed tab groups feature
-- implement ability to sort sessions alphabetically or by date added
+- add new tab button in toolbar
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
+- (maybe) add button in window to move whole window to another window
+- (maybe) add more info on stub page. eg. "Your page is loading... Click here to reload"
+- (maybe) adding ability to import tabs independent of tab groups
+- (maybe) implement ability to sort sessions alphabetically or by date added
+- try removing all old session tabs at once when switching sessions
+- work on focus states for tree items after dialog interactions
 - type drag-and-drop code
 - general code inspection and refactoring
 - refine fallback code
-- (if necessary) add alerts for action start and action complete
 - inspect and verify types across entire codebase
 - refine and organise text. look for anything in quotation marks like "Error!" and such. make use of full stops
-- remove all unused imports
-- (maybe) organise all imports
+- organise imports
 - use `Array<T>` to type arrays
 - use `await` anywhere it makes sense. don't use `async-await` in array filter functions though
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
@@ -42,7 +40,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - create `TreeDialog` and `ConfirmationDialog`
 - implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - notify users of errors that happen in service workers through message `chrome.runtime.message`
-- have a go at the `closed message channel before response` error
 - handle errors in timeouts as well
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - use early returns anywhere it makes sense
@@ -57,15 +54,9 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - Upload better description and summary
 - Upload a video
 - Link to website
-- Add changelog
+- Add changelog site
 
 ### Docs
 
+- Add reference to changelog site
 - Add reference to video
-- Popups not supported
-- Don't mind errors unless they affect the way you use the extension
-- You can't create any new windows or tabs in the beginning stages of switching to a new session
-- When you close a window, all it's tabs move to another session window if any is available
-- Tabs load when activated
-- Add changelog
-- Click page or press any button to reload. Don't try to reload using any other means

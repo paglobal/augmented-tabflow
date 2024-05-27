@@ -2,11 +2,8 @@ import { render } from "lit";
 import { h } from "promethium-js";
 import { App } from "./src/App";
 import { setThemeMode } from "./src/utils";
-import {
-  createBookmarkNodeAndSyncId,
-  updateTabGroupTreeDataAndCurrentSessionData,
-} from "./sharedUtils";
-import { titles, syncStorageKeys } from "./constants";
+import { createBookmarkNodeAndSyncId, sendMessage } from "./sharedUtils";
+import { titles, syncStorageKeys, messageTypes } from "./constants";
 
 (async function () {
   // @error
@@ -18,7 +15,9 @@ import { titles, syncStorageKeys } from "./constants";
     syncStorageKeys.pinnedTabGroupBookmarkNodeId,
     titles.pinnedTabGroup,
   );
-  await updateTabGroupTreeDataAndCurrentSessionData();
+  await sendMessage({
+    type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
+  });
   // auto light/dark mode based on user preferences
   if (window.matchMedia) {
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
