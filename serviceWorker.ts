@@ -35,10 +35,15 @@ chrome.runtime.onInstalled.addListener(async () => {
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
+(async () => {
+  await navigator.locks.request(lockNames.applyUpdates, async () => {
+    await setStorageData(sessionStorageKeys.startup, true);
+  });
+})();
+
 chrome.runtime.onStartup.addListener(async () => {
   // @error
   await navigator.locks.request(lockNames.applyUpdates, async () => {
-    console.log("startup!");
     await setStorageData(sessionStorageKeys.startup, true);
   });
   await createBookmarkNodeAndSyncId(
@@ -625,6 +630,8 @@ async function updateCurrentSessionData() {
     }
   } else {
     await setStorageData(sessionStorageKeys.currentSessionData, null);
+    // just in case `onStartup` doesn't fire
+    await setStorageData(sessionStorageKeys.startup, true);
   }
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,

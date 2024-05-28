@@ -71,12 +71,12 @@ export function Toolbar() {
           }}
         ></sl-icon-button>
         <sl-icon-button
-          name="window-plus"
-          title="Create Empty Session"
-          @click=${() => {
+          name="plus-lg"
+          title="New Tab"
+          @click=${async () => {
             // @handled
             try {
-              newSessionDialogRef.value?.show();
+              await chrome.tabs.create({ active: true });
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
@@ -93,6 +93,19 @@ export function Toolbar() {
                 addTabGroupSelectRef.value.value = randomTabGroupColorValue();
               }
               addTabGroupDialogRef.value?.show();
+            } catch (error) {
+              console.error(error);
+              notifyWithErrorMessageAndReloadButton();
+            }
+          }}
+        ></sl-icon-button>
+        <sl-icon-button
+          name="window-plus"
+          title="Create Empty Session"
+          @click=${() => {
+            // @handled
+            try {
+              newSessionDialogRef.value?.show();
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();

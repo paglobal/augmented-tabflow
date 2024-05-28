@@ -13,14 +13,13 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 - preserve state of session trees after modifications (by replacing `until` with new custom directive)
 - show info alerts at the beginning of some actions and consider not hiding their modals
-- open changelog page on extension update
 - make session trees and other dialog trees react to the necessary app state changes
-- support moving pinned and ungrouped tab groups to new windows
+- open changelog page on extension update
 - fix favicon nonsense with `keyed` directive
 - fix perpetual loading states of tab icons
 - implement recently closed tab groups feature
-- add new tab button in toolbar
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
+- (maybe) support moving pinned and ungrouped tab groups to new windows
 - (maybe) add button in window to move whole window to another window
 - (maybe) add more info on stub page. eg. "Your page is loading... Click here to reload"
 - (maybe) adding ability to import tabs independent of tab groups

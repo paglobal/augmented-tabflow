@@ -343,6 +343,7 @@ export async function createSession(
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(syncStorageKeys.rootBookmarkNodeId);
   if (rootBookmarkNodeId) {
+    notify("Creating session...", "primary");
     const sessionData = await chrome.bookmarks.create({
       title,
       parentId: rootBookmarkNodeId,
@@ -354,6 +355,7 @@ export async function createSession(
     if (useCurrentSessionData) {
       await saveCurrentSessionDataIntoBookmarkNode(sessionData.id);
     }
+    notify("Session successfully created.", "success");
   } else {
     notifyWithErrorMessageAndReloadButton();
   }
@@ -393,7 +395,9 @@ export async function deleteSession(
   isCurrentSession?: boolean,
 ) {
   // @maybe
+  notify("Deleting session...", "primary");
   await chrome.bookmarks.removeTree(sessionId);
+  notify("Session deleted successfully...", "success");
   if (isCurrentSession) {
     await openNewSession(null);
   }
@@ -420,6 +424,11 @@ export async function moveOrCopyToSession(
     return;
   }
   if ((_currentlyMovedOrCopiedTabOrTabGroup as chrome.tabs.Tab).url) {
+    if (copy === true) {
+      notify("Copying tab...", "primary");
+    } else {
+      notify("Moving tab...", "primary");
+    }
     let ungroupedTabGroupDataParentId:
       | chrome.bookmarks.BookmarkTreeNode["id"]
       | undefined;
@@ -446,6 +455,11 @@ export async function moveOrCopyToSession(
   } else if (
     (_currentlyMovedOrCopiedTabOrTabGroup as TabGroupTreeData[number]).tabs
   ) {
+    if (copy === true) {
+      notify("Copying tab group...", "primary");
+    } else {
+      notify("Moving tab group...", "primary");
+    }
     let tabGroupData: chrome.bookmarks.BookmarkTreeNode | undefined;
     if (
       _currentlyMovedOrCopiedTabOrTabGroup.title === titles.ungroupedTabGroup
@@ -501,6 +515,7 @@ export async function importTabGroupFromSession(
   tabGroupData: chrome.bookmarks.BookmarkTreeNode,
   copy: boolean = false,
 ) {
+  notify("Importing tab group...", "primary");
   const ungrouped = tabGroupData.title === titles.ungroupedTabGroup;
   let tabGroupDataChildren: Array<chrome.bookmarks.BookmarkTreeNode> = [];
   if (ungrouped) {
