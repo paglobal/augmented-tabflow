@@ -11,8 +11,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
-- preserve state of session trees after modifications (by replacing `until` with new custom directive)
-- show info alerts at the beginning of some actions and consider not hiding their modals
 - make session trees and other dialog trees react to the necessary app state changes
 - open changelog page on extension update
 - fix favicon nonsense with `keyed` directive

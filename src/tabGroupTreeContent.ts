@@ -187,8 +187,65 @@ export function tabGroupTreeContent() {
                   }
                 }}
               ></sl-icon-button>`}
+          ${tabGroup.type === tabGroupTypes.pinned
+            ? html`
+                <sl-icon-button
+                  name="pin-angle-fill"
+                  title="Unpin Tabs"
+                  @click=${async (e: Event) => {
+                    // @handled
+                    try {
+                      e.stopPropagation();
+                      for (const tab of tabGroup.tabs) {
+                        await chrome.tabs.update(tab.id!, { pinned: false });
+                      }
+                    } catch (error) {
+                      console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
+                    }
+                  }}
+                ></sl-icon-button>
+              `
+            : html`
+                <sl-icon-button
+                  name="pin-angle"
+                  title="Pin Tabs"
+                  @click=${async (e: Event) => {
+                    // @handled
+                    try {
+                      e.stopPropagation();
+                      for (const tab of tabGroup.tabs) {
+                        await chrome.tabs.update(tab.id!, { pinned: true });
+                      }
+                    } catch (error) {
+                      console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
+                    }
+                  }}
+                ></sl-icon-button>
+              `}
           ${tabGroup.type !== tabGroupTypes.normal
-            ? null
+            ? html`
+                <sl-icon-button
+                  name="folder"
+                  title="Group Tabs"
+                  @click=${(e: Event) => {
+                    // @handled
+                    try {
+                      e.stopPropagation();
+                      chrome.tabs.group({
+                        tabIds: tabGroup.tabs.map((tab) => tab.id) as [
+                          number,
+                          ...number[],
+                        ],
+                      });
+                    } catch (error) {
+                      console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
+                    }
+                  }}
+                ></sl-icon-button>
+              `
             : html`
                 <sl-icon-button
                   name="folder-minus"

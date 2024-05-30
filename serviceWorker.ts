@@ -24,6 +24,9 @@ chrome.sidePanel
 
 chrome.runtime.onInstalled.addListener(async () => {
   // @error
+  await chrome.tabs.create({
+    url: "https://www.paglobal.tech/pages/projects/augmented-tabflow.html",
+  });
   await createBookmarkNodeAndSyncId(
     syncStorageKeys.rootBookmarkNodeId,
     titles.rootBookmarkNode,
@@ -37,14 +40,20 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 (async () => {
   await navigator.locks.request(lockNames.applyUpdates, async () => {
-    await setStorageData(sessionStorageKeys.startup, true);
+    const startup = getStorageData<boolean>(sessionStorageKeys.startup);
+    if (startup === undefined) {
+      await setStorageData(sessionStorageKeys.startup, true);
+    }
   });
 })();
 
 chrome.runtime.onStartup.addListener(async () => {
   // @error
   await navigator.locks.request(lockNames.applyUpdates, async () => {
-    await setStorageData(sessionStorageKeys.startup, true);
+    const startup = getStorageData<boolean>(sessionStorageKeys.startup);
+    if (startup === undefined) {
+      await setStorageData(sessionStorageKeys.startup, true);
+    }
   });
   await createBookmarkNodeAndSyncId(
     syncStorageKeys.rootBookmarkNodeId,
@@ -85,15 +94,14 @@ chrome.tabGroups.onUpdated.addListener(async (tabGroup) => {
     (_tabGroup) => _tabGroup.id === tabGroup.id,
   );
   if (
-    oldTabGroup?.title === tabGroup.title &&
-    oldTabGroup?.color === tabGroup.color
+    oldTabGroup?.title !== tabGroup.title ||
+    oldTabGroup?.color !== tabGroup.color
   ) {
-    return;
+    await setStorageData(
+      sessionStorageKeys.readyToUpdateCurrentSessionData,
+      true,
+    );
   }
-  await setStorageData(
-    sessionStorageKeys.readyToUpdateCurrentSessionData,
-    true,
-  );
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
@@ -198,7 +206,12 @@ chrome.tabs.onReplaced.addListener(async () => {
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
   // @error
-  if (changeInfo.title || changeInfo.url) {
+  if (
+    changeInfo.title ||
+    changeInfo.url ||
+    changeInfo.groupId ||
+    changeInfo.pinned
+  ) {
     await setStorageData(
       sessionStorageKeys.readyToUpdateCurrentSessionData,
       true,
@@ -735,3 +748,17 @@ subscribeToMessage(
     await updateTabGroupTreeDataAndCurrentSessionData();
   },
 );
+
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command === "close-all-session-windows") {
+    closeAllSessionWindows();
+  } else if (command === "exit-current-session") {
+    const currentSessionData =
+      await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
+        sessionStorageKeys.currentSessionData,
+      );
+    if (currentSessionData) {
+      openNewSession(null);
+    }
+  }
+});

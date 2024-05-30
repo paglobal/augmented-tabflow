@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Augmented Tabflow",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "minimum_chrome_version": "116",
   "description": "Augment your tab workflow with extended tab, tab group and session managment.",
   "permissions": [
@@ -14,10 +14,10 @@
     "favicon"
   ],
   "icons": {
-    "16": "assets/icons/icon-3-dev-16.png",
-    "32": "assets/icons/icon-3-dev-32.png",
-    "48": "assets/icons/icon-3-dev-48.png",
-    "128": "assets/icons/icon-3-dev-128.png"
+    "16": "assets/icons/icon-3-16.png",
+    "32": "assets/icons/icon-3-32.png",
+    "48": "assets/icons/icon-3-48.png",
+    "128": "assets/icons/icon-3-128.png"
   },
   "background": {
     "service_worker": "serviceWorker.js",
@@ -28,5 +28,18 @@
   },
   "side_panel": {
     "default_path": "index.html"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": "Alt+T"
+    },
+    "close-all-session-windows": {
+      "suggested_key": "Alt+W",
+      "description": "Close all session windows"
+    },
+    "exit-current-session": {
+      "suggested_key": "Alt+Q",
+      "description": "Exit current session"
+    }
   }
 }

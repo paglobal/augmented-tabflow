@@ -2,7 +2,6 @@ import { adaptState, h } from "promethium-js";
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { createRef, ref } from "lit/directives/ref.js";
-import { until } from "lit/directives/until.js";
 import { setDefaultAnimation } from "@shoelace-style/shoelace/dist/utilities/animation-registry.js";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import type SlInput from "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -42,6 +41,7 @@ import { moveOrCopyToSessionTreeContent } from "./moveOrCopyToSessionTreeContent
 import { sessionWindowsTreeContent } from "./sessionWindowsTreeContent";
 import { TabGroupTreeData } from "../sharedUtils";
 import { importTabGroupFromSessionTreeContent } from "./importTabGroupFromSessionTreeContent";
+import promiseWithOneTimeFallback from "./promiseWithOneTimeFallback";
 
 // disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -138,7 +138,10 @@ export function App() {
               label: "Move To Window",
               content: html`${h(Tree, {
                 contentFn: () =>
-                  until(sessionWindowsTreeContent(), fallbackTreeContent()),
+                  promiseWithOneTimeFallback(
+                    sessionWindowsTreeContent(),
+                    fallbackTreeContent(),
+                  ),
               })}`,
               fullWidth: true,
               noTopBodyMargin: true,
@@ -148,7 +151,7 @@ export function App() {
               label: "Import Tab Group",
               content: html`${h(Tree, {
                 contentFn: () =>
-                  until(
+                  promiseWithOneTimeFallback(
                     importTabGroupFromSessionTreeContent(),
                     fallbackTreeContent(),
                   ),
@@ -161,7 +164,7 @@ export function App() {
               label: "Move Or Copy Tab To Session",
               content: html`${h(Tree, {
                 contentFn: () =>
-                  until(
+                  promiseWithOneTimeFallback(
                     moveOrCopyToSessionTreeContent("tab"),
                     fallbackTreeContent(),
                   ),
@@ -174,7 +177,7 @@ export function App() {
               label: "Move Or Copy Tab Group To Session",
               content: html`${h(Tree, {
                 contentFn: () =>
-                  until(
+                  promiseWithOneTimeFallback(
                     moveOrCopyToSessionTreeContent("tabGroup"),
                     fallbackTreeContent(),
                   ),

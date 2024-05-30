@@ -113,7 +113,7 @@ export function Toolbar() {
           }}
         ></sl-icon-button>
         <sl-icon-button
-          name="stickies"
+          name="folder"
           title="Group Ungrouped Tabs In This Window"
           @click=${() => {
             // @handled

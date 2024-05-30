@@ -532,6 +532,11 @@ export async function importTabGroupFromSession(
   } else {
     tabGroupDataChildren = await chrome.bookmarks.getChildren(tabGroupData.id);
   }
+  if (!tabGroupDataChildren.length) {
+    notify("Tab group empty.", "warning");
+
+    return;
+  }
   const tabIds: Array<chrome.tabs.Tab["id"]> = [];
   for (const tabData of tabGroupDataChildren) {
     const url = `/stubPage.html?title=${encodeURIComponent(
@@ -573,7 +578,6 @@ export async function importTabGroupFromSession(
       await chrome.bookmarks.removeTree(tabGroupData.id);
     }
   }
-  importTabGroupFromSessionTreeDialogRef.value?.hide();
   updateSessionsTreeData();
   notify("Tab group imported successfully.", "success");
 }
