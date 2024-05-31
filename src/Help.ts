@@ -70,6 +70,30 @@ export function Help() {
         Please don't close the side panel while an action you initiated is in
         progress.
       </li>
+      <li>
+        Any session window or tab you close is removed from your current
+        session. As such, please use either the "Exit Current Session" or "Close
+        All Session Windows" button when you're done with a session to ensure
+        that you don't mistakenly remove any tabs or windows from your current
+        session.
+      </li>
+      <li>
+        "Alt + T" is the default keyboard shortcut for toggling the sidepanel
+        with the extension UI.
+      </li>
+      <li>
+        "Alt + Q" is the default keyboard shortcut for exiting your current
+        session.
+      </li>
+      <li>
+        "Alt + W" is the default keyboard shortcut for closing all session
+        windows.
+      </li>
+      <li>You can modify all these shortcuts in the Chrome extensions page.</li>
+      <li>
+        Pinned tabs are not specific to any session as so stay open throughout
+        all sessions, even unsaved ones.
+      </li>
       <li>The rest is pretty intuitive. You'll figure it out.</li>
       <li>I hope you enjoy this extension. Go forth and be productive!</li>
     </ul>

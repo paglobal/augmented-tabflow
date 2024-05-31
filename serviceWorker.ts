@@ -22,11 +22,17 @@ chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error));
 
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async (details) => {
   // @error
-  await chrome.tabs.create({
-    url: "https://www.paglobal.tech/pages/projects/augmented-tabflow.html",
-  });
+  if (details.reason === "install") {
+    await chrome.tabs.create({
+      url: "https://www.paglobal.tech/pages/projects/augmented-tabflow.html",
+    });
+  } else if (details.reason === "update") {
+    await chrome.tabs.create({
+      url: "https://www.paglobal.tech/pages/posts/augmented-tabflow-changelog.html",
+    });
+  }
   await createBookmarkNodeAndSyncId(
     syncStorageKeys.rootBookmarkNodeId,
     titles.rootBookmarkNode,
