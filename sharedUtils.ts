@@ -7,9 +7,7 @@ import {
   tabGroupTypes,
   sessionStorageKeys,
   MessageType,
-  tabGroupTreeDataUpdateDebounceTimeout,
   lockNames,
-  messageTypes,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(

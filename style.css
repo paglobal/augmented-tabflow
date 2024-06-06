@@ -22,6 +22,34 @@ body,
   scrollbar-color: var(--sl-color-neutral-500) var(--sl-color-neutral-0);
 }
 
+html,
+body {
+  background: (--sl-overlay-background-color);
+}
+
+:root,
+:host,
+.sl-theme-light {
+  color-scheme: light;
+  --overlayed-background: #d1d0d3;
+}
+
+:host,
+.sl-theme-dark {
+  color-scheme: dark;
+  --overlayed-background: #0f0f11;
+}
+
+html,
+body {
+  background: var(--sl-color-neutral-0);
+}
+
+html:has(sl-dialog[open]),
+body:has(sl-dialog[open]) {
+  background: var(--overlayed-background);
+}
+
 #app {
   width: 100%;
   min-width: 100vw;
@@ -119,4 +147,8 @@ sl-button::part(label) {
 .sl-toast-stack {
   top: auto;
   bottom: 0;
+}
+
+sl-dialog::part(panel) {
+  max-height: 80vh;
 }

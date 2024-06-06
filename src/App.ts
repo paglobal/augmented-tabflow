@@ -98,7 +98,7 @@ export function App() {
     >
       <div
         style=${styleMap({
-          width: "min(800px, 90%)",
+          width: "90%",
           margin: "auto",
         })}
       >

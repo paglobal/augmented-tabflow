@@ -44,23 +44,8 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
-(async () => {
-  await navigator.locks.request(lockNames.applyUpdates, async () => {
-    const startup = getStorageData<boolean>(sessionStorageKeys.startup);
-    if (startup === undefined) {
-      await setStorageData(sessionStorageKeys.startup, true);
-    }
-  });
-})();
-
 chrome.runtime.onStartup.addListener(async () => {
   // @error
-  await navigator.locks.request(lockNames.applyUpdates, async () => {
-    const startup = getStorageData<boolean>(sessionStorageKeys.startup);
-    if (startup === undefined) {
-      await setStorageData(sessionStorageKeys.startup, true);
-    }
-  });
   await createBookmarkNodeAndSyncId(
     syncStorageKeys.rootBookmarkNodeId,
     titles.rootBookmarkNode,
@@ -649,8 +634,6 @@ async function updateCurrentSessionData() {
     }
   } else {
     await setStorageData(sessionStorageKeys.currentSessionData, null);
-    // just in case `onStartup` doesn't fire
-    await setStorageData(sessionStorageKeys.startup, true);
   }
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
@@ -694,7 +677,7 @@ async function reinitializePinnedTabs() {
 async function applyUpdates() {
   navigator.locks.request(lockNames.applyUpdates, async () => {
     const startup = await getStorageData<boolean>(sessionStorageKeys.startup);
-    if (startup) {
+    if (startup === undefined) {
       await reinitializePinnedTabs();
       await setStorageData(sessionStorageKeys.startup, false);
     }

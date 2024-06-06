@@ -11,17 +11,24 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
+- allow selection of different augmented tabflow sessions folder
+- keep already active tab open after session switch
+- consider adding button to "look inside" tab groups and import individual tabs
+- load all stub pages on startup to fix icon and title issue
+- fix dialog overflow issue that occurs on larger widths
+- consider increasing the maximum width
 - make session trees and other dialog trees react to the necessary app state changes
 - open changelog page on extension update
 - fix favicon nonsense with `keyed` directive
 - fix perpetual loading states of tab icons
 - implement recently closed tab groups feature
 - fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
-- (maybe) support moving pinned and ungrouped tab groups to new windows
-- (maybe) add button in window to move whole window to another window
-- (maybe) add more info on stub page. eg. "Your page is loading... Click here to reload"
-- (maybe) adding ability to import tabs independent of tab groups
-- (maybe) implement ability to sort sessions alphabetically or by date added
+- consider supporting moving pinned and ungrouped tab groups to new windows
+- consider adding button in window to move whole window to another window
+- consider adding more info on stub page. eg. "Your page is loading... Click here to reload"
+- consider adding ability to import tabs independent of tab groups
+- consider adding search bar for sessions
+- consider implementing ability to sort sessions alphabetically or by date added
 - try removing all old session tabs at once when switching sessions
 - work on focus states for tree items after dialog interactions
 - type drag-and-drop code
@@ -48,10 +55,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Store listing
 
-- Upload better description and summary
 - Upload a video
-- Link to website
-- Add changelog site
 
 ### Docs
 
