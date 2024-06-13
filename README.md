@@ -11,6 +11,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
+- migrate fully to JSX
+- remember windows of tabs and tab groups
 - allow selection of different augmented tabflow sessions folder
 - keep already active tab open after session switch
 - consider adding button to "look inside" tab groups and import individual tabs

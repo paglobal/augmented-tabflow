@@ -10,6 +10,8 @@
       }
     ],
     "experimentalDecorators": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "jsx": "react-jsx",
+    "jsxImportSource": "promethium-js"
   }
 }

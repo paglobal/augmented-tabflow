@@ -115,38 +115,43 @@ export function App() {
               paddingBottom: "1.5rem",
             })}
           >
-            ${h(SessionIndicator)} ${h(Toolbar)} ${h(SessionView)}
-            ${h(Dialog, {
-              label: "Sessions",
-              content: html`${h(Tree, {
-                contentFn: sessionsTreeContent,
-              })}`,
-              ref: sessionsTreeDialogRef,
-              fullWidth: true,
-              noTopBodyMargin: true,
-            })}
-            ${h(Dialog, {
-              label: "Tab Group Tree",
-              content: html`${h(Tree, {
-                contentFn: tabGroupTreeContent,
-              })}`,
-              fullWidth: true,
-              noTopBodyMargin: true,
-              ref: tabGroupTreeDialogRef,
-            })}
-            ${h(Dialog, {
-              label: "Move To Window",
-              content: html`${h(Tree, {
-                contentFn: () =>
-                  promiseWithOneTimeFallback(
-                    sessionWindowsTreeContent(),
-                    fallbackTreeContent(),
-                  ),
-              })}`,
-              fullWidth: true,
-              noTopBodyMargin: true,
-              ref: sessionWindowsTreeDialogRef,
-            })}
+            ${(
+              <>
+                <SessionIndicator></SessionIndicator>
+                <Toolbar></Toolbar>
+                <SessionView></SessionView>
+                <Dialog
+                  label="Sessions"
+                  content={<Tree contentFn={sessionsTreeContent}></Tree>}
+                  ref={sessionsTreeDialogRef}
+                  fullWidth
+                  noTopBodyMargin
+                ></Dialog>
+                <Dialog
+                  label="Tab Group Tree"
+                  content={<Tree contentFn={tabGroupTreeContent}></Tree>}
+                  ref={tabGroupTreeDialogRef}
+                  fullWidth
+                  noTopBodyMargin
+                ></Dialog>
+                <Dialog
+                  label="Move To Window"
+                  content={
+                    <Tree
+                      contentFn={() =>
+                        promiseWithOneTimeFallback(
+                          sessionWindowsTreeContent(),
+                          fallbackTreeContent(),
+                        )
+                      }
+                    ></Tree>
+                  }
+                  ref={sessionWindowsTreeDialogRef}
+                  fullWidth
+                  noTopBodyMargin
+                ></Dialog>
+              </>
+            )}
             ${h(Dialog, {
               label: "Import Tab Group",
               content: html`${h(Tree, {

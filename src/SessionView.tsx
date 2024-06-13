@@ -1,4 +1,3 @@
-import { h } from "promethium-js";
 import { Tree } from "./Tree";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { sessionsTreeContent } from "./sessionsTreeContent";
@@ -12,18 +11,12 @@ import {
 export function SessionView() {
   return () => {
     return sessionLoading() ||
-      currentSessionData() === currentSessionDataNotAvailable
-      ? h(Tree, {
-          contentFn: fallbackTreeContent,
-        })
-      : currentSessionData()
-      ? h(Tree, {
-          contentFn: tabGroupTreeContent,
-          fullHeight: true,
-        })
-      : h(Tree, {
-          contentFn: sessionsTreeContent,
-          fullHeight: true,
-        });
+      currentSessionData() === currentSessionDataNotAvailable ? (
+      <Tree contentFn={fallbackTreeContent}></Tree>
+    ) : currentSessionData() ? (
+      <Tree contentFn={tabGroupTreeContent} fullHeight></Tree>
+    ) : (
+      <Tree contentFn={sessionsTreeContent} fullHeight></Tree>
+    );
   };
 }
