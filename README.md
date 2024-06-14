@@ -11,6 +11,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
+- fix different bookmark ids on different machines problem
+- all newly created tab groups should be hoisted down
 - migrate fully to JSX
 - remember windows of tabs and tab groups
 - allow selection of different augmented tabflow sessions folder
