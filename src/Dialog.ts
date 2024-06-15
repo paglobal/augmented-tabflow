@@ -1,12 +1,13 @@
-import { TemplateResult, html } from "lit";
+import { html } from "lit";
 import { type Ref, ref } from "lit/directives/ref.js";
 import { styleMap } from "lit/directives/style-map.js";
 import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
+import { PromethiumNode } from "promethium-js";
 
 export function Dialog(props: {
   label: string;
-  content: TemplateResult;
+  children: PromethiumNode;
   ref: Ref<SlDialog>;
   fullWidth?: boolean;
   noTopBodyMargin?: boolean;
@@ -34,7 +35,7 @@ export function Dialog(props: {
           paddingBottom: "0.8rem",
         })}
       >
-        ${props.content}
+        ${props.children}
       </div>
     </sl-dialog>
   `;

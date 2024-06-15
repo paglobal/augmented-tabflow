@@ -1,4 +1,4 @@
-import { h } from "promethium-js";
+import { PromethiumNode, h } from "promethium-js";
 import { TemplateResult, html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { createRef, ref, type Ref } from "lit/directives/ref.js";
@@ -10,17 +10,16 @@ import { notifyWithErrorMessageAndReloadButton } from "./utils";
 export function DialogForm(props: {
   dialogLabel: string;
   dialogRef: Ref<SlDialog>;
-  formContent: TemplateResult;
+  children: PromethiumNode;
   submitButtonText: string;
   formAction: (data: any) => void;
 }) {
   const formRef = createRef<HTMLFormElement>();
 
   return () => html`
-    ${h(Dialog, {
-      label: props.dialogLabel,
-      content: html`
-        <form
+    ${(
+      <Dialog label={props.dialogLabel} ref={props.dialogRef}>
+        {html`<form
           ${ref(formRef)}
           class="dialog-form"
           @submit=${(e: Event) => {
@@ -46,7 +45,7 @@ export function DialogForm(props: {
             }
           }}
         >
-          ${props.formContent}
+          ${props.children}
           <sl-button
             type="submit"
             style=${styleMap({
@@ -57,9 +56,8 @@ export function DialogForm(props: {
             variant="primary"
             >${props.submitButtonText}</sl-button
           >
-        </form>
-      `,
-      ref: props.dialogRef,
-    })}
+        </form> `}
+      </Dialog>
+    )}
   `;
 }

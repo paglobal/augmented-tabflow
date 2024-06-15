@@ -1,4 +1,4 @@
-import { adaptState, h } from "promethium-js";
+import { adaptState } from "promethium-js";
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { createRef, ref } from "lit/directives/ref.js";
@@ -117,285 +117,303 @@ export function App() {
           >
             ${(
               <>
-                <SessionIndicator></SessionIndicator>
-                <Toolbar></Toolbar>
-                <SessionView></SessionView>
+                <SessionIndicator />
+                <Toolbar />
+                <SessionView />
                 <Dialog
                   label="Sessions"
-                  content={<Tree contentFn={sessionsTreeContent}></Tree>}
                   ref={sessionsTreeDialogRef}
                   fullWidth
                   noTopBodyMargin
-                ></Dialog>
+                >
+                  <Tree contentFn={sessionsTreeContent} />
+                </Dialog>
                 <Dialog
                   label="Tab Group Tree"
-                  content={<Tree contentFn={tabGroupTreeContent}></Tree>}
                   ref={tabGroupTreeDialogRef}
                   fullWidth
                   noTopBodyMargin
-                ></Dialog>
+                >
+                  <Tree contentFn={tabGroupTreeContent} />
+                </Dialog>
                 <Dialog
                   label="Move To Window"
-                  content={
-                    <Tree
-                      contentFn={() =>
-                        promiseWithOneTimeFallback(
-                          sessionWindowsTreeContent(),
-                          fallbackTreeContent(),
-                        )
-                      }
-                    ></Tree>
-                  }
                   ref={sessionWindowsTreeDialogRef}
                   fullWidth
                   noTopBodyMargin
-                ></Dialog>
+                >
+                  <Tree
+                    contentFn={() =>
+                      promiseWithOneTimeFallback(
+                        sessionWindowsTreeContent(),
+                        fallbackTreeContent(),
+                      )
+                    }
+                  />
+                </Dialog>
+                <Dialog
+                  label="Import Tab Group"
+                  ref={importTabGroupFromSessionTreeDialogRef}
+                  fullWidth
+                  noTopBodyMargin
+                >
+                  <Tree
+                    contentFn={() =>
+                      promiseWithOneTimeFallback(
+                        importTabGroupFromSessionTreeContent(),
+                        fallbackTreeContent(),
+                      )
+                    }
+                  />
+                </Dialog>
+                <Dialog
+                  label="Move Or Copy Tab To Session"
+                  ref={moveOrCopyTabToSessionTreeDialogRef}
+                  fullWidth
+                  noTopBodyMargin
+                >
+                  <Tree
+                    contentFn={() =>
+                      promiseWithOneTimeFallback(
+                        moveOrCopyToSessionTreeContent("tab"),
+                        fallbackTreeContent(),
+                      )
+                    }
+                  />
+                </Dialog>
+                <Dialog
+                  label="Move Or Copy Tab Group To Session"
+                  ref={moveOrCopyTabGroupToSessionTreeDialogRef}
+                  fullWidth
+                  noTopBodyMargin
+                >
+                  <Tree
+                    contentFn={() =>
+                      promiseWithOneTimeFallback(
+                        moveOrCopyToSessionTreeContent("tabGroup"),
+                        fallbackTreeContent(),
+                      )
+                    }
+                  />
+                </Dialog>
+                <Dialog label="Help" ref={helpDialogRef} noTopBodyMargin>
+                  <Help />
+                </Dialog>
+                <DialogForm
+                  dialogLabel="Edit Tab Group"
+                  dialogRef={editTabGroupDialogRefs.dialog}
+                  submitButtonText="Save"
+                  formAction={(data: {
+                    title: chrome.tabGroups.TabGroup["title"];
+                    color: chrome.tabGroups.Color;
+                  }) => {
+                    // @maybe
+                    updateTabGroup(currentlyEditedTabGroupId(), data);
+                  }}
+                >
+                  {html`
+                    <sl-input
+                      ${ref(editTabGroupDialogRefs.input)}
+                      name="title"
+                      placeholder="Title"
+                      autofocus
+                    ></sl-input>
+                    <sl-select
+                      ${ref(editTabGroupDialogRefs.select)}
+                      name="color"
+                      placeholder="Color"
+                      hoist
+                    >
+                      ${Object.entries(tabGroupColors()).map(
+                        ([colorName, colorValue]) => html`
+                          <sl-option value=${colorName}
+                            ><div></div>
+                            <span
+                              slot="prefix"
+                              style=${styleMap({
+                                background: colorValue,
+                                width: "0.8rem",
+                                height: "0.8rem",
+                                marginRight: "1rem",
+                                borderRadius: "50%",
+                                outline:
+                                  "0.15rem solid var(--sl-color-neutral-1000)",
+                                outlineOffset: "0.15rem",
+                              })}
+                            ></span
+                            >${colorName}</sl-option
+                          >
+                        `,
+                      )}
+                    </sl-select>
+                  `}
+                </DialogForm>
+                <DialogForm
+                  dialogLabel="Add Tab Group"
+                  dialogRef={addTabGroupDialogRef}
+                  submitButtonText="Save"
+                  formAction={async (data: {
+                    title: chrome.tabGroups.TabGroup["title"];
+                    color: chrome.tabGroups.Color;
+                  }) => {
+                    // @maybe
+                    if (!data.color) {
+                      data.color = randomTabGroupColorValue();
+                    }
+                    createTabGroup(data);
+                  }}
+                >
+                  {html`
+                    <sl-input
+                      name="title"
+                      placeholder="Title"
+                      autofocus
+                    ></sl-input>
+                    <sl-select
+                      ${ref(addTabGroupSelectRef)}
+                      name="color"
+                      placeholder="Color"
+                      hoist
+                    >
+                      ${Object.entries(tabGroupColors()).map(
+                        ([colorName, colorValue]) => html`
+                          <sl-option value=${colorName}
+                            ><div></div>
+                            <span
+                              slot="prefix"
+                              style=${styleMap({
+                                background: colorValue,
+                                width: "0.8rem",
+                                height: "0.8rem",
+                                marginRight: "1rem",
+                                borderRadius: "50%",
+                                outline:
+                                  "0.15rem solid var(--sl-color-neutral-1000)",
+                                outlineOffset: "0.15rem",
+                              })}
+                            ></span
+                            >${colorName}</sl-option
+                          >
+                        `,
+                      )}
+                    </sl-select>
+                  `}
+                </DialogForm>
+                <DialogForm
+                  dialogLabel="Save Current Session"
+                  dialogRef={saveCurrentSessionDialogRef}
+                  submitButtonText="Save"
+                  formAction={({ title }: { title: string }) => {
+                    // @maybe
+                    createSession(title, true);
+                  }}
+                >
+                  {html`
+                    <sl-input
+                      name="title"
+                      placeholder="Title"
+                      autofocus
+                    ></sl-input>
+                  `}
+                </DialogForm>
+                <DialogForm
+                  dialogLabel="Create Empty Session"
+                  dialogRef={newSessionDialogRef}
+                  submitButtonText="Save"
+                  formAction={({ title }: { title: string }) => {
+                    // @maybe
+                    createSession(title);
+                  }}
+                >
+                  {html`
+                    <sl-input
+                      name="title"
+                      placeholder="Title"
+                      autofocus
+                    ></sl-input>
+                  `}
+                </DialogForm>
+                <DialogForm
+                  dialogLabel="Edit Session Title"
+                  dialogRef={editSessionDialogRef}
+                  submitButtonText="Save"
+                  formAction={async ({ title }: { title: string }) => {
+                    // @maybe
+                    const _currentlyEditedSessionId =
+                      currentlyEditedSessionId() ?? true;
+                    await updateSessionTitle(_currentlyEditedSessionId, title);
+                    setCurrentlyEditedSessionId(null);
+                  }}
+                >
+                  {html`
+                    <sl-input
+                      ${ref(editSessionInputRef)}
+                      name="title"
+                      placeholder="Title"
+                      autofocus
+                    ></sl-input>
+                  `}
+                </DialogForm>
+                <Dialog
+                  label="Delete Session?"
+                  ref={deleteSessionDialogRef}
+                  fullWidth
+                  noTopBodyMargin
+                >
+                  {html`
+                    <div>
+                      Are you sure you want to delete session?
+                      <sl-button
+                        style=${styleMap({
+                          display: "block",
+                          fontSize: "1rem",
+                          marginTop: "3rem",
+                        })}
+                        variant="neutral"
+                        outline
+                        @click=${() => {
+                          // @handled
+                          try {
+                            deleteSessionDialogRef.value?.hide();
+                          } catch (error) {
+                            console.error(error);
+                            notifyWithErrorMessageAndReloadButton();
+                          }
+                        }}
+                        >No</sl-button
+                      >
+                      <sl-button
+                        style=${styleMap({
+                          display: "block",
+                          fontSize: "1rem",
+                          marginTop: "1rem",
+                        })}
+                        variant="danger"
+                        @click=${() => {
+                          // @handled
+                          try {
+                            const _currentlyDeletedSessionId =
+                              currentlyDeletedSessionId();
+                            if (_currentlyDeletedSessionId) {
+                              deleteSession(
+                                _currentlyDeletedSessionId,
+                                currentlyDeletedSessionIsCurrentSession(),
+                              );
+                            }
+                            setCurrentlyDeletedSessionId(null);
+                            setCurrentlyDeletedSessionIsCurrentSession(false);
+                          } catch (error) {
+                            console.error(error);
+                            notifyWithErrorMessageAndReloadButton();
+                          }
+                        }}
+                        >Yes</sl-button
+                      >
+                    </div>
+                  `}
+                </Dialog>
               </>
             )}
-            ${h(Dialog, {
-              label: "Import Tab Group",
-              content: html`${h(Tree, {
-                contentFn: () =>
-                  promiseWithOneTimeFallback(
-                    importTabGroupFromSessionTreeContent(),
-                    fallbackTreeContent(),
-                  ),
-              })}`,
-              fullWidth: true,
-              noTopBodyMargin: true,
-              ref: importTabGroupFromSessionTreeDialogRef,
-            })}
-            ${h(Dialog, {
-              label: "Move Or Copy Tab To Session",
-              content: html`${h(Tree, {
-                contentFn: () =>
-                  promiseWithOneTimeFallback(
-                    moveOrCopyToSessionTreeContent("tab"),
-                    fallbackTreeContent(),
-                  ),
-              })}`,
-              fullWidth: true,
-              noTopBodyMargin: true,
-              ref: moveOrCopyTabToSessionTreeDialogRef,
-            })}
-            ${h(Dialog, {
-              label: "Move Or Copy Tab Group To Session",
-              content: html`${h(Tree, {
-                contentFn: () =>
-                  promiseWithOneTimeFallback(
-                    moveOrCopyToSessionTreeContent("tabGroup"),
-                    fallbackTreeContent(),
-                  ),
-              })}`,
-              fullWidth: true,
-              noTopBodyMargin: true,
-              ref: moveOrCopyTabGroupToSessionTreeDialogRef,
-            })}
-            ${h(Dialog, {
-              label: "Help",
-              content: html`${h(Help)}`,
-              ref: helpDialogRef,
-              noTopBodyMargin: true,
-            })}
-            ${h(DialogForm, {
-              dialogLabel: "Edit Tab Group",
-              dialogRef: editTabGroupDialogRefs.dialog,
-              submitButtonText: "Save",
-              formContent: html`
-                <sl-input
-                  ${ref(editTabGroupDialogRefs.input)}
-                  name="title"
-                  placeholder="Title"
-                  autofocus
-                ></sl-input>
-                <sl-select
-                  ${ref(editTabGroupDialogRefs.select)}
-                  name="color"
-                  placeholder="Color"
-                  hoist
-                >
-                  ${Object.entries(tabGroupColors()).map(
-                    ([colorName, colorValue]) => html`
-                      <sl-option value=${colorName}
-                        ><div></div>
-                        <span
-                          slot="prefix"
-                          style=${styleMap({
-                            background: colorValue,
-                            width: "0.8rem",
-                            height: "0.8rem",
-                            marginRight: "1rem",
-                            borderRadius: "50%",
-                            outline:
-                              "0.15rem solid var(--sl-color-neutral-1000)",
-                            outlineOffset: "0.15rem",
-                          })}
-                        ></span
-                        >${colorName}</sl-option
-                      >
-                    `,
-                  )}
-                </sl-select>
-              `,
-              formAction(data: {
-                title: chrome.tabGroups.TabGroup["title"];
-                color: chrome.tabGroups.Color;
-              }) {
-                // @maybe
-                updateTabGroup(currentlyEditedTabGroupId(), data);
-              },
-            })}
-            ${h(DialogForm, {
-              dialogLabel: "Add Tab Group",
-              dialogRef: addTabGroupDialogRef,
-              formContent: html`
-                <sl-input name="title" placeholder="Title" autofocus></sl-input>
-                <sl-select
-                  ${ref(addTabGroupSelectRef)}
-                  name="color"
-                  placeholder="Color"
-                  hoist
-                >
-                  ${Object.entries(tabGroupColors()).map(
-                    ([colorName, colorValue]) => html`
-                      <sl-option value=${colorName}
-                        ><div></div>
-                        <span
-                          slot="prefix"
-                          style=${styleMap({
-                            background: colorValue,
-                            width: "0.8rem",
-                            height: "0.8rem",
-                            marginRight: "1rem",
-                            borderRadius: "50%",
-                            outline:
-                              "0.15rem solid var(--sl-color-neutral-1000)",
-                            outlineOffset: "0.15rem",
-                          })}
-                        ></span
-                        >${colorName}</sl-option
-                      >
-                    `,
-                  )}
-                </sl-select>
-              `,
-              submitButtonText: "Save",
-              async formAction(data: {
-                title: chrome.tabGroups.TabGroup["title"];
-                color: chrome.tabGroups.Color;
-              }) {
-                // @maybe
-                if (!data.color) {
-                  data.color = randomTabGroupColorValue();
-                }
-                createTabGroup(data);
-              },
-            })}
-            ${h(DialogForm, {
-              dialogLabel: "Save Current Session",
-              dialogRef: saveCurrentSessionDialogRef,
-              formContent: html`
-                <sl-input name="title" placeholder="Title" autofocus></sl-input>
-              `,
-              submitButtonText: "Save",
-              formAction({ title }: { title: string }) {
-                // @maybe
-                createSession(title, true);
-              },
-            })}
-            ${h(DialogForm, {
-              dialogLabel: "Create Empty Session",
-              dialogRef: newSessionDialogRef,
-              formContent: html`
-                <sl-input name="title" placeholder="Title" autofocus></sl-input>
-              `,
-              submitButtonText: "Save",
-              formAction({ title }: { title: string }) {
-                // @maybe
-                createSession(title);
-              },
-            })}
-            ${h(DialogForm, {
-              dialogLabel: "Edit Session Title",
-              dialogRef: editSessionDialogRef,
-              formContent: html`
-                <sl-input
-                  ${ref(editSessionInputRef)}
-                  name="title"
-                  placeholder="Title"
-                  autofocus
-                ></sl-input>
-              `,
-              submitButtonText: "Save",
-              async formAction({ title }: { title: string }) {
-                // @maybe
-                const _currentlyEditedSessionId =
-                  currentlyEditedSessionId() ?? true;
-                await updateSessionTitle(_currentlyEditedSessionId, title);
-                setCurrentlyEditedSessionId(null);
-              },
-            })}
-            ${h(Dialog, {
-              label: "Delete Session?",
-              content: html`
-                <div>
-                  Are you sure you want to delete session?
-                  <sl-button
-                    style=${styleMap({
-                      display: "block",
-                      fontSize: "1rem",
-                      marginTop: "3rem",
-                    })}
-                    variant="neutral"
-                    outline
-                    @click=${() => {
-                      // @handled
-                      try {
-                        deleteSessionDialogRef.value?.hide();
-                      } catch (error) {
-                        console.error(error);
-                        notifyWithErrorMessageAndReloadButton();
-                      }
-                    }}
-                    >No</sl-button
-                  >
-                  <sl-button
-                    style=${styleMap({
-                      display: "block",
-                      fontSize: "1rem",
-                      marginTop: "1rem",
-                    })}
-                    variant="danger"
-                    @click=${() => {
-                      // @handled
-                      try {
-                        const _currentlyDeletedSessionId =
-                          currentlyDeletedSessionId();
-                        if (_currentlyDeletedSessionId) {
-                          deleteSession(
-                            _currentlyDeletedSessionId,
-                            currentlyDeletedSessionIsCurrentSession(),
-                          );
-                        }
-                        setCurrentlyDeletedSessionId(null);
-                        setCurrentlyDeletedSessionIsCurrentSession(false);
-                      } catch (error) {
-                        console.error(error);
-                        notifyWithErrorMessageAndReloadButton();
-                      }
-                    }}
-                    >Yes</sl-button
-                  >
-                </div>
-              `,
-              ref: deleteSessionDialogRef,
-            })}
-            ${h(Dialog, {
-              label: "Help",
-              content: html`${h(Help)}`,
-              ref: helpDialogRef,
-              noTopBodyMargin: true,
-            })}
           </div>
         </div>
       </div>

@@ -11,6 +11,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
+- maybe implement a feature to export tab or tab group to any arbitrary bookmark folder
+- collapse tree items when done with exporting tab or tab group
 - fix different bookmark ids on different machines problem
 - all newly created tab groups should be hoisted down
 - migrate fully to JSX
@@ -59,9 +61,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Store listing
 
-- Upload a video
+- Upload video
 
 ### Docs
 
-- Add reference to changelog site
 - Add reference to video
