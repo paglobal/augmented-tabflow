@@ -11,20 +11,17 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
-- maybe implement a feature to export tab or tab group to any arbitrary bookmark folder
+- remove focus from sidebar after activating tab
+- consider implementing a feature to export tab or tab group to any arbitrary bookmark folder
 - collapse tree items when done with exporting tab or tab group
 - fix different bookmark ids on different machines problem
-- all newly created tab groups should be hoisted down
+- maybe all newly created tab groups should be hoisted down
 - migrate fully to JSX
 - remember windows of tabs and tab groups
-- allow selection of different augmented tabflow sessions folder
-- keep already active tab open after session switch
+- maybe keep already active tab open after session switch
 - consider adding button to "look inside" tab groups and import individual tabs
 - load all stub pages on startup to fix icon and title issue
-- fix dialog overflow issue that occurs on larger widths
-- consider increasing the maximum width
 - make session trees and other dialog trees react to the necessary app state changes
-- open changelog page on extension update
 - fix favicon nonsense with `keyed` directive
 - fix perpetual loading states of tab icons
 - implement recently closed tab groups feature
@@ -32,7 +29,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - consider supporting moving pinned and ungrouped tab groups to new windows
 - consider adding button in window to move whole window to another window
 - consider adding more info on stub page. eg. "Your page is loading... Click here to reload"
-- consider adding ability to import tabs independent of tab groups
 - consider adding search bar for sessions
 - consider implementing ability to sort sessions alphabetically or by date added
 - try removing all old session tabs at once when switching sessions
@@ -55,9 +51,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - use early returns anywhere it makes sense
 - (if necessary) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
 - (if necessary) add test suite
-- (maybe) implement internationalization
-- (maybe) cater for more browsers eg. by adding more entries to the `newTabUrls` array
-- (maybe) implement theme switcher
+- consider implementing internationalization
+- consider implementing manual theme switcher
 
 ### Store listing
 

@@ -1,6 +1,7 @@
 import { adaptState } from "promethium-js";
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
+import { until } from "lit/directives/until.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { setDefaultAnimation } from "@shoelace-style/shoelace/dist/utilities/animation-registry.js";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
@@ -174,7 +175,7 @@ export function App() {
                 >
                   <Tree
                     contentFn={() =>
-                      promiseWithOneTimeFallback(
+                      until(
                         moveOrCopyToSessionTreeContent("tab"),
                         fallbackTreeContent(),
                       )
@@ -189,7 +190,7 @@ export function App() {
                 >
                   <Tree
                     contentFn={() =>
-                      promiseWithOneTimeFallback(
+                      until(
                         moveOrCopyToSessionTreeContent("tabGroup"),
                         fallbackTreeContent(),
                       )

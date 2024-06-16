@@ -1,5 +1,4 @@
 import { html } from "lit";
-import { h } from "promethium-js";
 import { TreeItem } from "./TreeItem";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import { currentlyEjectedTabOrTabGroup } from "./App";
@@ -23,33 +22,35 @@ export async function sessionWindowsTreeContent() {
           await chrome.tabs.query({ windowId: window.id, active: true })
         )[0];
 
-        return h(TreeItem, {
-          tooltipContent: `${activeTab.title}`,
-          async onSelect(e: Event) {
-            // @handled
-            try {
-              e.stopPropagation();
-              moveTabOrTabGroupToWindow(window.id);
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          },
-          content: html` ${h(TreeItemColorPatchOrIcon, {
-            pageUrl: activeTab.url,
-          })}${activeTab.title}`,
-        });
+        return (
+          <TreeItem
+            tooltipContent={`${activeTab.title}`}
+            onSelect={async (e: Event) => {
+              // @handled
+              try {
+                e.stopPropagation();
+                moveTabOrTabGroupToWindow(window.id);
+              } catch (error) {
+                console.error(error);
+                notifyWithErrorMessageAndReloadButton();
+              }
+            }}
+          >
+            {html`${(
+              <>
+                <TreeItemColorPatchOrIcon pageUrl={activeTab.url} />
+                {activeTab.title}
+              </>
+            )}`}
+          </TreeItem>
+        );
       }),
     );
 
     sessionWindowsTreeContent.unshift(
-      h(TreeItem, {
-        tooltipContent: "New Window",
-        content: html`${h(TreeItemColorPatchOrIcon, {
-          icon: "MaterialSymbolsTabOutlineRounded",
-        })}
-        New Window`,
-        onSelect(e: Event) {
+      <TreeItem
+        tooltipContent="New Window"
+        onSelect={(e: Event) => {
           // @handled
           try {
             e.stopPropagation();
@@ -58,8 +59,15 @@ export async function sessionWindowsTreeContent() {
             console.error(error);
             notifyWithErrorMessageAndReloadButton();
           }
-        },
-      }),
+        }}
+      >
+        {html`${(
+          <>
+            <TreeItemColorPatchOrIcon icon="MaterialSymbolsTabOutlineRounded" />
+            New Window
+          </>
+        )}`}
+      </TreeItem>,
     );
 
     return sessionWindowsTreeContent;

@@ -1,5 +1,5 @@
-import { PromethiumNode, h } from "promethium-js";
-import { TemplateResult, html } from "lit";
+import { PromethiumNode } from "promethium-js";
+import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { createRef, ref, type Ref } from "lit/directives/ref.js";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
