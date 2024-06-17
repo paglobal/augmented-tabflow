@@ -11,7 +11,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
-- remove focus from sidebar after activating tab
+- remove focus from sidebar after activating tab (copy changes over to bible chrome extension)
+- in `TreeItem` component, users should be able to click action buttons with the enter key (copy changes over to bible chrome extension)
 - consider implementing a feature to export tab or tab group to any arbitrary bookmark folder
 - collapse tree items when done with exporting tab or tab group
 - fix different bookmark ids on different machines problem
@@ -25,7 +26,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - fix favicon nonsense with `keyed` directive
 - fix perpetual loading states of tab icons
 - implement recently closed tab groups feature
-- fix accessibility issues relating to keyboard navigation in `TreeItem` component (enter should cause element click and other focus related issues)
 - consider supporting moving pinned and ungrouped tab groups to new windows
 - consider adding button in window to move whole window to another window
 - consider adding more info on stub page. eg. "Your page is loading... Click here to reload"

@@ -1,4 +1,4 @@
-import { TemplateResult, html } from "lit";
+import { html } from "lit";
 import "@shoelace-style/shoelace/dist/components/tree-item/tree-item.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { PromethiumNode, adaptEffect, adaptState } from "promethium-js";
@@ -19,7 +19,7 @@ type DropTargetOptions = Parameters<typeof dropTargetForElements>[0];
 export function TreeItem(props: {
   children: PromethiumNode;
   tooltipContent: string;
-  actionButtons?: TemplateResult;
+  actionButtons?: PromethiumNode;
   expanded?: boolean;
   selected?: boolean;
   onExpand?: (e: Event) => void;

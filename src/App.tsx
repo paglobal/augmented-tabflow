@@ -89,8 +89,8 @@ export const [firstTabInNewTabGroup, setFirstTabInNewTabGroup] =
   adaptState<chrome.tabs.Tab | null>(null);
 
 export function App() {
-  function mainAppView() {
-    return html`<div
+  return () =>
+    html`<div
       id="app"
       style=${styleMap({
         height: "100vh",
@@ -419,7 +419,4 @@ export function App() {
         </div>
       </div>
     </div>`;
-  }
-
-  return () => html`${mainAppView()}`;
 }
