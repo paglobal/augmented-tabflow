@@ -20,7 +20,6 @@ import {
   currentlyMovedOrCopiedTabOrTabGroup,
   deleteSessionDialogRef,
   firstTabInNewTabGroup,
-  importTabGroupFromSessionTreeDialogRef,
   moveOrCopyTabGroupToSessionTreeDialogRef,
   moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,

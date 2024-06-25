@@ -3,6 +3,7 @@
     "noEmit": true,
     "lib": ["dom", "ES2022"],
     "types": ["chrome-types"],
+    "skipLibCheck": true,
     "strict": true,
     "plugins": [
       {

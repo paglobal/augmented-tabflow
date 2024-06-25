@@ -11,6 +11,16 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Important
 
+- implement merge for tab groups
+- implement multiple select for actions
+- consider always aggregating all `Ungrouped` tab group data after exports
+- (promethium-js) fix adaptEffect return
+- (promethium-js) depArray memos
+- try reducing minimum chrome version
+- listen to additions to sessionData to update tabs
+- fix bug with file protocol on windows
+- deal with overflow in `SessionIndicator`
+- use ctrl+click for alternate click behaviour eg. copy instead of move
 - remove focus from sidebar after activating tab (copy changes over to bible chrome extension)
 - in `TreeItem` component, users should be able to click action buttons with the enter key (copy changes over to bible chrome extension)
 - consider implementing a feature to export tab or tab group to any arbitrary bookmark folder
