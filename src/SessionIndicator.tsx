@@ -31,7 +31,12 @@ export function SessionIndicator() {
       <sl-button
         variant=${buttonVariant}
         outline
-        style=${styleMap({ width: "100%" })}
+        style=${styleMap({
+          width: "100%",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          padding: "0.5rem",
+        })}
         @click=${() => {
           // @handled
           try {

@@ -142,6 +142,8 @@ form.dialog-form sl-select:last-child {
 
 sl-button::part(label) {
   font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sl-toast-stack {

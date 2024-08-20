@@ -478,6 +478,7 @@ export async function moveOrCopyToSession(
     }
     const tabs = await chrome.tabs.query({
       groupId: _currentlyMovedOrCopiedTabOrTabGroup.id,
+      pinned: false,
     });
     const tabIds = tabs.map((tab) => tab.id);
     for (const tab of tabs) {
