@@ -12,40 +12,42 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 ### Urgent
 
 - fix different bookmark ids on different machines problem
-- fix bug with file protocol in prod
-- load all stub pages on startup to fix icon and title issue
-- fix stale favicon bug
-- fix perpetual loading states of tab icons
-- attribute projects that made this project possible
+- fix bug with file and other protocols in prod
+- fix stale favicon bug and perpetual loading states
+- display other windows in vertical view
+- change `Save Current Session` to `Create Empty Session` when in session
+- implement rule for grouping tab groups into windows by color (it should affect moving tab groups to other windows)
+- support moving pinned and ungrouped tab groups to new windows
 
-### Important
+### Less Urgent
 
+- (maybe) implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks`
+- implement recently closed tab groups feature
+- (maybe) alway aggregate all `Ungrouped` tab group data after exports
+- (maybe) add option to group ungrouped tabs in import dialog
+- (maybe) implement group select and bulk actions
+- (maybe) keep already active tab open after session switch
+- (maybe) try loading all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
+- try reducing minimum chrome version
 - remove focus from sidebar after activating tab
 - work on focus states for tree items after dialog interactions
-- consider implementing a feature to export tab or tab group to any arbitrary bookmark folder
-- listen to additions to sessionData to update tabs
-- display tabs from other windows (maybe)
+- (maybe) listen to additions to sessionData to update tabs
 - implement merge for tab groups
 - open side-panel in any new windows
-- change `Save Current Session` to `Create Empty Session` when in session
 - implement multiple select for actions
-- consider always aggregating all `Ungrouped` tab group data after exports
-- try reducing minimum chrome version
 - use ctrl+click for alternate click behaviour eg. copy instead of move
 - in `TreeItem` component, users should be able to click action buttons with the enter key
-- collapse tree items when done with exporting tab or tab group
+- collapse tree items in export dialog when done with exporting tab or tab group
 - maybe all newly created tab groups should be hoisted down
 - migrate fully to JSX
-- remember collapsed state and windows of tab groups
-- (maybe) keep already active tab open after session switch
 - consider adding button to "look inside" tab groups and import individual tabs
 - make session trees and other dialog trees react to the necessary app state changes
-- implement recently closed tab groups feature
-- consider supporting moving pinned and ungrouped tab groups to new windows
-- consider adding button in window to move whole window to another window
-- consider adding more info on stub page. eg. "Your page is loading... Click here to reload"
-- consider implementing search for sessions and tabs
-- consider implementing ability to sort sessions alphabetically or by date added
+- (maybe) add more info on stub page. eg. "Your page is loading... Click here to reload"
+- (maybe) implement search for sessions and tabs
+- (maybe) implement ability to sort sessions alphabetically or by date added
+
+### Later
+
 - type drag-and-drop code
 - general code inspection and refactoring
 - refine fallback code
@@ -62,17 +64,17 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - handle errors in timeouts as well
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - use early returns anywhere it makes sense
-- (if necessary) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
-- (if necessary) add test suite
-- consider implementing internationalization
-- consider implementing manual theme switcher
+- (maybe, please be careful) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
+- add test suite
+- (maybe) implement internationalization
+- (maybe) implement manual theme switcher
 
 ### Store listing
 
-- Upload video
-- Attribution for projects that made this project possible
+- upload new video
+- attribute projects that made this project possible
 
-### Docs
+### Help Dialog
 
-- Add reference to video
-- Attribution for projects that made this project possible
+- add reference to new youtube video
+- attribute projects that made this project possible
