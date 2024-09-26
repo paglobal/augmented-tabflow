@@ -75,3 +75,7 @@ export const messageTypes = {
 } as const satisfies Record<string, MessageType>;
 
 export const tabGroupTreeDataUpdateDebounceTimeout = 200;
+
+export const stubPagePathName = "/stubPage.html";
+
+export const protocolsEligibleForEncoding = ["https:", "http:"];

@@ -3,6 +3,7 @@ import {
   lockNames,
   messageTypes,
   sessionStorageKeys,
+  stubPagePathName,
   syncStorageKeys,
   tabGroupColorList,
   tabGroupTreeDataUpdateDebounceTimeout,
@@ -16,6 +17,7 @@ import {
   setStorageData,
   subscribeToMessage,
   saveCurrentSessionDataIntoBookmarkNode,
+  encodeTabDataAsUrl,
 } from "./sharedUtils";
 
 chrome.sidePanel
@@ -277,11 +279,11 @@ async function createSessionTabsFromSessionData(
     for (let j = 0; j < tabGroupDataChildren.length; j++) {
       const tabData = tabGroupDataChildren[j];
       const active = i === 0 && j === 0 ? true : false;
-      const url = `/stubPage.html?title=${encodeURIComponent(
-        tabData.title,
-      )}&url=${encodeURIComponent(tabData.url ?? "")}${
-        active ? "&active=true" : ""
-      }`;
+      const url = encodeTabDataAsUrl({
+        title: tabData.title,
+        url: tabData.url || "",
+        active,
+      });
       const tab = await chrome.tabs.create({
         url,
         active,
@@ -330,11 +332,11 @@ async function createSessionTabsFromPreviousUnsavedSessionTabGroupTreeData() {
             tabGroupTypes.pinned)
           ? true
           : false;
-      const url = `/stubPage.html?title=${encodeURIComponent(
-        oldTab.title ?? "",
-      )}&url=${encodeURIComponent(oldTab.url ?? "")}${
-        active ? "&active=true" : ""
-      }`;
+      const url = encodeTabDataAsUrl({
+        title: oldTab.title || "",
+        url: oldTab.url || "",
+        active,
+      });
       const tab = await chrome.tabs.create({
         url,
         active,
@@ -488,7 +490,7 @@ async function getTabGroupTreeData() {
       }
       if (
         url?.hostname === chrome.runtime.id &&
-        url?.pathname === "/stubPage.html"
+        url?.pathname === stubPagePathName
       ) {
         const params = new URLSearchParams(url.search);
         currentTab.title = params.get("title") ?? undefined;
@@ -529,7 +531,7 @@ async function getTabGroupTreeData() {
     }
     if (
       url?.hostname === chrome.runtime.id &&
-      url?.pathname === "/stubPage.html"
+      url?.pathname === stubPagePathName
     ) {
       const params = new URLSearchParams(url.search);
       tab.title = params.get("title") ?? undefined;
@@ -563,7 +565,7 @@ async function getTabGroupTreeData() {
     }
     if (
       url?.hostname === chrome.runtime.id &&
-      url?.pathname === "/stubPage.html"
+      url?.pathname === stubPagePathName
     ) {
       const params = new URLSearchParams(url.search);
       tab.title = params.get("title") ?? undefined;
@@ -659,9 +661,10 @@ async function reinitializePinnedTabs() {
     const pinnedTabGroupBookmarkNodeChildren =
       await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
     for (const tabData of pinnedTabGroupBookmarkNodeChildren.reverse()) {
-      const url = `/stubPage.html?title=${encodeURIComponent(
-        tabData.title,
-      )}&url=${encodeURIComponent(tabData.url ?? "")}`;
+      const url = encodeTabDataAsUrl({
+        title: tabData.title,
+        url: tabData.url || "",
+      });
       await chrome.tabs.create({
         url,
         pinned: true,

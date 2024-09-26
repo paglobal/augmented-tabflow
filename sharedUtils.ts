@@ -8,6 +8,8 @@ import {
   sessionStorageKeys,
   MessageType,
   lockNames,
+  stubPagePathName,
+  protocolsEligibleForEncoding,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -157,4 +159,23 @@ export function getFaviconUrl(pageUrl: string | null | undefined) {
   url.searchParams.set("size", "32");
 
   return url.toString();
+}
+
+export function encodeTabDataAsUrl(options: {
+  title: string;
+  url: string;
+  active?: boolean;
+}) {
+  const urlFromUrl = new URL(options.url);
+  console.log(urlFromUrl.protocol);
+  if (protocolsEligibleForEncoding.includes(urlFromUrl.protocol)) {
+    console.log("hi!");
+    return `${stubPagePathName}?title=${encodeURIComponent(
+      options.title ?? "",
+    )}&url=${encodeURIComponent(options.url ?? "")}${
+      options.active ? "&active=true" : ""
+    }`;
+  } else {
+    return options.url;
+  }
 }

@@ -2,6 +2,7 @@ import { adaptState } from "promethium-js";
 import {
   messageTypes,
   sessionStorageKeys,
+  stubPagePathName,
   syncStorageKeys,
   tabGroupTypes,
   titles,
@@ -14,6 +15,7 @@ import {
   subscribeToStorageData,
   sendMessage,
   saveCurrentSessionDataIntoBookmarkNode,
+  encodeTabDataAsUrl,
 } from "../sharedUtils";
 import {
   currentlyEjectedTabOrTabGroup,
@@ -488,7 +490,7 @@ export async function moveOrCopyToSession(
       }
       if (
         url?.hostname === chrome.runtime.id &&
-        url?.pathname === "/stubPage.html"
+        url?.pathname === stubPagePathName
       ) {
         const params = new URLSearchParams(url.search);
         tab.url = params.get("url") ?? undefined;
@@ -539,9 +541,10 @@ export async function importTabGroupFromSession(
   }
   const tabIds: Array<chrome.tabs.Tab["id"]> = [];
   for (const tabData of tabGroupDataChildren) {
-    const url = `/stubPage.html?title=${encodeURIComponent(
-      tabData.title,
-    )}&url=${encodeURIComponent(tabData.url ?? "")}`;
+    const url = encodeTabDataAsUrl({
+      title: tabData.title,
+      url: tabData.url || "",
+    });
     const tab = await chrome.tabs.create({
       url,
       active: false,

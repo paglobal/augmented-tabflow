@@ -11,16 +11,20 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Urgent
 
+- add swipe to switch windows
 - fix different bookmark ids on different machines problem
 - fix bug with file and other protocols in prod
 - fix stale favicon bug and perpetual loading states
 - display other windows in vertical view
-- change `Save Current Session` to `Create Empty Session` when in session
-- implement rule for grouping tab groups into windows by color (it should affect moving tab groups to other windows)
+- add `Create Empty Session` to session pane
+- implement local persistence pertaining to windows and document them
 - support moving pinned and ungrouped tab groups to new windows
+- open side-panel in any new windows
+- remove focus from sidebar after activating tab
 
 ### Less Urgent
 
+- implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - (maybe) implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks`
 - implement recently closed tab groups feature
 - (maybe) alway aggregate all `Ungrouped` tab group data after exports
@@ -29,11 +33,9 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) keep already active tab open after session switch
 - (maybe) try loading all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
 - try reducing minimum chrome version
-- remove focus from sidebar after activating tab
 - work on focus states for tree items after dialog interactions
 - (maybe) listen to additions to sessionData to update tabs
 - implement merge for tab groups
-- open side-panel in any new windows
 - implement multiple select for actions
 - use ctrl+click for alternate click behaviour eg. copy instead of move
 - in `TreeItem` component, users should be able to click action buttons with the enter key
@@ -59,7 +61,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 - type `sendMessage` and `subscribeToMessage` for automatic inference
 - create `TreeDialog` and `ConfirmationDialog`
-- implement proper error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - notify users of errors that happen in service workers through message `chrome.runtime.message`
 - handle errors in timeouts as well
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
@@ -69,7 +70,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) implement internationalization
 - (maybe) implement manual theme switcher
 
-### Store listing
+### Store Listing
 
 - upload new video
 - attribute projects that made this project possible
@@ -78,3 +79,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 - add reference to new youtube video
 - attribute projects that made this project possible
+
+### Recent Changes
+
+- fixed problem with pages loaded with file protocol and possibly other protocols
