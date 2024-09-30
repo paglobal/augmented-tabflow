@@ -135,20 +135,6 @@ export function activateTab(tab: chrome.tabs.Tab) {
   chrome.tabs.update(tab.id as number, { active: true });
 }
 
-export async function groupUngroupedTabsInWindow() {
-  // @maybe
-  const ungroupedTabs = await chrome.tabs.query({
-    groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
-    currentWindow: true,
-  });
-  if (ungroupedTabs.length > 0) {
-    const tabIds = ungroupedTabs.map((tab) => tab.id) as [number, ...number[]];
-    chrome.tabs.group({ tabIds });
-  } else {
-    notify("No ungrouped tabs in this window", "warning");
-  }
-}
-
 export async function createTabGroup(options: {
   title: chrome.tabGroups.TabGroup["title"];
   color: chrome.tabGroups.Color;
@@ -165,6 +151,7 @@ export async function createTabGroup(options: {
     },
   });
   await chrome.tabGroups.update(groupId, options);
+  await chrome.tabGroups.move(groupId, { index: -1 });
   setFirstTabInNewTabGroup(null);
 }
 
@@ -214,27 +201,6 @@ subscribeToStorageData<chrome.bookmarks.BookmarkTreeNode>(
     if (currentSessionData !== undefined) {
       updateCurrentSessionData(currentSessionData);
     }
-  },
-);
-
-export const [sessionLoading, setSessionLoading] = adaptState<boolean>(false);
-updateSessionLoading();
-
-async function updateSessionLoading(sessionLoading?: boolean) {
-  if (sessionLoading === undefined) {
-    sessionLoading =
-      (await getStorageData<boolean>(sessionStorageKeys.sessionLoading)) ??
-      false;
-  }
-  setSessionLoading(sessionLoading);
-}
-
-subscribeToStorageData<boolean>(
-  sessionStorageKeys.sessionLoading,
-  ({ newValue: sessionLoading }) => {
-    // @error
-    sessionLoading = sessionLoading ?? false;
-    updateSessionLoading(sessionLoading);
   },
 );
 

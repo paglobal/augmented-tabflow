@@ -11,41 +11,60 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Urgent
 
-- add swipe to switch windows
 - fix different bookmark ids on different machines problem
-- fix bug with file and other protocols in prod
-- fix stale favicon bug and perpetual loading states
+- transfer synced ids to local storage
+- add bookmarkers on checking/creation of both
+- check for all other valid bookmarks (`Augmented Tabflow Sessions` and `Pinned`)
+- transfer children of valid bookmarks into bookmarks with saved ids (`Augmented Tabflow Sessions` and `Pinned`)
+- delete all other valid bookmarks (`Augmented Tabflow Sessions` and `Pinned`)
+- dedupe bookmarkers (`Augmented Tabflow Sessions` and `Pinned`)
+- always aggregate all `Ungrouped` tab group data after importing or exporting (apply functions from above)
+- add bookmarkers on save and dedupe bookmarkers (`Augmented Tabflow Sessions` and `Pinned`)
+- properly skip over bookmarker when opening pinned tabs
+- properly skip over bookmarker when reading sessions data
+- pop `Other Bookmarks` onto recently edited bookmarks list after modifications (use bookmarker)
+
+- implement fullscreening
+- toggle `fullscreeningActive` state when fullscreen mode is toggled on any other page aside from the new tab page or the dedicated button is pressed
+- on the happen of basically anything, make the current window match the state of `fullscreeningActive` except on the new tab page
+- add double-clicking or clicking on icon for more actions (enter new url, reload, go forward or backward one page, etc)
+- add `Activate Fullscreening` to toolbar
+
+- implement local persistence pertaining to window instances (bookmarkId => windowInstanceNumber)
+- update local data on every session save
+- use local data to open tabs in appropriate window instances on session open
+- add two-finger swipe to switch windows
 - display other windows in vertical view
-- add `Create Empty Session` to session pane
-- implement local persistence pertaining to windows and document them
-- support moving pinned and ungrouped tab groups to new windows
 - open side-panel in any new windows
-- remove focus from sidebar after activating tab
 
 ### Less Urgent
 
-- implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
-- (maybe) implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks`
-- implement recently closed tab groups feature
-- (maybe) alway aggregate all `Ungrouped` tab group data after exports
-- (maybe) add option to group ungrouped tabs in import dialog
-- (maybe) implement group select and bulk actions
-- (maybe) keep already active tab open after session switch
-- (maybe) try loading all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
-- try reducing minimum chrome version
+- add option for adding tab to other tab groups under `Add To Tab Group`
+- add options for merging tab groups with other tab groups under `Ungroup Tabs`
+
+- remove focus from sidebar after activating tab
 - work on focus states for tree items after dialog interactions
-- (maybe) listen to additions to sessionData to update tabs
-- implement merge for tab groups
-- implement multiple select for actions
-- use ctrl+click for alternate click behaviour eg. copy instead of move
+- (maybe) remove focus states altogether
 - in `TreeItem` component, users should be able to click action buttons with the enter key
+
+- fix stale favicon bug and perpetual loading states
+- use ctrl+click for alternate click behaviour eg. copy instead of move
+- support moving pinned and ungrouped tab groups to new windows
+
+- implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks`
+- consider adding button to "look inside" tab groups and import individual tabs
+
+- implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
+- implement recently closed tab groups feature
+- implement group select and bulk actions
+- load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
+- (maybe) reduce minimum chrome version
 - collapse tree items in export dialog when done with exporting tab or tab group
 - maybe all newly created tab groups should be hoisted down
 - migrate fully to JSX
-- consider adding button to "look inside" tab groups and import individual tabs
 - make session trees and other dialog trees react to the necessary app state changes
 - (maybe) add more info on stub page. eg. "Your page is loading... Click here to reload"
-- (maybe) implement search for sessions and tabs
+- (maybe) implement search for sessions and tabs (already implemented in browser)
 - (maybe) implement ability to sort sessions alphabetically or by date added
 
 ### Later
@@ -73,12 +92,14 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 ### Store Listing
 
 - upload new video
+- link to chrome keyboard shortcuts page and other necessary pages
 - attribute projects that made this project possible
 
 ### Help Dialog
 
 - add reference to new youtube video
 - attribute projects that made this project possible
+- document behaviour concerning interacting with bookmarking from mobile
 
 ### Recent Changes
 

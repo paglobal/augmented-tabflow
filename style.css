@@ -152,5 +152,7 @@ sl-button::part(label) {
 }
 
 sl-dialog::part(panel) {
-  max-height: 80vh;
+  position: absolute;
+  top: 2rem;
+  max-height: calc(100vh - 4rem);
 }

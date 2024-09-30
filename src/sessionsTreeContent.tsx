@@ -15,6 +15,7 @@ import {
   editSessionDialogRef,
   editSessionInputRef,
   helpDialogRef,
+  newSessionDialogRef,
   saveCurrentSessionDialogRef,
   setCurrentlyDeletedSessionId,
   setCurrentlyDeletedSessionIsCurrentSession,
@@ -201,6 +202,24 @@ export function sessionsTreeContent() {
           icon: "window-plus",
         })}
         Save Current Session`}
+      </TreeItem>,
+      <TreeItem
+        tooltipContent="Create Empty Session"
+        onSelect={(e: Event) => {
+          // @handled
+          try {
+            e.stopPropagation();
+            newSessionDialogRef.value?.show();
+          } catch (error) {
+            console.error(error);
+            notifyWithErrorMessageAndReloadButton();
+          }
+        }}
+      >
+        {html`${h(TreeItemColorPatchOrIcon, {
+          icon: "window-plus",
+        })}
+        Create Empty Session`}
       </TreeItem>,
     );
 

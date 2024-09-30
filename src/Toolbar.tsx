@@ -3,7 +3,6 @@ import { styleMap } from "lit/directives/style-map.js";
 import {
   currentSessionData,
   currentSessionDataNotAvailable,
-  groupUngroupedTabsInWindow,
 } from "./sessionService";
 import {
   notifyWithErrorMessageAndReloadButton,
@@ -12,10 +11,8 @@ import {
 import {
   helpDialogRef,
   addTabGroupDialogRef,
-  newSessionDialogRef,
   editSessionInputRef,
   editSessionDialogRef,
-  tabGroupTreeDialogRef,
   setCurrentlyDeletedSessionId,
   setCurrentlyDeletedSessionIsCurrentSession,
   deleteSessionDialogRef,
@@ -41,35 +38,6 @@ export function Toolbar() {
           paddingBottom: "0.75rem",
         })}
       >
-        ${currentSessionData() &&
-        currentSessionData() !== currentSessionDataNotAvailable
-          ? null
-          : html`<sl-icon-button
-              name="list-ul"
-              title="Show Tab Group Tree"
-              @click=${() => {
-                // @handled
-                try {
-                  tabGroupTreeDialogRef.value?.show();
-                } catch (error) {
-                  console.error(error);
-                  notifyWithErrorMessageAndReloadButton();
-                }
-              }}
-            ></sl-icon-button>`}
-        <sl-icon-button
-          name="arrow-90deg-down"
-          title="Import Tab Group"
-          @click=${() => {
-            // @handled
-            try {
-              importTabGroupFromSessionTreeDialogRef.value?.show();
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          }}
-        ></sl-icon-button>
         <sl-icon-button
           name="plus-lg"
           title="New Tab"
@@ -100,25 +68,12 @@ export function Toolbar() {
           }}
         ></sl-icon-button>
         <sl-icon-button
-          name="window-plus"
-          title="Create Empty Session"
+          name="arrow-90deg-down"
+          title="Import Tab Group"
           @click=${() => {
             // @handled
             try {
-              newSessionDialogRef.value?.show();
-            } catch (error) {
-              console.error(error);
-              notifyWithErrorMessageAndReloadButton();
-            }
-          }}
-        ></sl-icon-button>
-        <sl-icon-button
-          name="folder"
-          title="Group Ungrouped Tabs In This Window"
-          @click=${() => {
-            // @handled
-            try {
-              groupUngroupedTabsInWindow();
+              importTabGroupFromSessionTreeDialogRef.value?.show();
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();

@@ -61,7 +61,6 @@ export const addTabGroupSelectRef = createRef<SlSelect>();
 export const newSessionDialogRef = createRef<SlDialog>();
 export const editSessionDialogRef = createRef<SlDialog>();
 export const editSessionInputRef = createRef<SlInput>();
-export const tabGroupTreeDialogRef = createRef<SlDialog>();
 export const sessionsTreeDialogRef = createRef<SlDialog>();
 export const deleteSessionDialogRef = createRef<SlDialog>();
 export const moveOrCopyTabToSessionTreeDialogRef = createRef<SlDialog>();
@@ -128,14 +127,6 @@ export function App() {
                   noTopBodyMargin
                 >
                   <Tree contentFn={sessionsTreeContent} />
-                </Dialog>
-                <Dialog
-                  label="Tab Group Tree"
-                  ref={tabGroupTreeDialogRef}
-                  fullWidth
-                  noTopBodyMargin
-                >
-                  <Tree contentFn={tabGroupTreeContent} />
                 </Dialog>
                 <Dialog
                   label="Move To Window"
