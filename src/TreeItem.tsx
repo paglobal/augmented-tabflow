@@ -12,6 +12,7 @@ import {
   type Edge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item.js";
+import type SlButtonGroup from "@shoelace-style/shoelace/dist/components/button-group/button-group.js";
 
 type DraggableOptions = Parameters<typeof draggable>[0];
 type DropTargetOptions = Parameters<typeof dropTargetForElements>[0];
@@ -24,13 +25,14 @@ export function TreeItem(props: {
   selected?: boolean;
   onExpand?: (e: Event) => void;
   onCollapse?: (e: Event) => void;
-  onSelect?: (e: Event) => void;
+  onSelect?: (e: MouseEvent) => void;
   draggableOptions?: Partial<DraggableOptions>;
   dropTargetOptions?: Partial<DropTargetOptions>;
 }) {
   const [draggedOverEdge, setDraggedOverEdge] = adaptState<Edge | null>(null);
   const [dragging, setDragging] = adaptState(false);
   const treeItemRef = createRef<SlTreeItem>();
+  const buttonGroupRef = createRef<SlButtonGroup>();
 
   adaptEffect(() => {
     if (
@@ -94,6 +96,18 @@ export function TreeItem(props: {
     }
   }, []);
 
+  adaptEffect(() => {
+    (
+      Array.from(buttonGroupRef.value?.children ?? []) as Array<HTMLElement>
+    ).forEach((iconButton) => {
+      iconButton.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          iconButton.click();
+        }
+      });
+    });
+  }, []);
+
   return () => {
     const draggedOverStyles = draggedOverEdge()
       ? {
@@ -131,6 +145,7 @@ export function TreeItem(props: {
           })}
         >
           <sl-button-group
+            ${ref(buttonGroupRef)}
             label="Actions"
             style=${styleMap({
               padding: "0 0.4rem",

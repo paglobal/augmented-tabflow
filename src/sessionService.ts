@@ -126,13 +126,13 @@ export async function closeTabGroup(tabGroup: TabGroupTreeData[number]) {
   await chrome.tabs.remove(tabIds);
 }
 
-export function activateTab(tab: chrome.tabs.Tab) {
+export async function activateTab(tab: chrome.tabs.Tab) {
   // @maybe
   // focus tab window first if it's not already in focus
   if (tab.windowId !== chrome.windows.WINDOW_ID_CURRENT) {
-    chrome.windows.update(tab.windowId, { focused: true });
+    await chrome.windows.update(tab.windowId, { focused: true });
   }
-  chrome.tabs.update(tab.id as number, { active: true });
+  await chrome.tabs.update(tab.id as number, { active: true });
 }
 
 export async function createTabGroup(options: {
@@ -368,7 +368,7 @@ export async function deleteSession(
   if (isCurrentSession) {
     await openNewSession(null);
   }
-  deleteSessionDialogRef.value?.hide();
+  await deleteSessionDialogRef.value?.hide();
 }
 
 export async function openNewSession(
@@ -418,7 +418,7 @@ export async function moveOrCopyToSession(
       await chrome.tabs.remove(_currentlyMovedOrCopiedTabOrTabGroup.id!);
       notify("Tab moved successfully.", "success");
     }
-    moveOrCopyTabToSessionTreeDialogRef.value?.hide();
+    await moveOrCopyTabToSessionTreeDialogRef.value?.hide();
   } else if (
     (_currentlyMovedOrCopiedTabOrTabGroup as TabGroupTreeData[number]).tabs
   ) {
@@ -562,5 +562,5 @@ export async function moveTabOrTabGroupToWindow(
     },
   });
   setCurrentlyEjectedTabOrTabGroup(null);
-  sessionWindowsTreeDialogRef.value?.hide();
+  await sessionWindowsTreeDialogRef.value?.hide();
 }

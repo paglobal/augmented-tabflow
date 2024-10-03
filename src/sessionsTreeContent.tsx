@@ -91,12 +91,11 @@ export function sessionsTreeContent() {
                     e.stopPropagation();
                     if (editSessionInputRef.value) {
                       setCurrentlyEditedSessionId(sessionData.id);
-                      editSessionDialogRef.value?.show();
+                      editSessionInputRef.value.value = sessionData.title;
                       setTimeout(() => {
-                        if (editSessionInputRef.value) {
-                          editSessionInputRef.value.value = sessionData.title;
-                        }
+                        editSessionInputRef.value?.select();
                       });
+                      await editSessionDialogRef.value?.show();
                     }
                   } catch (error) {
                     console.error(error);
@@ -113,7 +112,7 @@ export function sessionsTreeContent() {
                     e.stopPropagation();
                     setCurrentlyDeletedSessionId(sessionData.id);
                     setCurrentlyDeletedSessionIsCurrentSession(false);
-                    deleteSessionDialogRef.value?.show();
+                    await deleteSessionDialogRef.value?.show();
                   } catch (error) {
                     console.error(error);
                     notifyWithErrorMessageAndReloadButton();
@@ -131,11 +130,11 @@ export function sessionsTreeContent() {
     sessionsTreeContent.unshift(
       <TreeItem
         tooltipContent="Help"
-        onSelect={(e: Event) => {
+        onSelect={async (e: Event) => {
           // @handled
           try {
             e.stopPropagation();
-            helpDialogRef.value?.show();
+            await helpDialogRef.value?.show();
           } catch (error) {
             console.error(error);
             notifyWithErrorMessageAndReloadButton();
@@ -187,11 +186,11 @@ export function sessionsTreeContent() {
       ),
       <TreeItem
         tooltipContent="Save Current Session"
-        onSelect={(e: Event) => {
+        onSelect={async (e: Event) => {
           // @handled
           try {
             e.stopPropagation();
-            saveCurrentSessionDialogRef.value?.show();
+            await saveCurrentSessionDialogRef.value?.show();
           } catch (error) {
             console.error(error);
             notifyWithErrorMessageAndReloadButton();
@@ -205,11 +204,11 @@ export function sessionsTreeContent() {
       </TreeItem>,
       <TreeItem
         tooltipContent="Create Empty Session"
-        onSelect={(e: Event) => {
+        onSelect={async (e: Event) => {
           // @handled
           try {
             e.stopPropagation();
-            newSessionDialogRef.value?.show();
+            await newSessionDialogRef.value?.show();
           } catch (error) {
             console.error(error);
             notifyWithErrorMessageAndReloadButton();

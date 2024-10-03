@@ -16,10 +16,13 @@ import {
   editTabGroupDialogRefs,
   moveOrCopyTabGroupToSessionTreeDialogRef,
   moveOrCopyTabToSessionTreeDialogRef,
+  navigateDialogRef,
+  navigateInputRef,
   sessionWindowsTreeDialogRef,
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEditedTabGroupId,
   setCurrentlyEjectedTabOrTabGroup,
+  setCurrentlyNavigatedTabId,
   setFirstTabInNewTabGroup,
 } from "./App";
 import { lockNames, newTabUrls, tabGroupTypes } from "../constants";
@@ -159,30 +162,24 @@ export function tabGroupTreeContent() {
               : html`<sl-icon-button
                   name="pen"
                   title="Edit"
-                  @click=${(e: Event) => {
+                  @click=${async (e: Event) => {
                     // @handled
                     try {
                       e.stopPropagation();
                       setCurrentlyEditedTabGroupId(tabGroup.id);
-                      editTabGroupDialogRefs.dialog.value?.show();
-                      // use `setTimeout` to ensure that the cursor gets placed in the right position in the input at the right time (so that it isn't taken back)
-                      setTimeout(() => {
-                        // @handled
-                        try {
-                          if (
-                            editTabGroupDialogRefs.input.value &&
-                            editTabGroupDialogRefs.select.value
-                          ) {
-                            editTabGroupDialogRefs.input.value.value =
-                              tabGroup.title as string;
-                            editTabGroupDialogRefs.select.value.value =
-                              tabGroup.color;
-                          }
-                        } catch (error) {
-                          console.error(error);
-                          notifyWithErrorMessageAndReloadButton();
-                        }
-                      });
+                      if (
+                        editTabGroupDialogRefs.input.value &&
+                        editTabGroupDialogRefs.select.value
+                      ) {
+                        editTabGroupDialogRefs.input.value.value =
+                          tabGroup.title as string;
+                        setTimeout(() => {
+                          editTabGroupDialogRefs.input.value?.select();
+                        });
+                        editTabGroupDialogRefs.select.value.value =
+                          tabGroup.color;
+                      }
+                      await editTabGroupDialogRefs.dialog.value?.show();
                     } catch (error) {
                       console.error(error);
                       notifyWithErrorMessageAndReloadButton();
@@ -279,7 +276,7 @@ export function tabGroupTreeContent() {
                     try {
                       e.stopPropagation();
                       setCurrentlyEjectedTabOrTabGroup(tabGroup);
-                      sessionWindowsTreeDialogRef.value?.show();
+                      await sessionWindowsTreeDialogRef.value?.show();
                     } catch (error) {
                       console.error(error);
                       notifyWithErrorMessageAndReloadButton();
@@ -336,11 +333,12 @@ export function tabGroupTreeContent() {
                       <TreeItem
                         tooltipContent={tab.title as string}
                         selected={tab.active}
-                        onSelect={(e: Event) => {
+                        onSelect={async (e: MouseEvent) => {
                           // @handled
                           try {
                             e.stopPropagation();
-                            activateTab(tab);
+                            await activateTab(tab);
+                            (document.activeElement as HTMLElement).blur();
                           } catch (error) {
                             console.error(error);
                             notifyWithErrorMessageAndReloadButton();
@@ -437,6 +435,28 @@ export function tabGroupTreeContent() {
                           },
                         }}
                         actionButtons={html`
+                          <sl-icon-button
+                            name="pen"
+                            title="Edit"
+                            @click=${async (e: Event) => {
+                              // @handled
+                              try {
+                                e.stopPropagation();
+                                setCurrentlyNavigatedTabId(tab.id);
+                                if (navigateInputRef.value) {
+                                  navigateInputRef.value.value =
+                                    tab.url as string;
+                                  setTimeout(() => {
+                                    navigateInputRef.value?.select();
+                                  });
+                                }
+                                await navigateDialogRef.value?.show();
+                              } catch (error) {
+                                console.error(error);
+                                notifyWithErrorMessageAndReloadButton();
+                              }
+                            }}
+                          ></sl-icon-button>
                           ${tabGroup.type === tabGroupTypes.pinned
                             ? html`
                                 <sl-icon-button
@@ -495,7 +515,7 @@ export function tabGroupTreeContent() {
                           <sl-icon-button
                             name="plus-circle"
                             title="Add Tab To New Group"
-                            @click=${(e: Event) => {
+                            @click=${async (e: Event) => {
                               // @handled
                               try {
                                 e.stopPropagation();
@@ -504,7 +524,7 @@ export function tabGroupTreeContent() {
                                   addTabGroupSelectRef.value.value =
                                     randomTabGroupColorValue();
                                 }
-                                addTabGroupDialogRef.value?.show();
+                                await addTabGroupDialogRef.value?.show();
                               } catch (error) {
                                 console.error(error);
                                 notifyWithErrorMessageAndReloadButton();
@@ -519,7 +539,7 @@ export function tabGroupTreeContent() {
                               try {
                                 e.stopPropagation();
                                 setCurrentlyEjectedTabOrTabGroup(tab);
-                                sessionWindowsTreeDialogRef.value?.show();
+                                await sessionWindowsTreeDialogRef.value?.show();
                               } catch (error) {
                                 console.error(error);
                                 notifyWithErrorMessageAndReloadButton();
@@ -568,7 +588,6 @@ export function tabGroupTreeContent() {
                               ) : null}
                               {
                                 <TreeItemColorPatchOrIcon
-                                  faviconUrl={tab.favIconUrl}
                                   pageUrl={tab.url}
                                   showSpinner={
                                     tab.status === "loading" &&

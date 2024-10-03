@@ -54,13 +54,13 @@ export function Toolbar() {
         <sl-icon-button
           name="plus-circle"
           title="Add Tab Group"
-          @click=${() => {
+          @click=${async () => {
             // @handled
             try {
               if (addTabGroupSelectRef.value) {
                 addTabGroupSelectRef.value.value = randomTabGroupColorValue();
               }
-              addTabGroupDialogRef.value?.show();
+              await addTabGroupDialogRef.value?.show();
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
@@ -70,10 +70,10 @@ export function Toolbar() {
         <sl-icon-button
           name="arrow-90deg-down"
           title="Import Tab Group"
-          @click=${() => {
+          @click=${async () => {
             // @handled
             try {
-              importTabGroupFromSessionTreeDialogRef.value?.show();
+              await importTabGroupFromSessionTreeDialogRef.value?.show();
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
@@ -98,18 +98,14 @@ export function Toolbar() {
                         _currentSessionData &&
                         _currentSessionData !== currentSessionDataNotAvailable
                       ) {
-                        editSessionDialogRef.value?.show();
-                        setTimeout(() => {
-                          // @handled
-                          try {
-                            if (editSessionInputRef.value) {
-                              editSessionInputRef.value.value =
-                                _currentSessionData.title;
-                            }
-                          } catch (error) {
-                            console.error(error);
-                          }
-                        });
+                        if (editSessionInputRef.value) {
+                          editSessionInputRef.value.value =
+                            _currentSessionData.title;
+                          setTimeout(() => {
+                            editSessionInputRef.value?.select();
+                          });
+                        }
+                        await editSessionDialogRef.value?.show();
                       } else {
                         notifyWithErrorMessageAndReloadButton();
                       }
@@ -133,7 +129,7 @@ export function Toolbar() {
                     ) {
                       setCurrentlyDeletedSessionId(_currentSessionData.id);
                       setCurrentlyDeletedSessionIsCurrentSession(true);
-                      deleteSessionDialogRef.value?.show();
+                      await deleteSessionDialogRef.value?.show();
                     } else {
                       notifyWithErrorMessageAndReloadButton();
                     }
@@ -145,12 +141,24 @@ export function Toolbar() {
               ></sl-icon-button>
             `}
         <sl-icon-button
-          name="question-circle"
-          title="Help"
+          name="fullscreen"
+          title="Activate Fullscreening"
           @click=${() => {
             // @handled
             try {
-              helpDialogRef.value?.show();
+            } catch (error) {
+              console.error(error);
+              notifyWithErrorMessageAndReloadButton();
+            }
+          }}
+        ></sl-icon-button>
+        <sl-icon-button
+          name="question-circle"
+          title="Help"
+          @click=${async () => {
+            // @handled
+            try {
+              await helpDialogRef.value?.show();
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();

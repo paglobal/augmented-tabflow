@@ -22,7 +22,7 @@ export function DialogForm(props: {
         {html`<form
           ${ref(formRef)}
           class="dialog-form"
-          @submit=${(e: Event) => {
+          @submit=${async (e: Event) => {
             // @handled
             try {
               e.preventDefault();
@@ -30,15 +30,8 @@ export function DialogForm(props: {
                 const data = serialize(formRef.value);
                 props.formAction(data);
               }
-              props.dialogRef.value?.hide();
               formRef.value?.reset();
-              document.addEventListener(
-                "focusin",
-                () => {
-                  (document.activeElement as HTMLElement)?.blur();
-                },
-                { once: true },
-              );
+              await props.dialogRef.value?.hide();
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();

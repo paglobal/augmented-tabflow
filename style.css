@@ -22,11 +22,6 @@ body,
   scrollbar-color: var(--sl-color-neutral-500) var(--sl-color-neutral-0);
 }
 
-html,
-body {
-  background: (--sl-overlay-background-color);
-}
-
 :root,
 :host,
 .sl-theme-light {

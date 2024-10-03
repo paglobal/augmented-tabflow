@@ -29,6 +29,14 @@ export function Dialog(props: {
         "--header-spacing": "1rem",
         "--body-spacing": `${bodyMargins.top} ${bodyMargins.right} ${bodyMargins.bottom} ${bodyMargins.left}`,
       })}
+      @sl-hide=${() =>
+        document.addEventListener(
+          "focusin",
+          () => {
+            (document.activeElement as HTMLElement)?.blur();
+          },
+          { once: true },
+        )}
     >
       <div
         style=${styleMap({

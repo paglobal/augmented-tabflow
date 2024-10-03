@@ -25,39 +25,38 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - pop `Other Bookmarks` onto recently edited bookmarks list after modifications (use bookmarker)
 
 - implement fullscreening
-- toggle `fullscreeningActive` state when fullscreen mode is toggled on any other page aside from the new tab page or the dedicated button is pressed
-- on the happen of basically anything, make the current window match the state of `fullscreeningActive` except on the new tab page
-- add double-clicking or clicking on icon for more actions (enter new url, reload, go forward or backward one page, etc)
+- always match `fullscreeningActive` state with current fullscreen state when side-panel is open and vice-versa
 - add `Activate Fullscreening` to toolbar
+- add double-clicking or clicking on icon for more actions (enter new url, reload, go forward or backward one page, etc)
+- focus menu with down arrow key when there is it visible (there is text in the menu)
+- show dialog on new tab creation (chrome://newtab and co)
+- control/cmd + l for activating dialog
 
 - implement local persistence pertaining to window instances (bookmarkId => windowInstanceNumber)
 - update local data on every session save
 - use local data to open tabs in appropriate window instances on session open
 - add two-finger swipe to switch windows
 - display other windows in vertical view
-- open side-panel in any new windows
+- open side-panel in any new windows we create
 
 ### Less Urgent
 
-- add option for adding tab to other tab groups under `Add To Tab Group`
-- add options for merging tab groups with other tab groups under `Ungroup Tabs`
+- load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
 
-- remove focus from sidebar after activating tab
-- work on focus states for tree items after dialog interactions
-- (maybe) remove focus states altogether
-- in `TreeItem` component, users should be able to click action buttons with the enter key
-
-- fix stale favicon bug and perpetual loading states
-- use ctrl+click for alternate click behaviour eg. copy instead of move
+- add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group`)
+- add options for merging tab groups with other tab groups under `Ungroup Tabs` (ie. where do you want to move them to? `Ungrouped Tabs` or some other tab group?)
+- add dialog for giving name and color to new tab groups created from `Ungrouped Tabs` or `Pinned Tabs`
 - support moving pinned and ungrouped tab groups to new windows
 
-- implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks`
+- implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks` and/or `Reading List`
 - consider adding button to "look inside" tab groups and import individual tabs
 
+- implement omnibox opensearch stuff
+- use ctrl+click for alternate click behaviour eg. copy instead of move
+- (maybe) add `Pop Out` button for picture-in-picture
 - implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - implement recently closed tab groups feature
 - implement group select and bulk actions
-- load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
 - (maybe) reduce minimum chrome version
 - collapse tree items in export dialog when done with exporting tab or tab group
 - maybe all newly created tab groups should be hoisted down
@@ -100,6 +99,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add reference to new youtube video
 - attribute projects that made this project possible
 - document behaviour concerning interacting with bookmarking from mobile
+- (maybe) document the fact that there's no need to restore
 
 ### Recent Changes
 

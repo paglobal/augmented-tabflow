@@ -37,10 +37,10 @@ export function SessionIndicator() {
           textOverflow: "ellipsis",
           padding: "0.5rem",
         })}
-        @click=${() => {
+        @click=${async () => {
           // @handled
           try {
-            sessionsTreeDialogRef.value?.show();
+            await sessionsTreeDialogRef.value?.show();
           } catch (error) {
             console.error(error);
             notifyWithErrorMessageAndReloadButton();

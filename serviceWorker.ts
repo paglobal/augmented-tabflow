@@ -108,7 +108,7 @@ async function restoreTabIfBlank(tabId: chrome.tabs.Tab["id"]) {
       }
       if (
         url?.hostname === chrome.runtime.id &&
-        url?.pathname === "/stubPage.html"
+        url?.pathname === stubPagePathName
       ) {
         const params = new URLSearchParams(url.search);
         await chrome.tabs.update(tabId, {
