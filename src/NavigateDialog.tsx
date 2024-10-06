@@ -8,6 +8,7 @@ import {
   SlDialog,
   SlInput,
   SlMenu,
+  SlMenuItem,
   SlSelectEvent,
 } from "@shoelace-style/shoelace";
 import { Dialog } from "./Dialog";
@@ -272,9 +273,19 @@ export function NavigateDialog() {
                       <sl-menu-item
                         value=${suggestion.obj.value}
                         @keydown=${(e: KeyboardEvent) => {
-                          if (navigateInputRef.value && e.key !== "Tab") {
+                          if (
+                            navigateInputRef.value &&
+                            e.key !== "Tab" &&
+                            e.key !== "ArrowDown"
+                          ) {
                             navigateInputRef.value.focus();
                           }
+                        }}
+                        @mouseenter=${(e: Event) => {
+                          const menuItem = e.target as SlMenuItem;
+                          navigateSuggestionsMenuRef.value?.setCurrentItem(
+                            menuItem,
+                          );
                         }}
                       >
                         ${(
