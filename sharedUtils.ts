@@ -167,9 +167,7 @@ export function encodeTabDataAsUrl(options: {
   active?: boolean;
 }) {
   const urlFromUrl = new URL(options.url);
-  console.log(urlFromUrl.protocol);
   if (protocolsEligibleForEncoding.includes(urlFromUrl.protocol)) {
-    console.log("hi!");
     return `${stubPagePathName}?title=${encodeURIComponent(
       options.title ?? "",
     )}&url=${encodeURIComponent(options.url ?? "")}${
@@ -178,4 +176,14 @@ export function encodeTabDataAsUrl(options: {
   } else {
     return options.url;
   }
+}
+
+export function debounce(callback: () => void, timeout: number) {
+  let timeoutId: number | undefined;
+  return () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      callback();
+    }, timeout);
+  };
 }

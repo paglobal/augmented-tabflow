@@ -1,6 +1,5 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
-import "@shoelace-style/shoelace/dist/components/tree/tree.js";
 import { type SlSelectionChangeEvent } from "@shoelace-style/shoelace/dist/events/sl-selection-change";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 

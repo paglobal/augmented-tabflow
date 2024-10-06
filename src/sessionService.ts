@@ -1,11 +1,13 @@
 import { adaptState } from "promethium-js";
 import {
   messageTypes,
+  protocolsEligibleForEncoding,
   sessionStorageKeys,
   stubPagePathName,
   syncStorageKeys,
   tabGroupTypes,
   titles,
+  tlds,
 } from "../constants";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -30,6 +32,7 @@ import {
   setCurrentlyEjectedTabOrTabGroup,
   setFirstTabInNewTabGroup,
 } from "./App";
+import { currentlyNavigatedTabId, navigateDialogRef } from "./NavigateDialog";
 
 export const [tabGroupTreeData, setTabGroupTreeData] =
   adaptState<TabGroupTreeData>([]);
@@ -563,4 +566,34 @@ export async function moveTabOrTabGroupToWindow(
   });
   setCurrentlyEjectedTabOrTabGroup(null);
   await sessionWindowsTreeDialogRef.value?.hide();
+}
+
+export async function navigate(query: string) {
+  let url: string | undefined;
+  try {
+    url = new URL(query).href;
+  } catch (error) {
+    const possibleUrl = protocolsEligibleForEncoding[0] + query;
+    const urlFromUrl = new URL(possibleUrl);
+    console.log(urlFromUrl);
+    url = tlds.some((tld) =>
+      // convert both to lowercase just in case
+      urlFromUrl.origin.toLowerCase().endsWith(`.${tld.toLowerCase()}`),
+    )
+      ? possibleUrl
+      : undefined;
+  }
+  let tabId = currentlyNavigatedTabId();
+  if (!tabId) {
+    tabId = (await chrome.tabs.create({})).id;
+  }
+  if (url && tabId) {
+    await chrome.tabs.update(tabId, { url });
+  } else {
+    await chrome.search.query({
+      text: query,
+      tabId,
+    });
+  }
+  await navigateDialogRef.value?.hide();
 }

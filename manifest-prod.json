@@ -12,9 +12,11 @@
     "storage",
     "unlimitedStorage",
     "bookmarks",
-    "favicon"
+    "favicon",
+    "history",
+    "search"
   ],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": ["*://suggestqueries.google.com/*"],
   "icons": {
     "16": "assets/icons/icon-3-16.png",
     "32": "assets/icons/icon-3-32.png",

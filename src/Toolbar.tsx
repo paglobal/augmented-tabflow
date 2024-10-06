@@ -19,6 +19,11 @@ import {
   addTabGroupSelectRef,
   importTabGroupFromSessionTreeDialogRef,
 } from "./App";
+import {
+  navigateDialogRef,
+  navigateInputRef,
+  setCurrentlyNavigatedTabId,
+} from "./NavigateDialog";
 
 export function Toolbar() {
   return () =>
@@ -41,10 +46,15 @@ export function Toolbar() {
         <sl-icon-button
           name="plus-lg"
           title="New Tab"
-          @click=${async () => {
+          @click=${async (e: Event) => {
             // @handled
             try {
-              await chrome.tabs.create({ active: true });
+              e.stopPropagation();
+              setCurrentlyNavigatedTabId(null);
+              if (navigateInputRef.value) {
+                navigateInputRef.value.value = "";
+              }
+              await navigateDialogRef.value?.show();
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
@@ -142,7 +152,7 @@ export function Toolbar() {
             `}
         <sl-icon-button
           name="fullscreen"
-          title="Activate Fullscreening"
+          title="Enter Fullscreen"
           @click=${() => {
             // @handled
             try {

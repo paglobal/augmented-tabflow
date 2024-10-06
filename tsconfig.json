@@ -13,6 +13,7 @@
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "jsx": "react-jsx",
-    "jsxImportSource": "promethium-js"
+    "jsxImportSource": "promethium-js",
+    "esModuleInterop": true
   }
 }

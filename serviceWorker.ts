@@ -1,7 +1,10 @@
 import {
   SessionData,
+  commands,
   lockNames,
   messageTypes,
+  onInstalledPage,
+  onUpdatedPage,
   sessionStorageKeys,
   stubPagePathName,
   syncStorageKeys,
@@ -28,11 +31,11 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   // @error
   if (details.reason === "install") {
     await chrome.tabs.create({
-      url: "https://www.paglobal.tech/pages/projects/augmented-tabflow.html",
+      url: onInstalledPage,
     });
   } else if (details.reason === "update") {
     await chrome.tabs.create({
-      url: "https://www.paglobal.tech/pages/posts/augmented-tabflow-changelog.html",
+      url: onUpdatedPage,
     });
   }
   await createBookmarkNodeAndSyncId(
@@ -660,7 +663,7 @@ async function reinitializePinnedTabs() {
   if (pinnedTabGroupBookmarkNodeId) {
     const pinnedTabGroupBookmarkNodeChildren =
       await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
-    for (const tabData of pinnedTabGroupBookmarkNodeChildren.reverse()) {
+    for (const tabData of pinnedTabGroupBookmarkNodeChildren) {
       const url = encodeTabDataAsUrl({
         title: tabData.title,
         url: tabData.url || "",
@@ -742,9 +745,9 @@ subscribeToMessage(
 );
 
 chrome.commands.onCommand.addListener(async (command) => {
-  if (command === "close-all-session-windows") {
+  if (command === commands.closeAllSessionWindows) {
     closeAllSessionWindows();
-  } else if (command === "exit-current-session") {
+  } else if (command === commands.exitCurrentSession) {
     const currentSessionData =
       await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
         sessionStorageKeys.currentSessionData,

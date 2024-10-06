@@ -4,9 +4,7 @@ import { styleMap } from "lit/directives/style-map.js";
 import { until } from "lit/directives/until.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { setDefaultAnimation } from "@shoelace-style/shoelace/dist/utilities/animation-registry.js";
-import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
-import type SlInput from "@shoelace-style/shoelace/dist/components/input/input.js";
-import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.js";
+import { SlDialog, SlInput, SlSelect } from "@shoelace-style/shoelace";
 import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/button-group/button-group.js";
@@ -19,12 +17,15 @@ import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/popup/popup.js";
 import "@shoelace-style/shoelace/dist/components/menu/menu.js";
 import "@shoelace-style/shoelace/dist/components/menu-item/menu-item.js";
+import "@shoelace-style/shoelace/dist/components/tree/tree.js";
+import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import { Toolbar } from "./Toolbar";
 import { Help } from "./Help";
 import { Dialog } from "./Dialog";
 import { SessionIndicator } from "./SessionIndicator";
 import { DialogForm } from "./DialogForm";
 import { Tree } from "./Tree";
+import { NavigateDialog } from "./NavigateDialog";
 import {
   tabGroupColors,
   randomTabGroupColorValue,
@@ -55,8 +56,6 @@ export const editTabGroupDialogRefs = {
   input: createRef<SlInput>(),
   select: createRef<SlSelect>(),
 };
-export const navigateInputRef = createRef<SlInput>();
-
 export const helpDialogRef = createRef<SlDialog>();
 export const saveCurrentSessionDialogRef = createRef<SlDialog>();
 export const addTabGroupDialogRef = createRef<SlDialog>();
@@ -70,7 +69,6 @@ export const moveOrCopyTabToSessionTreeDialogRef = createRef<SlDialog>();
 export const moveOrCopyTabGroupToSessionTreeDialogRef = createRef<SlDialog>();
 export const sessionWindowsTreeDialogRef = createRef<SlDialog>();
 export const importTabGroupFromSessionTreeDialogRef = createRef<SlDialog>();
-export const navigateDialogRef = createRef<SlDialog>();
 
 export const [currentlyEditedTabGroupId, setCurrentlyEditedTabGroupId] =
   adaptState<chrome.tabGroups.TabGroup["id"] | null>(null);
@@ -90,11 +88,6 @@ export const [currentlyEjectedTabOrTabGroup, setCurrentlyEjectedTabOrTabGroup] =
   adaptState<chrome.tabs.Tab | TabGroupTreeData[number] | null>(null);
 export const [firstTabInNewTabGroup, setFirstTabInNewTabGroup] =
   adaptState<chrome.tabs.Tab | null>(null);
-export const [currentlyNavigatedTabId, setCurrentlyNavigatedTabId] = adaptState<
-  chrome.tabs.Tab["id"] | null
->(null);
-export const [navigationDropdownActive, setNavigationDropdownActive] =
-  adaptState<boolean>(false);
 
 export function App() {
   return () =>
@@ -413,91 +406,7 @@ export function App() {
                     </div>
                   `}
                 </Dialog>
-                <Dialog
-                  label="Navigate"
-                  ref={navigateDialogRef}
-                  noTopBodyMargin
-                >
-                  {html`
-                    <sl-button-group
-                      label="Navigation Tools"
-                      style=${styleMap({
-                        fontSize: "1rem",
-                        paddingTop: "0.25rem",
-                        paddingBottom: "0.5rem",
-                        display: "flex",
-                        justifyContent: "center",
-                      })}
-                    >
-                      <sl-icon-button
-                        name="arrow-left"
-                        title="Go Back"
-                        @click=${async () => {
-                          // @handled
-                          try {
-                            const _currentyNavigatedTabId =
-                              currentlyNavigatedTabId();
-                            if (_currentyNavigatedTabId) {
-                              await chrome.tabs.goBack(_currentyNavigatedTabId);
-                            }
-                          } catch (error) {
-                            console.error(error);
-                            notifyWithErrorMessageAndReloadButton();
-                          }
-                        }}
-                      ></sl-icon-button>
-                      <sl-icon-button
-                        name="arrow-right"
-                        title="Go Forward"
-                        @click=${async () => {
-                          // @handled
-                          try {
-                            const _currentyNavigatedTabId =
-                              currentlyNavigatedTabId();
-                            if (_currentyNavigatedTabId) {
-                              await chrome.tabs.goForward(
-                                _currentyNavigatedTabId,
-                              );
-                            }
-                          } catch (error) {
-                            console.error(error);
-                            notifyWithErrorMessageAndReloadButton();
-                          }
-                        }}
-                      ></sl-icon-button>
-                      <sl-icon-button
-                        name="arrow-clockwise"
-                        title="Reload Page"
-                        @click=${async () => {
-                          // @handled
-                          try {
-                            const _currentyNavigatedTabId =
-                              currentlyNavigatedTabId();
-                            if (_currentyNavigatedTabId) {
-                              await chrome.tabs.reload(_currentyNavigatedTabId);
-                            }
-                          } catch (error) {
-                            console.error(error);
-                            notifyWithErrorMessageAndReloadButton();
-                          }
-                        }}
-                      ></sl-icon-button>
-                    </sl-button-group>
-                    <sl-popup placement="bottom" sync="width">
-                      <sl-input
-                        ${ref(navigateInputRef)}
-                        slot="anchor"
-                        placeholder="Search"
-                        autofocus
-                      ></sl-input>
-                      <sl-menu>
-                        <sl-menu-item>Option 1</sl-menu-item>
-                        <sl-menu-item disabled>Option 2</sl-menu-item>
-                        <sl-menu-item>Option 3</sl-menu-item>
-                      </sl-menu>
-                    </sl-popup>
-                  `}
-                </Dialog>
+                <NavigateDialog />
               </>
             )}
           </div>

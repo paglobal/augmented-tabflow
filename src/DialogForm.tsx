@@ -1,8 +1,8 @@
 import { PromethiumNode } from "promethium-js";
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
-import { createRef, ref, type Ref } from "lit/directives/ref.js";
-import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
+import { createRef, ref, Ref } from "lit/directives/ref.js";
+import { SlDialog } from "@shoelace-style/shoelace";
 import { Dialog } from "./Dialog";
 import { serialize } from "@shoelace-style/shoelace/dist/utilities/form.js";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";

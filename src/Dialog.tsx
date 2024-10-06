@@ -1,8 +1,7 @@
 import { html } from "lit";
-import { type Ref, ref } from "lit/directives/ref.js";
+import { Ref, ref } from "lit/directives/ref.js";
 import { styleMap } from "lit/directives/style-map.js";
-import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
-import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
+import { SlDialog } from "@shoelace-style/shoelace";
 import { PromethiumNode } from "promethium-js";
 
 export function Dialog(props: {
@@ -11,6 +10,8 @@ export function Dialog(props: {
   ref: Ref<SlDialog>;
   fullWidth?: boolean;
   noTopBodyMargin?: boolean;
+  onAfterShow?: () => void;
+  onAfterHide?: () => void;
 }) {
   const bodyMargins = {
     top: props.noTopBodyMargin ? "0" : "1rem",
@@ -37,6 +38,8 @@ export function Dialog(props: {
           },
           { once: true },
         )}
+      @sl-after-show=${props.onAfterShow}
+      @sl-after-hide=${props.onAfterHide}
     >
       <div
         style=${styleMap({

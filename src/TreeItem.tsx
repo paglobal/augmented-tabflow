@@ -9,10 +9,9 @@ import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import {
   attachClosestEdge,
   extractClosestEdge,
-  type Edge,
+  Edge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
-import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item.js";
-import type SlButtonGroup from "@shoelace-style/shoelace/dist/components/button-group/button-group.js";
+import { SlTreeItem, SlButtonGroup } from "@shoelace-style/shoelace";
 
 type DraggableOptions = Parameters<typeof draggable>[0];
 type DropTargetOptions = Parameters<typeof dropTargetForElements>[0];
