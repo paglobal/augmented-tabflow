@@ -240,7 +240,8 @@ export function NavigateDialog() {
               @keydown=${(e: KeyboardEvent) => {
                 if (e.key === "ArrowDown") {
                   (
-                    navigateSuggestionsMenuRef.value?.children[1] as HTMLElement
+                    navigateSuggestionsMenuRef.value
+                      ?.firstElementChild as HTMLElement
                   )?.focus();
                 } else if (e.key === "ArrowUp") {
                   (
