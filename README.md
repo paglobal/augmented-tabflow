@@ -24,16 +24,12 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - properly skip over bookmarker when reading sessions data
 - pop `Other Bookmarks` onto recently edited bookmarks list after modifications (use bookmarker)
 -
-- finish navigation dialog implementation
-- always match `fullscreen` state with current fullscreen state as long as extension is active
-- allow fullscreen toggling via toolbar
 - implement local persistence pertaining to window instances (bookmarkId => windowInstanceNumber)
 - update local data on every session save
 - use local data to open tabs in appropriate window instances on session open
 - add two-finger swipe to switch windows
 - display other windows in vertical view
 - open side-panel in any new windows we create or move to
--
 - use popups with `Ctrl + T` and `Alt + L` on fullscreen (document the ability to change controls)
 
 ### Less Urgent
@@ -75,12 +71,12 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 - type `sendMessage` and `subscribeToMessage` for automatic inference
-- create `TreeDialog` and `ConfirmationDialog`
 - notify users of errors that happen in service workers through message `chrome.runtime.message`
 - handle errors in timeouts as well
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - type drag-and-drop code
 - refine fallback code
+- look out for instances of typescript `!`'s in the codebae
 -
 - (maybe) reduce minimum chrome version
 - (maybe, please be careful) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
@@ -101,7 +97,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add reference to new youtube video
 - attribute projects that made this project possible
 - document behaviour concerning interacting with bookmarking from mobile
-- (maybe) document the fact that there's no need to restore
+- (maybe) document the fact that there's no need to restore old tabs
+- document the ability to modify keyboard shortcuts at the top
 
 ### Recent Changes
 

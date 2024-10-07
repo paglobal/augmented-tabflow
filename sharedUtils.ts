@@ -10,10 +10,11 @@ import {
   lockNames,
   stubPagePathName,
   protocolsEligibleForEncoding,
+  LocalStorageKey,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
-  key: SyncStorageKey | SessionStorageKey,
+  key: SyncStorageKey | SessionStorageKey | LocalStorageKey,
 ) {
   const areaName = key.split("-")[0] as AreaName;
 
@@ -21,7 +22,7 @@ export async function getStorageData<T = unknown>(
 }
 
 export async function setStorageData<T = unknown>(
-  key: SyncStorageKey | SessionStorageKey,
+  key: SyncStorageKey | SessionStorageKey | LocalStorageKey,
   value: T,
 ) {
   const areaName = key.split("-")[0] as AreaName;
@@ -29,7 +30,7 @@ export async function setStorageData<T = unknown>(
 }
 
 export async function subscribeToStorageData<T = unknown>(
-  key: SyncStorageKey | SessionStorageKey,
+  key: SyncStorageKey | SessionStorageKey | LocalStorageKey,
   fn: (changes: { newValue: T | undefined; oldValue: T | undefined }) => void,
 ) {
   chrome.storage.onChanged.addListener((changes, areaName) => {

@@ -28,6 +28,14 @@ export const syncStorageKeys = {
   pinnedTabGroupBookmarkNodeId: "sync-2",
 } as const satisfies Record<string, SyncStorageKey>;
 
+export type LocalStorageKey = `local-${number}`;
+
+export const localStorageKeys = {
+  rootBookmarkNodeId: "local-1",
+  pinnedTabGroupBookmarkNodeId: "local-2",
+  fullscreen: "local-3",
+} as const satisfies Record<string, LocalStorageKey>;
+
 export type TabGroupType = `tabGroup-${number}`;
 
 export const tabGroupTypes = {

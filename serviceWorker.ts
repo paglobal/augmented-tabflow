@@ -12,6 +12,7 @@ import {
   tabGroupTreeDataUpdateDebounceTimeout,
   tabGroupTypes,
   titles,
+  localStorageKeys,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -216,7 +217,42 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
+chrome.windows.onBoundsChanged.addListener(async (window) => {
+  // @maybe
+  await syncWindowFullscreenState(window);
+});
+
+chrome.windows.onCreated.addListener(async (window) => {
+  // @maybe
+  const fullscreen = await getStorageData<boolean>(localStorageKeys.fullscreen);
+  if (window.type === "normal" && window.id) {
+    await chrome.windows.update(window.id, {
+      state: fullscreen ? "fullscreen" : "maximized",
+    });
+  }
+});
+
+chrome.windows.onFocusChanged.addListener(async (windowId) => {
+  // @maybe
+  if (windowId !== -1) {
+    const window = await chrome.windows.get(windowId);
+    await syncWindowFullscreenState(window);
+  }
+});
+
+async function syncWindowFullscreenState(window: chrome.windows.Window) {
+  // @maybe
+  if (window.type === "normal") {
+    if (window.state === "fullscreen") {
+      await setStorageData<boolean>(localStorageKeys.fullscreen, true);
+    } else {
+      await setStorageData<boolean>(localStorageKeys.fullscreen, false);
+    }
+  }
+}
+
 async function removeOldSessionTabs(tabGroupTreeData: TabGroupTreeData) {
+  // @maybe
   await navigator.locks.request(lockNames.removingOldSessionTabs, async () => {
     await setStorageData(sessionStorageKeys.removingOldSessionTabs, true);
   });
@@ -260,6 +296,7 @@ async function removeOldSessionTabs(tabGroupTreeData: TabGroupTreeData) {
 async function createSessionTabsFromSessionData(
   sessionData: chrome.bookmarks.BookmarkTreeNode,
 ) {
+  // @maybe
   const sessionDataChildren =
     (await chrome.bookmarks.getSubTree(sessionData.id))[0].children ?? [];
   if (!sessionDataChildren?.length) {
@@ -308,6 +345,7 @@ async function createSessionTabsFromSessionData(
 }
 
 async function createSessionTabsFromPreviousUnsavedSessionTabGroupTreeData() {
+  // @maybe
   const previousUnsavedSessionTabGroupTreeData =
     (await getStorageData<TabGroupTreeData>(
       sessionStorageKeys.previousUnsavedSessionTabGroupTreeData,
@@ -416,14 +454,10 @@ export async function moveTabOrTabGroupToWindow(
     | chrome.tabs.Tab
     | chrome.tabGroups.TabGroup
     | null,
-  windowId?: chrome.windows.Window["id"],
+  windowId: chrome.windows.Window["id"],
+  stubTabId?: chrome.tabs.Tab["id"],
 ) {
-  let stubTabId: chrome.tabs.Tab["id"] | undefined;
-  if (!windowId) {
-    const window = await chrome.windows.create();
-    stubTabId = (await chrome.tabs.query({ windowId: window?.id }))[0].id;
-    windowId = window?.id;
-  }
+  // @maybe
   if ((currentlyEjectedTabOrTabGroup as chrome.tabs.Tab).url) {
     await chrome.tabs.move(currentlyEjectedTabOrTabGroup?.id!, {
       windowId,
@@ -456,10 +490,16 @@ export async function moveTabOrTabGroupToWindow(
 }
 
 subscribeToMessage(messageTypes.moveTabOrTabGroupToWindow, (data) => {
-  moveTabOrTabGroupToWindow(data.currentlyEjectedTabOrTabGroup, data.windowId);
+  // @maybe
+  moveTabOrTabGroupToWindow(
+    data.currentlyEjectedTabOrTabGroup,
+    data.windowId,
+    data.stubTabId,
+  );
 });
 
 async function closeAllSessionWindows() {
+  // @maybe
   await navigator.locks.request(lockNames.applyUpdates, async () => {
     await setStorageData(sessionStorageKeys.sessionLoading, true);
     const sessionTabs = await chrome.tabs.query({ windowType: "normal" });
@@ -481,6 +521,7 @@ subscribeToMessage(messageTypes.closeAllSessionWindows, async () => {
 });
 
 async function getTabGroupTreeData() {
+  // @maybe
   const tabGroups = await chrome.tabGroups.query({});
   const tabs = await chrome.tabs.query({
     windowType: "normal",
@@ -597,6 +638,7 @@ async function getTabGroupTreeData() {
 async function removeBookmarkNodeChildren(
   bookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"],
 ) {
+  // @maybe
   const currentSessionDataChildren =
     await chrome.bookmarks.getChildren(bookmarkNodeId);
   for (const tabGroupData of currentSessionDataChildren) {
@@ -605,6 +647,7 @@ async function removeBookmarkNodeChildren(
 }
 
 async function updateCurrentSessionData() {
+  // @maybe
   const readyToUpdateCurrentSessionData = await getStorageData<boolean>(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
   );
@@ -647,6 +690,7 @@ async function updateCurrentSessionData() {
 }
 
 async function reinitializePinnedTabs() {
+  // @maybe
   await setStorageData(sessionStorageKeys.sessionLoading, true);
   const oldPinnedTabs = await chrome.tabs.query({ pinned: true });
   for (const tab of oldPinnedTabs) {
@@ -681,10 +725,23 @@ async function reinitializePinnedTabs() {
 }
 
 async function applyUpdates() {
+  // @maybe
   navigator.locks.request(lockNames.applyUpdates, async () => {
     const startup = await getStorageData<boolean>(sessionStorageKeys.startup);
     if (startup === undefined) {
       await reinitializePinnedTabs();
+      const fullscreen = await getStorageData<boolean>(
+        localStorageKeys.fullscreen,
+      );
+      const sessionWindows = await chrome.windows.getAll({
+        windowTypes: ["normal"],
+      });
+      sessionWindows.forEach(async (sessionWindow) => {
+        if (sessionWindow.id) {
+          const newState = fullscreen ? "fullscreen" : sessionWindow.state;
+          await chrome.windows.update(sessionWindow.id, { state: newState });
+        }
+      });
       await setStorageData(sessionStorageKeys.startup, false);
     }
     const tabGroupTreeData = await getTabGroupTreeData();
@@ -700,6 +757,7 @@ async function applyUpdates() {
 }
 
 async function updateTabGroupTreeDataAndCurrentSessionData() {
+  // @maybe
   const debounceTabGroupTreeDataUpdates = await getStorageData<boolean>(
     sessionStorageKeys.debounceTabGroupTreeDataUpdates,
   );
@@ -740,11 +798,13 @@ async function updateTabGroupTreeDataAndCurrentSessionData() {
 subscribeToMessage(
   messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
   async () => {
+    // @maybe
     await updateTabGroupTreeDataAndCurrentSessionData();
   },
 );
 
 chrome.commands.onCommand.addListener(async (command) => {
+  // @maybe
   if (command === commands.closeAllSessionWindows) {
     closeAllSessionWindows();
   } else if (command === commands.exitCurrentSession) {

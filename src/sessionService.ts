@@ -1,5 +1,6 @@
 import { adaptState } from "promethium-js";
 import {
+  localStorageKeys,
   messageTypes,
   protocolsEligibleForEncoding,
   sessionStorageKeys,
@@ -38,6 +39,7 @@ export const [tabGroupTreeData, setTabGroupTreeData] =
 updateTabGroupTreeData();
 
 async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
+  // @error
   if (tabGroupTreeData === undefined) {
     tabGroupTreeData =
       (await getStorageData<TabGroupTreeData>(
@@ -180,6 +182,7 @@ updateCurrentSessionData();
 async function updateCurrentSessionData(
   currentSessionData?: chrome.bookmarks.BookmarkTreeNode | null,
 ) {
+  // @error
   if (currentSessionData === undefined) {
     currentSessionData =
       (await getStorageData<chrome.bookmarks.BookmarkTreeNode>(
@@ -478,6 +481,7 @@ export async function importTabGroupFromSession(
   tabGroupData: chrome.bookmarks.BookmarkTreeNode,
   copy: boolean = false,
 ) {
+  // @maybe
   notify("Importing tab group...", "primary");
   const ungrouped = tabGroupData.title === titles.ungroupedTabGroup;
   let tabGroupDataChildren: Array<chrome.bookmarks.BookmarkTreeNode> = [];
@@ -549,11 +553,20 @@ export async function importTabGroupFromSession(
 export async function moveTabOrTabGroupToWindow(
   windowId?: chrome.windows.Window["id"],
 ) {
+  // @maybe
+  let stubTabId: chrome.tabs.Tab["id"] | undefined;
+  if (!windowId) {
+    const window = await chrome.windows.create();
+    stubTabId = (await chrome.tabs.query({ windowId: window?.id }))[0].id;
+    windowId = window?.id;
+  }
+  await chrome.sidePanel.open({ windowId });
   sendMessage({
     type: messageTypes.moveTabOrTabGroupToWindow,
     data: {
       currentlyEjectedTabOrTabGroup: currentlyEjectedTabOrTabGroup(),
       windowId,
+      stubTabId,
     },
   });
   setCurrentlyEjectedTabOrTabGroup(null);
@@ -561,6 +574,7 @@ export async function moveTabOrTabGroupToWindow(
 }
 
 export async function navigate(query: string) {
+  // @maybe
   let url: string | undefined;
   try {
     url = new URL(query).href;
@@ -589,3 +603,25 @@ export async function navigate(query: string) {
   }
   await navigateDialogRef.value?.hide();
 }
+
+export const [fullscreen, setFullscreen] = adaptState<boolean>(false);
+
+async function updateFullscreen(window?: chrome.windows.Window) {
+  if (window === undefined) {
+    const currentWindow = await chrome.windows.getCurrent({
+      windowTypes: ["normal"],
+    });
+    setFullscreen(currentWindow.state === "fullscreen" ? true : false);
+  } else {
+    setFullscreen(window.state === "fullscreen" ? true : false);
+  }
+}
+
+chrome.windows.onBoundsChanged.addListener(async (window) => {
+  const currentWindow = await chrome.windows.getCurrent({
+    windowTypes: ["normal"],
+  });
+  if (window.id === currentWindow.id) {
+    updateFullscreen(window);
+  }
+});

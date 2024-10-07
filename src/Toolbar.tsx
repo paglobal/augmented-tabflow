@@ -4,6 +4,7 @@ import {
   createTabGroup,
   currentSessionData,
   currentSessionDataNotAvailable,
+  fullscreen,
 } from "./sessionService";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -17,8 +18,10 @@ import {
 } from "./App";
 
 export function Toolbar() {
-  return () =>
-    html` <div
+  return () => {
+    const _fullscreen = fullscreen();
+
+    return html` <div
       style=${styleMap({
         display: "flex",
         justifyContent: "center",
@@ -134,11 +137,23 @@ export function Toolbar() {
               ></sl-icon-button>
             `}
         <sl-icon-button
-          name="fullscreen"
-          title="Enter Fullscreen"
-          @click=${() => {
+          name=${_fullscreen ? "fullscreen-exit" : "fullscreen"}
+          title=${_fullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          @click=${async () => {
             // @handled
             try {
+              const currentWindow = await chrome.windows.getCurrent();
+              if (currentWindow.id) {
+                if (currentWindow.state === "fullscreen") {
+                  await chrome.windows.update(currentWindow.id, {
+                    state: "maximized",
+                  });
+                } else {
+                  await chrome.windows.update(currentWindow.id, {
+                    state: "fullscreen",
+                  });
+                }
+              }
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
@@ -160,4 +175,5 @@ export function Toolbar() {
         ></sl-icon-button>
       </sl-button-group>
     </div>`;
+  };
 }
