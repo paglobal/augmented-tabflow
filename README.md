@@ -34,10 +34,11 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - display other windows in vertical view
 - open side-panel in any new windows we create or move to
 -
-- use popups with `Ctrl + T` and `Alt + L` on fullscreen
+- use popups with `Ctrl + T` and `Alt + L` on fullscreen (document the ability to change controls)
 
 ### Less Urgent
 
+- look into loading states
 - report possible bug with menu navigation in shoelace (up and down arrow navigation)
 - experiment with focusing the last active element on a page after activating the page
 - load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip

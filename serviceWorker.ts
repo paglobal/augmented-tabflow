@@ -2,9 +2,9 @@ import {
   SessionData,
   commands,
   lockNames,
-  messageTypes,
   onInstalledPage,
   onUpdatedPage,
+  messageTypes,
   sessionStorageKeys,
   stubPagePathName,
   syncStorageKeys,
@@ -755,5 +755,6 @@ chrome.commands.onCommand.addListener(async (command) => {
     if (currentSessionData) {
       openNewSession(null);
     }
+  } else if (command === commands.openNavigationBox) {
   }
 });

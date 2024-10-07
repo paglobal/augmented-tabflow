@@ -123,6 +123,7 @@ export function NavigateDialog() {
       ...bookmarkSuggestions(),
       ...googleSuggestions(),
     ];
+    const encounteredValues: Record<string, boolean> = {};
     const aggregateSuggestions = fuzzysort
       .go(
         navigateInputRef.value?.value ?? "",
@@ -131,6 +132,16 @@ export function NavigateDialog() {
           keys: ["value", "title"],
         },
       )
+      // filter out duplicates
+      .filter((suggestion) => {
+        if (encounteredValues[suggestion.obj.value]) {
+          return false;
+        } else {
+          encounteredValues[suggestion.obj.value] = true;
+
+          return true;
+        }
+      })
       .slice(0, maxSuggestionsInTotal);
 
     return aggregateSuggestions;
@@ -271,6 +282,7 @@ export function NavigateDialog() {
 
                     return html`
                       <sl-menu-item
+                        title=${`${suggestion.obj.title} - ${suggestion.obj.value}`}
                         value=${suggestion.obj.value}
                         @keydown=${(e: KeyboardEvent) => {
                           if (
@@ -299,7 +311,7 @@ export function NavigateDialog() {
                                   : undefined
                               }
                               pageUrl={
-                                suggestion.obj.type === "google"
+                                suggestion.obj.type !== "google"
                                   ? suggestion.obj.value
                                   : undefined
                               }

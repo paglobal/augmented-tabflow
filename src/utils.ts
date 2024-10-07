@@ -15,14 +15,6 @@ export const tabGroupColors = () => ({
   orange: "#FFAA6F",
 });
 
-export function randomTabGroupColorValue() {
-  const tabGroupColorNames = Object.keys(tabGroupColors());
-
-  return tabGroupColorNames[
-    Math.floor(Math.random() * tabGroupColorNames.length)
-  ] as chrome.tabGroups.Color;
-}
-
 // copied from "https://shoelace.style/components/alert" and slightly modified
 export function notify(
   message: string,

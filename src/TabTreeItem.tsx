@@ -3,21 +3,15 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import { TreeItem } from "./TreeItem";
 import { type TabGroupTreeData } from "../sharedUtils";
-import { activateTab } from "./sessionService";
+import { activateTab, createTabGroup } from "./sessionService";
 import {
-  addTabGroupDialogRef,
-  addTabGroupSelectRef,
   moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEjectedTabOrTabGroup,
-  setFirstTabInNewTabGroup,
 } from "./App";
 import { lockNames, newTabUrls, tabGroupTypes } from "../constants";
-import {
-  notifyWithErrorMessageAndReloadButton,
-  randomTabGroupColorValue,
-} from "./utils";
+import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
   navigateDialogRef,
   navigateInputRef,
@@ -180,11 +174,11 @@ export function TabTreeItem(props: {
                 <sl-icon-button
                   name="folder-minus"
                   title="Remove From Group"
-                  @click=${(e: Event) => {
+                  @click=${async (e: Event) => {
                     // @handled
                     try {
                       e.stopPropagation();
-                      chrome.tabs.ungroup(tab.id as number);
+                      await chrome.tabs.ungroup(tab.id as number);
                     } catch (error) {
                       console.error(error);
                       notifyWithErrorMessageAndReloadButton();
@@ -199,11 +193,7 @@ export function TabTreeItem(props: {
               // @handled
               try {
                 e.stopPropagation();
-                setFirstTabInNewTabGroup(tab);
-                if (addTabGroupSelectRef.value) {
-                  addTabGroupSelectRef.value.value = randomTabGroupColorValue();
-                }
-                await addTabGroupDialogRef.value?.show();
+                await createTabGroup(tab);
               } catch (error) {
                 console.error(error);
                 notifyWithErrorMessageAndReloadButton();

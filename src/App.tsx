@@ -26,16 +26,11 @@ import { SessionIndicator } from "./SessionIndicator";
 import { DialogForm } from "./DialogForm";
 import { Tree } from "./Tree";
 import { NavigateDialog } from "./NavigateDialog";
-import {
-  tabGroupColors,
-  randomTabGroupColorValue,
-  notifyWithErrorMessageAndReloadButton,
-} from "./utils";
+import { tabGroupColors, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
   createSession,
   updateTabGroup,
   updateSessionTitle,
-  createTabGroup,
   deleteSession,
 } from "./sessionService";
 import { fallbackTreeContent } from "./fallbackTreeContent";
@@ -58,8 +53,6 @@ export const editTabGroupDialogRefs = {
 };
 export const helpDialogRef = createRef<SlDialog>();
 export const saveCurrentSessionDialogRef = createRef<SlDialog>();
-export const addTabGroupDialogRef = createRef<SlDialog>();
-export const addTabGroupSelectRef = createRef<SlSelect>();
 export const newSessionDialogRef = createRef<SlDialog>();
 export const editSessionDialogRef = createRef<SlDialog>();
 export const editSessionInputRef = createRef<SlInput>();
@@ -86,8 +79,6 @@ export const [
 ] = adaptState<chrome.tabs.Tab | TabGroupTreeData[number] | null>(null);
 export const [currentlyEjectedTabOrTabGroup, setCurrentlyEjectedTabOrTabGroup] =
   adaptState<chrome.tabs.Tab | TabGroupTreeData[number] | null>(null);
-export const [firstTabInNewTabGroup, setFirstTabInNewTabGroup] =
-  adaptState<chrome.tabs.Tab | null>(null);
 
 export function App() {
   return () =>
@@ -214,57 +205,6 @@ export function App() {
                     ></sl-input>
                     <sl-select
                       ${ref(editTabGroupDialogRefs.select)}
-                      name="color"
-                      placeholder="Color"
-                      hoist
-                    >
-                      ${Object.entries(tabGroupColors()).map(
-                        ([colorName, colorValue]) => html`
-                          <sl-option value=${colorName}
-                            ><div></div>
-                            <span
-                              slot="prefix"
-                              style=${styleMap({
-                                background: colorValue,
-                                width: "0.8rem",
-                                height: "0.8rem",
-                                marginRight: "1rem",
-                                borderRadius: "50%",
-                                outline:
-                                  "0.15rem solid var(--sl-color-neutral-1000)",
-                                outlineOffset: "0.15rem",
-                              })}
-                            ></span
-                            >${colorName}</sl-option
-                          >
-                        `,
-                      )}
-                    </sl-select>
-                  `}
-                </DialogForm>
-                <DialogForm
-                  dialogLabel="Add Tab Group"
-                  dialogRef={addTabGroupDialogRef}
-                  submitButtonText="Save"
-                  formAction={async (data: {
-                    title: chrome.tabGroups.TabGroup["title"];
-                    color: chrome.tabGroups.Color;
-                  }) => {
-                    // @maybe
-                    if (!data.color) {
-                      data.color = randomTabGroupColorValue();
-                    }
-                    createTabGroup(data);
-                  }}
-                >
-                  {html`
-                    <sl-input
-                      name="title"
-                      placeholder="Title"
-                      autofocus
-                    ></sl-input>
-                    <sl-select
-                      ${ref(addTabGroupSelectRef)}
                       name="color"
                       placeholder="Color"
                       hoist

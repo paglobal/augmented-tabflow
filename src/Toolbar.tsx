@@ -1,29 +1,20 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import {
+  createTabGroup,
   currentSessionData,
   currentSessionDataNotAvailable,
 } from "./sessionService";
-import {
-  notifyWithErrorMessageAndReloadButton,
-  randomTabGroupColorValue,
-} from "./utils";
+import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
   helpDialogRef,
-  addTabGroupDialogRef,
   editSessionInputRef,
   editSessionDialogRef,
   setCurrentlyDeletedSessionId,
   setCurrentlyDeletedSessionIsCurrentSession,
   deleteSessionDialogRef,
-  addTabGroupSelectRef,
   importTabGroupFromSessionTreeDialogRef,
 } from "./App";
-import {
-  navigateDialogRef,
-  navigateInputRef,
-  setCurrentlyNavigatedTabId,
-} from "./NavigateDialog";
 
 export function Toolbar() {
   return () =>
@@ -46,15 +37,10 @@ export function Toolbar() {
         <sl-icon-button
           name="plus-lg"
           title="New Tab"
-          @click=${async (e: Event) => {
+          @click=${async () => {
             // @handled
             try {
-              e.stopPropagation();
-              setCurrentlyNavigatedTabId(null);
-              if (navigateInputRef.value) {
-                navigateInputRef.value.value = "";
-              }
-              await navigateDialogRef.value?.show();
+              await chrome.tabs.create({});
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
@@ -67,10 +53,7 @@ export function Toolbar() {
           @click=${async () => {
             // @handled
             try {
-              if (addTabGroupSelectRef.value) {
-                addTabGroupSelectRef.value.value = randomTabGroupColorValue();
-              }
-              await addTabGroupDialogRef.value?.show();
+              await createTabGroup();
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();

@@ -44,6 +44,10 @@
     "exit-current-session": {
       "suggested_key": "Alt+Q",
       "description": "Exit current session"
+    },
+    "open-navigation-box": {
+      "suggested_key": "Alt+L",
+      "description": "Open navigation box"
     }
   }
 }

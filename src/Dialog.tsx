@@ -30,16 +30,17 @@ export function Dialog(props: {
         "--header-spacing": "1rem",
         "--body-spacing": `${bodyMargins.top} ${bodyMargins.right} ${bodyMargins.bottom} ${bodyMargins.left}`,
       })}
-      @sl-hide=${() =>
+      @sl-after-show=${props.onAfterShow}
+      @sl-after-hide=${() => {
+        props.onAfterHide?.();
         document.addEventListener(
           "focusin",
           () => {
             (document.activeElement as HTMLElement)?.blur();
           },
           { once: true },
-        )}
-      @sl-after-show=${props.onAfterShow}
-      @sl-after-hide=${props.onAfterHide}
+        );
+      }}
     >
       <div
         style=${styleMap({

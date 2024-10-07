@@ -90,6 +90,7 @@ export const onUpdatedPage =
 export const commands = {
   closeAllSessionWindows: "close-all-session-windows",
   exitCurrentSession: "exit-current-session",
+  openNavigationBox: "open-navigation-box",
 };
 
 export const tlds = [

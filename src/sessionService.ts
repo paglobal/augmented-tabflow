@@ -23,14 +23,12 @@ import {
   currentlyEjectedTabOrTabGroup,
   currentlyMovedOrCopiedTabOrTabGroup,
   deleteSessionDialogRef,
-  firstTabInNewTabGroup,
   moveOrCopyTabGroupToSessionTreeDialogRef,
   moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,
   sessionsTreeDialogRef,
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEjectedTabOrTabGroup,
-  setFirstTabInNewTabGroup,
 } from "./App";
 import { currentlyNavigatedTabId, navigateDialogRef } from "./NavigateDialog";
 
@@ -138,24 +136,18 @@ export async function activateTab(tab: chrome.tabs.Tab) {
   await chrome.tabs.update(tab.id as number, { active: true });
 }
 
-export async function createTabGroup(options: {
-  title: chrome.tabGroups.TabGroup["title"];
-  color: chrome.tabGroups.Color;
-}) {
+export async function createTabGroup(tab?: chrome.tabs.Tab) {
   // @maybe
-  let _firstTabInNewTabGroup = firstTabInNewTabGroup();
-  if (!_firstTabInNewTabGroup) {
-    _firstTabInNewTabGroup = await chrome.tabs.create({ active: true });
+  if (!tab) {
+    tab = await chrome.tabs.create({ active: true });
   }
-  const groupId = await chrome.tabs.group({
-    tabIds: _firstTabInNewTabGroup.id as number,
+  const tabGroupId = await chrome.tabs.group({
+    tabIds: tab.id as number,
     createProperties: {
-      windowId: _firstTabInNewTabGroup.windowId,
+      windowId: tab.windowId,
     },
   });
-  await chrome.tabGroups.update(groupId, options);
-  await chrome.tabGroups.move(groupId, { index: -1 });
-  setFirstTabInNewTabGroup(null);
+  await chrome.tabGroups.move(tabGroupId, { index: -1 });
 }
 
 export function updateTabGroup(
@@ -573,27 +565,27 @@ export async function navigate(query: string) {
   try {
     url = new URL(query).href;
   } catch (error) {
-    const possibleUrl = protocolsEligibleForEncoding[0] + query;
-    const urlFromUrl = new URL(possibleUrl);
-    console.log(urlFromUrl);
-    url = tlds.some((tld) =>
-      // convert both to lowercase just in case
-      urlFromUrl.origin.toLowerCase().endsWith(`.${tld.toLowerCase()}`),
-    )
-      ? possibleUrl
-      : undefined;
+    try {
+      const possibleUrl = protocolsEligibleForEncoding[0] + query;
+      const urlFromUrl = new URL(possibleUrl);
+      url = tlds.some((tld) =>
+        // convert both to lowercase just in case
+        urlFromUrl.origin.toLowerCase().endsWith(`.${tld.toLowerCase()}`),
+      )
+        ? possibleUrl
+        : undefined;
+    } catch (error) {}
   }
-  let tabId = currentlyNavigatedTabId();
-  if (!tabId) {
-    tabId = (await chrome.tabs.create({})).id;
-  }
-  if (url && tabId) {
-    await chrome.tabs.update(tabId, { url });
-  } else {
-    await chrome.search.query({
-      text: query,
-      tabId,
-    });
+  const _currentlyNavigatedTabId = currentlyNavigatedTabId();
+  if (_currentlyNavigatedTabId) {
+    if (url) {
+      await chrome.tabs.update(_currentlyNavigatedTabId, { url });
+    } else {
+      await chrome.search.query({
+        text: query,
+        tabId: _currentlyNavigatedTabId,
+      });
+    }
   }
   await navigateDialogRef.value?.hide();
 }
