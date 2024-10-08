@@ -11,6 +11,7 @@ export const sessionStorageKeys = {
   tabGroupTreeDataUpdateTimeoutId: "session-4",
   ungroupedTabGroupCollapsed: "session-5",
   previousUnsavedSessionTabGroupTreeData: "session-6",
+  // TODO: get on this as soon as you can
   recentlyClosedTabGroups: "session-7",
   readyToUpdateCurrentSessionData: "session-8",
   pinnedTabGroupCollapsed: "session-9",
@@ -19,6 +20,7 @@ export const sessionStorageKeys = {
   stubTabId: "session-12",
   removingOldSessionTabs: "session-13",
   startup: "session-14",
+  currentlyNavigatedTabId: "session-15",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;
@@ -34,6 +36,8 @@ export const localStorageKeys = {
   rootBookmarkNodeId: "local-1",
   pinnedTabGroupBookmarkNodeId: "local-2",
   fullscreen: "local-3",
+  screenWidth: "local-4",
+  screenHeight: "local-5",
 } as const satisfies Record<string, LocalStorageKey>;
 
 export type TabGroupType = `tabGroup-${number}`;
@@ -87,6 +91,8 @@ export const tabGroupTreeDataUpdateDebounceTimeout = 200;
 
 export const stubPagePathName = "/stubPage.html";
 
+export const navigationBoxPathName = "/navigationBox.html";
+
 export const protocolsEligibleForEncoding = ["https:", "http:"];
 
 export const onInstalledPage =
@@ -100,6 +106,8 @@ export const commands = {
   exitCurrentSession: "exit-current-session",
   openNavigationBox: "open-navigation-box",
 };
+
+export const navigationBoxDimensions = { width: 780, height: 400 };
 
 export const tlds = [
   "AAA",

@@ -1,7 +1,7 @@
 import { html } from "lit";
 import { Ref, ref } from "lit/directives/ref.js";
 import { styleMap } from "lit/directives/style-map.js";
-import { SlDialog } from "@shoelace-style/shoelace";
+import { SlDialog, SlRequestCloseEvent } from "@shoelace-style/shoelace";
 import { PromethiumNode } from "promethium-js";
 
 export function Dialog(props: {
@@ -12,6 +12,9 @@ export function Dialog(props: {
   noTopBodyMargin?: boolean;
   onAfterShow?: () => void;
   onAfterHide?: () => void;
+  onHide?: () => void;
+  open?: boolean;
+  preventClosing?: boolean;
 }) {
   const bodyMargins = {
     top: props.noTopBodyMargin ? "0" : "1rem",
@@ -22,13 +25,16 @@ export function Dialog(props: {
 
   return () => html`
     <sl-dialog
-      label=${props.label}
       ${ref(props.ref)}
+      ?open=${props.open}
+      .noHeader=${props.preventClosing ? true : false}
+      label=${props.label}
       style=${styleMap({
         fontSize: "1rem",
         color: "var(--sl-color-neutral-800)",
         "--header-spacing": "1rem",
         "--body-spacing": `${bodyMargins.top} ${bodyMargins.right} ${bodyMargins.bottom} ${bodyMargins.left}`,
+        "--width": "min(800px, 90%)",
       })}
       @sl-after-show=${props.onAfterShow}
       @sl-after-hide=${() => {
@@ -40,6 +46,12 @@ export function Dialog(props: {
           },
           { once: true },
         );
+      }}
+      @sl-hide=${props.onHide}
+      @sl-request-close=${(e: SlRequestCloseEvent) => {
+        if (props.preventClosing && e.detail.source === "overlay") {
+          e.preventDefault();
+        }
       }}
     >
       <div

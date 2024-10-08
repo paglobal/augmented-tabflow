@@ -27,16 +27,17 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - implement local persistence pertaining to window instances (bookmarkId => windowInstanceNumber)
 - update local data on every session save
 - use local data to open tabs in appropriate window instances on session open
-- add two-finger swipe to switch windows
 - display other windows in vertical view
+- add two-finger swipe to switch windows
 - open side-panel in any new windows we create or move to
+
 - use popups with `Ctrl + T` and `Alt + L` on fullscreen (document the ability to change controls)
 
 ### Less Urgent
 
-- look into loading states
-- report possible bug with menu navigation in shoelace (up and down arrow navigation)
 - experiment with focusing the last active element on a page after activating the page
+- look into (false) loading states
+- report possible bug with menu navigation in shoelace (up and down arrow navigation)
 - load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
 - add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group`)
 - add options for merging tab groups with other tab groups under `Ungroup Tabs` (ie. where do you want to move them to? `Ungrouped Tabs` or some other tab group?)

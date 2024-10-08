@@ -1,6 +1,5 @@
 import { adaptState } from "promethium-js";
 import {
-  localStorageKeys,
   messageTypes,
   protocolsEligibleForEncoding,
   sessionStorageKeys,
@@ -46,7 +45,6 @@ async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
         sessionStorageKeys.tabGroupTreeData,
       )) ?? [];
   }
-  // filter out any tabs or tab groups that are not in this window
   const currentWindowId = (await chrome.windows.getCurrent()).id;
   tabGroupTreeData.forEach((tabGroup) => {
     if (!tabGroup.windowId) {

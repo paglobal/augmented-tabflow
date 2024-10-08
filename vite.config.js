@@ -8,7 +8,8 @@ export default defineConfig({
       input: {
         script: resolve(__dirname, "index.html"),
         serviceWorker: resolve(__dirname, "serviceWorker.ts"),
-        stubPage: resolve(__dirname, "stubPage.ts"),
+        stubPage: resolve(__dirname, "stubPage.html"),
+        navigationBox: resolve(__dirname, "navigationBox.html"),
       },
       output: {
         entryFileNames: "[name].js",

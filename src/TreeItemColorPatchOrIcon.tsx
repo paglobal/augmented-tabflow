@@ -17,11 +17,14 @@ export function TreeItemColorPatchOrIcon(props: {
 
   return () => {
     setTimeout(async () => {
-      // don't think this does anything but just in case
-      await fetch(getFaviconUrl(props.pageUrl), {
-        method: "POST",
-        credentials: "include",
-      });
+      // @error
+      try {
+        // don't think this does anything but just in case
+        await fetch(getFaviconUrl(props.pageUrl), {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch (error) {}
       // actual assignment to prevent use of wrong image
       if (imageRef.value) {
         imageRef.value.src = getFaviconUrl(props.pageUrl);

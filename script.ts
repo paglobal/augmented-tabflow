@@ -4,6 +4,7 @@ import { App } from "./src/App";
 import { setThemeMode } from "./src/utils";
 import { createBookmarkNodeAndSyncId, sendMessage } from "./sharedUtils";
 import { titles, syncStorageKeys, messageTypes } from "./constants";
+import "./customElements";
 
 (async function () {
   // @error

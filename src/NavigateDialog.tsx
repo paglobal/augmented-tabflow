@@ -29,7 +29,11 @@ export const [currentlyNavigatedTabId, setCurrentlyNavigatedTabId] = adaptState<
   chrome.tabs.Tab["id"] | null
 >(null);
 
-export function NavigateDialog() {
+export function NavigateDialog(props: {
+  onHide?: () => void;
+  open?: boolean;
+  preventClosing?: boolean;
+}) {
   const suggestionsDebounceTime = 500;
   const maxSuggestionsPerCategory = 5;
   const maxSuggestionsInTotal = 10;
@@ -132,7 +136,6 @@ export function NavigateDialog() {
           keys: ["value", "title"],
         },
       )
-      // filter out duplicates
       .filter((suggestion) => {
         if (encounteredValues[suggestion.obj.value]) {
           return false;
@@ -152,6 +155,8 @@ export function NavigateDialog() {
   return () => {
     return (
       <Dialog
+        open={props.open}
+        preventClosing={props.preventClosing}
         label="Navigate"
         ref={navigateDialogRef}
         onAfterShow={() => {
@@ -160,77 +165,73 @@ export function NavigateDialog() {
         onAfterHide={() => {
           setNavigationDropdownActive(false);
         }}
+        onHide={props.onHide}
       >
         {html`
-          ${currentlyNavigatedTabId()
-            ? html`
-                <sl-button-group
-                  label="Navigation Tools"
-                  style=${styleMap({
-                    fontSize: "1rem",
-                    marginTop: "-0.5rem",
-                    paddingBottom: "0.5rem",
-                    display: "flex",
-                    justifyContent: "center",
-                  })}
-                >
-                  <sl-icon-button
-                    name="arrow-left"
-                    title="Go Back"
-                    @click=${async () => {
-                      // @handled
-                      try {
-                        const _currentyNavigatedTabId =
-                          currentlyNavigatedTabId();
-                        if (_currentyNavigatedTabId) {
-                          await chrome.tabs.goBack(_currentyNavigatedTabId);
-                        }
-                      } catch (error) {
-                        console.error(error);
-                        notifyWithErrorMessageAndReloadButton();
-                      }
-                    }}
-                  ></sl-icon-button>
-                  <sl-icon-button
-                    name="arrow-right"
-                    title="Go Forward"
-                    @click=${async () => {
-                      // @handled
-                      try {
-                        const _currentyNavigatedTabId =
-                          currentlyNavigatedTabId();
-                        if (_currentyNavigatedTabId) {
-                          await chrome.tabs.goForward(_currentyNavigatedTabId);
-                        }
-                      } catch (error) {
-                        console.error(error);
-                        notifyWithErrorMessageAndReloadButton();
-                      }
-                    }}
-                  ></sl-icon-button>
-                  <sl-icon-button
-                    name="arrow-clockwise"
-                    title="Reload Page"
-                    @click=${async () => {
-                      // @handled
-                      try {
-                        const _currentyNavigatedTabId =
-                          currentlyNavigatedTabId();
-                        if (_currentyNavigatedTabId) {
-                          await chrome.tabs.reload(_currentyNavigatedTabId);
-                        }
-                      } catch (error) {
-                        console.error(error);
-                        notifyWithErrorMessageAndReloadButton();
-                      }
-                    }}
-                  ></sl-icon-button>
-                </sl-button-group>
-              `
-            : null}
+          <sl-button-group
+            label="Navigation Tools"
+            style=${styleMap({
+              fontSize: "1rem",
+              marginTop: "-0.5rem",
+              paddingBottom: "0.5rem",
+              display: "flex",
+              justifyContent: "center",
+            })}
+          >
+            <sl-icon-button
+              name="arrow-left"
+              title="Go Back"
+              @click=${async () => {
+                // @handled
+                try {
+                  const _currentyNavigatedTabId = currentlyNavigatedTabId();
+                  if (_currentyNavigatedTabId) {
+                    await chrome.tabs.goBack(_currentyNavigatedTabId);
+                  }
+                } catch (error) {
+                  console.error(error);
+                  notifyWithErrorMessageAndReloadButton();
+                }
+              }}
+            ></sl-icon-button>
+            <sl-icon-button
+              name="arrow-right"
+              title="Go Forward"
+              @click=${async () => {
+                // @handled
+                try {
+                  const _currentyNavigatedTabId = currentlyNavigatedTabId();
+                  if (_currentyNavigatedTabId) {
+                    await chrome.tabs.goForward(_currentyNavigatedTabId);
+                  }
+                } catch (error) {
+                  console.error(error);
+                  notifyWithErrorMessageAndReloadButton();
+                }
+              }}
+            ></sl-icon-button>
+            <sl-icon-button
+              name="arrow-clockwise"
+              title="Reload Page"
+              @click=${async () => {
+                // @handled
+                try {
+                  const _currentyNavigatedTabId = currentlyNavigatedTabId();
+                  if (_currentyNavigatedTabId) {
+                    await chrome.tabs.reload(_currentyNavigatedTabId);
+                  }
+                } catch (error) {
+                  console.error(error);
+                  notifyWithErrorMessageAndReloadButton();
+                }
+              }}
+            ></sl-icon-button>
+          </sl-button-group>
           <sl-popup
             placement="bottom"
             sync="width"
+            auto-size="both"
+            auto-size-padding="10"
             ?active=${navigationDropdownActive()}
           >
             <sl-input
@@ -250,16 +251,24 @@ export function NavigateDialog() {
                 }
               }}
               @keydown=${(e: KeyboardEvent) => {
-                if (e.key === "ArrowDown") {
-                  (
-                    navigateSuggestionsMenuRef.value
-                      ?.firstElementChild as HTMLElement
-                  )?.focus();
+                if (e.key === "ArrowDown" || e.key === "Tab") {
+                  const newCurrentMenuItem = navigateSuggestionsMenuRef.value
+                    ?.firstElementChild as SlMenuItem | null;
+                  if (newCurrentMenuItem) {
+                    newCurrentMenuItem?.focus();
+                    navigateSuggestionsMenuRef.value?.setCurrentItem(
+                      newCurrentMenuItem,
+                    );
+                  }
                 } else if (e.key === "ArrowUp") {
-                  (
-                    navigateSuggestionsMenuRef.value
-                      ?.lastElementChild as HTMLElement
-                  )?.focus();
+                  const newCurrentMenuItem = navigateSuggestionsMenuRef.value
+                    ?.lastElementChild as SlMenuItem | null;
+                  if (newCurrentMenuItem) {
+                    newCurrentMenuItem?.focus();
+                    navigateSuggestionsMenuRef.value?.setCurrentItem(
+                      newCurrentMenuItem,
+                    );
+                  }
                 } else if (e.key === "Enter") {
                   navigate(navigateInputRef.value?.value ?? "");
                 }
@@ -268,8 +277,22 @@ export function NavigateDialog() {
             ${aggregateSuggestions().length > 0
               ? html`<sl-menu
                   ${ref(navigateSuggestionsMenuRef)}
+                  style=${styleMap({
+                    maxWidth: "var(--auto-size-available-width)",
+                    maxHeight: "var(--auto-size-available-height)",
+                    overflow: "auto",
+                  })}
                   @sl-select=${async (e: SlSelectEvent) => {
                     await navigate(e.detail.item.value);
+                  }}
+                  @scroll=${() => {
+                    const firstMenuItem =
+                      navigateSuggestionsMenuRef.value?.firstElementChild;
+                    const currentMenuItem =
+                      navigateSuggestionsMenuRef.value?.getCurrentItem();
+                    if (firstMenuItem === currentMenuItem) {
+                      navigateSuggestionsMenuRef.value?.scrollTo(0, 0);
+                    }
                   }}
                 >
                   ${aggregateSuggestions().map((suggestion) => {
@@ -282,7 +305,9 @@ export function NavigateDialog() {
 
                     return html`
                       <sl-menu-item
-                        title=${`${suggestion.obj.title} - ${suggestion.obj.value}`}
+                        title=${`${suggestion.obj.title ?? "Untitled"} - ${
+                          suggestion.obj.value
+                        }`}
                         value=${suggestion.obj.value}
                         @keydown=${(e: KeyboardEvent) => {
                           if (
@@ -294,10 +319,12 @@ export function NavigateDialog() {
                           }
                         }}
                         @mouseenter=${(e: Event) => {
-                          const menuItem = e.target as SlMenuItem;
-                          navigateSuggestionsMenuRef.value?.setCurrentItem(
-                            menuItem,
-                          );
+                          const menuItem = e.target as SlMenuItem | null;
+                          if (menuItem) {
+                            navigateSuggestionsMenuRef.value?.setCurrentItem(
+                              menuItem,
+                            );
+                          }
                         }}
                       >
                         ${(
