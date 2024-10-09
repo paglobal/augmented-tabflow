@@ -1,19 +1,19 @@
 import { App } from "./src/App";
 import { setThemeMode, initApp } from "./src/utils";
-import { createBookmarkNodeAndSyncId, sendMessage } from "./sharedUtils";
-import { titles, syncStorageKeys, messageTypes } from "./constants";
+import { createBookmarkNodeAndStoreId, sendMessage } from "./sharedUtils";
+import { titles, messageTypes, localStorageKeys } from "./constants";
 import "./customElements";
 
 initApp(
   App,
   async () => {
     // @error
-    await createBookmarkNodeAndSyncId(
-      syncStorageKeys.rootBookmarkNodeId,
+    await createBookmarkNodeAndStoreId(
+      localStorageKeys.rootBookmarkNodeId,
       titles.rootBookmarkNode,
     );
-    await createBookmarkNodeAndSyncId(
-      syncStorageKeys.pinnedTabGroupBookmarkNodeId,
+    await createBookmarkNodeAndStoreId(
+      localStorageKeys.pinnedTabGroupBookmarkNodeId,
       titles.pinnedTabGroup,
     );
     await sendMessage({

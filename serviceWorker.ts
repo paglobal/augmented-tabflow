@@ -19,7 +19,7 @@ import {
 } from "./constants";
 import {
   type TabGroupTreeData,
-  createBookmarkNodeAndSyncId,
+  createBookmarkNodeAndStoreId,
   getStorageData,
   setStorageData,
   subscribeToMessage,
@@ -42,12 +42,12 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       url: onUpdatedPage,
     });
   }
-  await createBookmarkNodeAndSyncId(
-    syncStorageKeys.rootBookmarkNodeId,
+  await createBookmarkNodeAndStoreId(
+    localStorageKeys.rootBookmarkNodeId,
     titles.rootBookmarkNode,
   );
-  await createBookmarkNodeAndSyncId(
-    syncStorageKeys.pinnedTabGroupBookmarkNodeId,
+  await createBookmarkNodeAndStoreId(
+    localStorageKeys.pinnedTabGroupBookmarkNodeId,
     titles.pinnedTabGroup,
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
@@ -55,12 +55,12 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
 chrome.runtime.onStartup.addListener(async () => {
   // @error
-  await createBookmarkNodeAndSyncId(
-    syncStorageKeys.rootBookmarkNodeId,
+  await createBookmarkNodeAndStoreId(
+    localStorageKeys.rootBookmarkNodeId,
     titles.rootBookmarkNode,
   );
-  await createBookmarkNodeAndSyncId(
-    syncStorageKeys.pinnedTabGroupBookmarkNodeId,
+  await createBookmarkNodeAndStoreId(
+    localStorageKeys.pinnedTabGroupBookmarkNodeId,
     titles.pinnedTabGroup,
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
@@ -684,7 +684,7 @@ async function updateCurrentSessionData() {
     }
     const pinnedTabGroupBookmarkNodeId = await getStorageData<
       chrome.bookmarks.BookmarkTreeNode["id"]
-    >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
+    >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
     await removeBookmarkNodeChildren(pinnedTabGroupBookmarkNodeId!);
     if (tabGroupTreeData[0]?.type === tabGroupTypes.pinned) {
       for (const tab of tabGroupTreeData[0].tabs) {
@@ -718,7 +718,7 @@ async function reinitializePinnedTabs() {
   }
   const pinnedTabGroupBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
-  >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
+  >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
   if (pinnedTabGroupBookmarkNodeId) {
     const pinnedTabGroupBookmarkNodeChildren =
       await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);

@@ -1,7 +1,6 @@
 import {
-  type SyncStorageKey,
-  type SessionStorageKey,
-  syncStorageKeys,
+  SyncStorageKey,
+  SessionStorageKey,
   AreaName,
   TabGroupType,
   tabGroupTypes,
@@ -11,6 +10,8 @@ import {
   stubPagePathName,
   protocolsEligibleForEncoding,
   LocalStorageKey,
+  localStorageKeys,
+  syncStorageKeys,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -27,6 +28,13 @@ export async function setStorageData<T = unknown>(
 ) {
   const areaName = key.split("-")[0] as AreaName;
   chrome.storage[areaName].set({ [key]: value });
+}
+
+export async function removeStorageData(
+  key: SyncStorageKey | SessionStorageKey | LocalStorageKey,
+) {
+  const areaName = key.split("-")[0] as AreaName;
+  chrome.storage[areaName].remove(key);
 }
 
 export async function subscribeToStorageData<T = unknown>(
@@ -51,21 +59,43 @@ export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
   tabs: chrome.tabs.Tab[];
 })[];
 
-export async function createBookmarkNodeAndSyncId(
-  syncStorageKey: SyncStorageKey,
+export async function createBookmarkNodeAndStoreId(
+  localStorageKey: LocalStorageKey,
   bookmarkNodeTitle: string,
 ) {
+  const syncRootBookmarkNodeId = await getStorageData<
+    chrome.bookmarks.BookmarkTreeNode["id"]
+  >(syncStorageKeys.rootBookmarkNodeId);
+  const syncPinnedTabGroupBookmarkNodeId = await getStorageData<
+    chrome.bookmarks.BookmarkTreeNode["id"]
+  >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
+  if (syncRootBookmarkNodeId) {
+    console.log("Hello-1");
+    await setStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
+      localStorageKeys.rootBookmarkNodeId,
+      syncRootBookmarkNodeId,
+    );
+    await removeStorageData(syncStorageKeys.rootBookmarkNodeId);
+  }
+  if (syncPinnedTabGroupBookmarkNodeId) {
+    console.log("Hello-2");
+    await setStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
+      localStorageKeys.pinnedTabGroupBookmarkNodeId,
+      syncPinnedTabGroupBookmarkNodeId,
+    );
+    await removeStorageData(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
+  }
   await navigator.locks.request(lockNames.createBookmarkNode, async () => {
     try {
       const bookmarkNodeId =
         await getStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
-          syncStorageKey,
+          localStorageKey,
         );
       let parentId: chrome.bookmarks.BookmarkTreeNode["id"] | undefined;
-      if (syncStorageKey === syncStorageKeys.pinnedTabGroupBookmarkNodeId) {
+      if (localStorageKey === localStorageKeys.pinnedTabGroupBookmarkNodeId) {
         parentId = await getStorageData<
           chrome.bookmarks.BookmarkTreeNode["id"]
-        >(syncStorageKeys.rootBookmarkNodeId);
+        >(localStorageKeys.rootBookmarkNodeId);
       }
       try {
         const bookmarkNode = (await chrome.bookmarks.get(bookmarkNodeId!))[0];
@@ -77,13 +107,13 @@ export async function createBookmarkNodeAndSyncId(
               parentId,
             })
           ).id;
-          await setStorageData(syncStorageKey, bookmarkNodeId);
+          await setStorageData(localStorageKey, bookmarkNodeId);
         }
       } catch (error) {
         const bookmarkNodeId = (
           await chrome.bookmarks.create({ title: bookmarkNodeTitle, parentId })
         ).id;
-        await setStorageData(syncStorageKey, bookmarkNodeId);
+        await setStorageData(localStorageKey, bookmarkNodeId);
       }
     } catch (error) {
       // no error handling here. we'll do that in the sidepanel ui

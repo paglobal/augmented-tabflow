@@ -1,5 +1,6 @@
 import { adaptState } from "promethium-js";
 import {
+  localStorageKeys,
   messageTypes,
   protocolsEligibleForEncoding,
   sessionStorageKeys,
@@ -214,7 +215,7 @@ async function updateSessionsTreeData(
   // @error
   const rootBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
-  >(syncStorageKeys.rootBookmarkNodeId);
+  >(localStorageKeys.rootBookmarkNodeId);
   if (bookmarkIdOrBookmarkInfo) {
     if (typeof bookmarkIdOrBookmarkInfo === "string") {
       try {
@@ -235,7 +236,7 @@ async function updateSessionsTreeData(
   }
   const pinnedTabGroupBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
-  >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
+  >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
   if (rootBookmarkNodeId && pinnedTabGroupBookmarkNodeId) {
     const sessionsDataChildren = (
       await chrome.bookmarks.getChildren(rootBookmarkNodeId)
@@ -304,7 +305,7 @@ export async function createSession(
   // @maybe
   const rootBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
-  >(syncStorageKeys.rootBookmarkNodeId);
+  >(localStorageKeys.rootBookmarkNodeId);
   if (rootBookmarkNodeId) {
     notify("Creating session...", "primary");
     const sessionData = await chrome.bookmarks.create({
