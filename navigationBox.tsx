@@ -1,6 +1,5 @@
-import { html, render } from "lit";
+import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
-import { h } from "promethium-js";
 import {
   NavigateDialog,
   setCurrentlyNavigatedTabId,
@@ -12,6 +11,7 @@ import {
   sessionStorageKeys,
 } from "./constants";
 import { getStorageData, setStorageData } from "./sharedUtils";
+import { initApp } from "./src/utils";
 
 function App() {
   return () =>
@@ -79,9 +79,8 @@ async function centerWindow() {
   await setStorageData<number>(localStorageKeys.screenHeight, screen.height);
 }
 
-(async function () {
+initApp(App, async () => {
   // @error
-  // auto light/dark mode based on user preferences
   await centerWindow();
   const _window = await chrome.windows.getCurrent();
   window.addEventListener("blur", async () => {
@@ -98,21 +97,4 @@ async function centerWindow() {
     return;
   }
   setCurrentlyNavigatedTabId(_currentlyNavigatedTabId);
-  if (window.matchMedia) {
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      document.documentElement.classList.add("sl-theme-dark");
-    } else {
-      document.documentElement.classList.remove("sl-theme-dark");
-    }
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", () => {
-        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          document.documentElement.classList.add("sl-theme-dark");
-        } else {
-          document.documentElement.classList.remove("sl-theme-dark");
-        }
-      });
-  }
-  render(h(App), document.body);
-})();
+});

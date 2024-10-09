@@ -1,7 +1,10 @@
 import { SlAlert } from "@shoelace-style/shoelace";
-import { adaptState } from "promethium-js";
+import { render } from "lit";
+import { PromethiumNode, Setter, adaptState } from "promethium-js";
 
-export const [themeMode, setThemeMode] = adaptState<"light" | "dark">("light");
+type ThemeMode = "light" | "dark";
+
+export const [themeMode, setThemeMode] = adaptState<ThemeMode>("light");
 
 export const tabGroupColors = () => ({
   grey: themeMode() === "dark" ? "#DADBE0" : "#5E6268",
@@ -48,4 +51,33 @@ export function notifyWithErrorMessageAndReloadButton() {
     .forEach((button) =>
       button.addEventListener("click", () => location.reload()),
     );
+}
+
+export function initApp(
+  App: (props: Object) => () => PromethiumNode,
+  initFn: () => void,
+  setThemeMode?: Setter<ThemeMode>,
+) {
+  initFn();
+  if (window.matchMedia) {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setThemeMode?.("dark");
+      document.documentElement.classList.add("sl-theme-dark");
+    } else {
+      setThemeMode?.("light");
+      document.documentElement.classList.remove("sl-theme-dark");
+    }
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", () => {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          setThemeMode?.("dark");
+          document.documentElement.classList.add("sl-theme-dark");
+        } else {
+          setThemeMode?.("light");
+          document.documentElement.classList.remove("sl-theme-dark");
+        }
+      });
+  }
+  render(<App />, document.body);
 }

@@ -6,7 +6,7 @@ export default defineConfig({
     outDir: "dist",
     rollupOptions: {
       input: {
-        script: resolve(__dirname, "index.html"),
+        sidePanel: resolve(__dirname, "sidePanel.html"),
         serviceWorker: resolve(__dirname, "serviceWorker.ts"),
         stubPage: resolve(__dirname, "stubPage.html"),
         navigationBox: resolve(__dirname, "navigationBox.html"),
