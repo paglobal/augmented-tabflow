@@ -601,25 +601,3 @@ export async function navigate(query: string) {
   }
   await navigateDialogRef.value?.hide();
 }
-
-export const [fullscreen, setFullscreen] = adaptState<boolean>(false);
-
-async function updateFullscreen(window?: chrome.windows.Window) {
-  if (window === undefined) {
-    const currentWindow = await chrome.windows.getCurrent({
-      windowTypes: ["normal"],
-    });
-    setFullscreen(currentWindow.state === "fullscreen" ? true : false);
-  } else {
-    setFullscreen(window.state === "fullscreen" ? true : false);
-  }
-}
-
-chrome.windows.onBoundsChanged.addListener(async (window) => {
-  const currentWindow = await chrome.windows.getCurrent({
-    windowTypes: ["normal"],
-  });
-  if (window.id === currentWindow.id) {
-    updateFullscreen(window);
-  }
-});

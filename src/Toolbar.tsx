@@ -4,7 +4,6 @@ import {
   createTabGroup,
   currentSessionData,
   currentSessionDataNotAvailable,
-  fullscreen,
 } from "./sessionService";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -19,8 +18,6 @@ import {
 
 export function Toolbar() {
   return () => {
-    const _fullscreen = fullscreen();
-
     return html` <div
       style=${styleMap({
         display: "flex",
@@ -137,8 +134,8 @@ export function Toolbar() {
               ></sl-icon-button>
             `}
         <sl-icon-button
-          name=${_fullscreen ? "fullscreen-exit" : "fullscreen"}
-          title=${_fullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          name="aspect-ratio"
+          title="Toggle Fullscreen"
           @click=${async () => {
             // @handled
             try {

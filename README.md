@@ -31,8 +31,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add two-finger swipe to switch windows
 - open side-panel in any new windows we create or move to
 
-- use popups with `Ctrl + T` and `Alt + L` on fullscreen (document the ability to change controls)
-
 ### Less Urgent
 
 - experiment with focusing the last active element on a page after activating the page
