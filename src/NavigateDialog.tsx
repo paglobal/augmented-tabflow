@@ -318,6 +318,9 @@ export function NavigateDialog(props: {
                             navigateInputRef.value.focus();
                           }
                         }}
+                        @mousemove=${() => {
+                          navigateInputRef.value?.focus();
+                        }}
                         @mouseenter=${(e: Event) => {
                           const menuItem = e.target as SlMenuItem | null;
                           if (menuItem) {
@@ -325,6 +328,7 @@ export function NavigateDialog(props: {
                               menuItem,
                             );
                           }
+                          navigateInputRef.value?.focus();
                         }}
                       >
                         ${(

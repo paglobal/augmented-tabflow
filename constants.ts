@@ -109,6 +109,14 @@ export const commands = {
 
 export const navigationBoxDimensions = { width: 780, height: 400 };
 
+export const bookmarkerDetails = {
+  title:
+    "PLEASE DO NOT TOUCH! NOT UNLESS YOU ABSOLUTELY KNOW WHAT YOU'RE DOING OR JUST DON'T CARE!!!",
+  url: `chrome-extension://${chrome.runtime.id}${stubPagePathName}`,
+};
+
+export const otherBookmarksBookmarkNodeTitle = "Other bookmarks";
+
 export const tlds = [
   "AAA",
   "AARP",

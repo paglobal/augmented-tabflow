@@ -1,11 +1,11 @@
 import { adaptState } from "promethium-js";
 import {
+  bookmarkerDetails,
   localStorageKeys,
   messageTypes,
   protocolsEligibleForEncoding,
   sessionStorageKeys,
   stubPagePathName,
-  syncStorageKeys,
   tabGroupTypes,
   titles,
   tlds,
@@ -151,7 +151,7 @@ export async function createTabGroup(tab?: chrome.tabs.Tab) {
   await chrome.tabGroups.move(tabGroupId, { index: -1 });
 }
 
-export function updateTabGroup(
+export async function updateTabGroup(
   tabId: chrome.tabGroups.TabGroup["id"] | null,
   options: {
     title: chrome.tabGroups.TabGroup["title"];
@@ -160,7 +160,7 @@ export function updateTabGroup(
 ) {
   // @maybe
   if (tabId) {
-    chrome.tabGroups.update(tabId, {
+    await chrome.tabGroups.update(tabId, {
       title: options.title,
       color: options.color,
     });
@@ -208,7 +208,7 @@ export const [sessionsTreeData, setSessionsTreeData] = adaptState<
 updateSessionsTreeData();
 
 async function updateSessionsTreeData(
-  bookmarkIdOrBookmarkInfo?:
+  bookmarkNodeIdOrBookmarkNodeInfo?:
     | chrome.bookmarks.BookmarkTreeNode["id"]
     | { parentId?: chrome.bookmarks.BookmarkTreeNode["id"] },
 ) {
@@ -216,11 +216,11 @@ async function updateSessionsTreeData(
   const rootBookmarkNodeId = await getStorageData<
     chrome.bookmarks.BookmarkTreeNode["id"]
   >(localStorageKeys.rootBookmarkNodeId);
-  if (bookmarkIdOrBookmarkInfo) {
-    if (typeof bookmarkIdOrBookmarkInfo === "string") {
+  if (bookmarkNodeIdOrBookmarkNodeInfo) {
+    if (typeof bookmarkNodeIdOrBookmarkNodeInfo === "string") {
       try {
         const bookmark = (
-          await chrome.bookmarks.get(bookmarkIdOrBookmarkInfo)
+          await chrome.bookmarks.get(bookmarkNodeIdOrBookmarkNodeInfo)
         )[0];
         if (bookmark.parentId !== rootBookmarkNodeId) {
           return;
@@ -229,7 +229,7 @@ async function updateSessionsTreeData(
         return;
       }
     } else {
-      if (bookmarkIdOrBookmarkInfo.parentId !== rootBookmarkNodeId) {
+      if (bookmarkNodeIdOrBookmarkNodeInfo.parentId !== rootBookmarkNodeId) {
         return;
       }
     }
@@ -242,6 +242,12 @@ async function updateSessionsTreeData(
       await chrome.bookmarks.getChildren(rootBookmarkNodeId)
     ).filter((sessionData) => {
       if (sessionData.url) {
+        if (
+          sessionData.url === bookmarkerDetails.url &&
+          sessionData.title === bookmarkerDetails.title
+        ) {
+          return false;
+        }
         chrome.bookmarks.remove(sessionData.id);
 
         return false;
@@ -258,30 +264,30 @@ async function updateSessionsTreeData(
   }
 }
 
-chrome.bookmarks.onCreated.addListener((_, bookmark) => {
+chrome.bookmarks.onCreated.addListener((_, bookmarkNode) => {
   // @handled
   try {
-    updateSessionsTreeData(bookmark);
+    updateSessionsTreeData(bookmarkNode);
   } catch (error) {
     console.error(error);
     notifyWithErrorMessageAndReloadButton();
   }
 });
 
-chrome.bookmarks.onChanged.addListener((bookmarkId) => {
+chrome.bookmarks.onChanged.addListener((bookmarkNodeId) => {
   // @handled
   try {
-    updateSessionsTreeData(bookmarkId);
+    updateSessionsTreeData(bookmarkNodeId);
   } catch (error) {
     console.error(error);
     notifyWithErrorMessageAndReloadButton();
   }
 });
 
-chrome.bookmarks.onMoved.addListener((bookmarkId) => {
+chrome.bookmarks.onMoved.addListener((bookmarkNodeId) => {
   // @handled
   try {
-    updateSessionsTreeData(bookmarkId);
+    updateSessionsTreeData(bookmarkNodeId);
   } catch (error) {
     console.error(error);
     notifyWithErrorMessageAndReloadButton();
@@ -372,7 +378,7 @@ export async function openNewSession(
   newSessionData: chrome.bookmarks.BookmarkTreeNode | null,
 ) {
   // @maybe
-  sessionsTreeDialogRef.value?.hide();
+  await sessionsTreeDialogRef.value?.hide();
   sendMessage({ type: messageTypes.openNewSession, data: newSessionData });
 }
 
@@ -470,7 +476,7 @@ export async function moveOrCopyToSession(
       await chrome.tabs.remove(tabIds as number[]);
       notify("Tab group moved successfully.", "success");
     }
-    moveOrCopyTabGroupToSessionTreeDialogRef.value?.hide();
+    await moveOrCopyTabGroupToSessionTreeDialogRef.value?.hide();
   }
   setCurrentMovedOrCopiedTabOrTabGroup(null);
   updateSessionsTreeData();

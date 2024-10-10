@@ -7,7 +7,6 @@ import {
   messageTypes,
   sessionStorageKeys,
   stubPagePathName,
-  syncStorageKeys,
   tabGroupColorList,
   tabGroupTreeDataUpdateDebounceTimeout,
   tabGroupTypes,
@@ -16,6 +15,7 @@ import {
   navigationBoxPathName,
   navigationBoxDimensions,
   newTabUrls,
+  bookmarkerDetails,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -25,6 +25,7 @@ import {
   subscribeToMessage,
   saveCurrentSessionDataIntoBookmarkNode,
   encodeTabDataAsUrl,
+  insertBookmarker,
 } from "./sharedUtils";
 
 chrome.sidePanel
@@ -657,7 +658,9 @@ async function removeBookmarkNodeChildren(
   const currentSessionDataChildren =
     await chrome.bookmarks.getChildren(bookmarkNodeId);
   for (const tabGroupData of currentSessionDataChildren) {
-    await chrome.bookmarks.removeTree(tabGroupData.id);
+    try {
+      await chrome.bookmarks.removeTree(tabGroupData.id);
+    } catch (error) {}
   }
 }
 
@@ -685,14 +688,17 @@ async function updateCurrentSessionData() {
     const pinnedTabGroupBookmarkNodeId = await getStorageData<
       chrome.bookmarks.BookmarkTreeNode["id"]
     >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
-    await removeBookmarkNodeChildren(pinnedTabGroupBookmarkNodeId!);
-    if (tabGroupTreeData[0]?.type === tabGroupTypes.pinned) {
-      for (const tab of tabGroupTreeData[0].tabs) {
-        await chrome.bookmarks.create({
-          parentId: pinnedTabGroupBookmarkNodeId,
-          title: tab.title,
-          url: tab.url,
-        });
+    if (pinnedTabGroupBookmarkNodeId) {
+      await removeBookmarkNodeChildren(pinnedTabGroupBookmarkNodeId);
+      await insertBookmarker(pinnedTabGroupBookmarkNodeId);
+      if (tabGroupTreeData[0]?.type === tabGroupTypes.pinned) {
+        for (const tab of tabGroupTreeData[0].tabs) {
+          await chrome.bookmarks.create({
+            parentId: pinnedTabGroupBookmarkNodeId,
+            title: tab.title,
+            url: tab.url,
+          });
+        }
       }
     }
   } else {
@@ -723,6 +729,12 @@ async function reinitializePinnedTabs() {
     const pinnedTabGroupBookmarkNodeChildren =
       await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
     for (const tabData of pinnedTabGroupBookmarkNodeChildren) {
+      if (
+        tabData.title === bookmarkerDetails.title &&
+        tabData.url === bookmarkerDetails.url
+      ) {
+        continue;
+      }
       const url = encodeTabDataAsUrl({
         title: tabData.title,
         url: tabData.url || "",
@@ -737,6 +749,11 @@ async function reinitializePinnedTabs() {
     // @error
   }
   await setStorageData(sessionStorageKeys.sessionLoading, false);
+}
+
+async function removeSessionFolderFromDefaultBookmarkSuggestion() {
+  const bookmarkNodeId = (await chrome.bookmarks.create({})).id;
+  await chrome.bookmarks.remove(bookmarkNodeId);
 }
 
 async function applyUpdates() {
@@ -762,6 +779,7 @@ async function applyUpdates() {
     const tabGroupTreeData = await getTabGroupTreeData();
     await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
     await updateCurrentSessionData();
+    await removeSessionFolderFromDefaultBookmarkSuggestion();
     const sessionLoading = await getStorageData<boolean>(
       sessionStorageKeys.sessionLoading,
     );

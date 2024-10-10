@@ -11,20 +11,9 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Urgent
 
-- fix different bookmark ids on different machines problem
-- transfer synced ids to local storage
-- add bookmarkers on checking/creation of both
-- check for all other valid bookmarks (`Augmented Tabflow Sessions` and `Pinned`)
-- transfer children of valid bookmarks into bookmarks with saved ids (`Augmented Tabflow Sessions` and `Pinned`)
-- delete all other valid bookmarks (`Augmented Tabflow Sessions` and `Pinned`)
-- dedupe bookmarkers (`Augmented Tabflow Sessions` and `Pinned`)
 - always aggregate all `Ungrouped` tab group data after importing or exporting (apply functions from above)
-- add bookmarkers on save and dedupe bookmarkers (`Augmented Tabflow Sessions` and `Pinned`)
-- properly skip over bookmarker when opening pinned tabs
-- properly skip over bookmarker when reading sessions data
-- pop `Other Bookmarks` onto recently edited bookmarks list after modifications (use bookmarker)
 -
-- implement local persistence pertaining to window instances (bookmarkId => windowInstanceNumber)
+- implement local persistence pertaining to window instances (bookmarkNodeId => windowInstanceNumber)
 - update local data on every session save
 - use local data to open tabs in appropriate window instances on session open
 - display other windows in vertical view
@@ -61,6 +50,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 -
 - implement manual theme switcher
 - implement omnibox opensearch stuff
+- add all chrome internal pages to search suggestions
 - use ctrl+click for alternate click behaviour eg. copy instead of move
 - (maybe) add `Pop Out` button for picture-in-picture
 - implement group select and bulk actions
@@ -98,6 +88,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - document behaviour concerning interacting with bookmarking from mobile
 - (maybe) document the fact that there's no need to restore old tabs
 - document the ability to modify keyboard shortcuts at the top
+- document use with your favourite window manager
+- document `Ctrl+Shift+A` shortcut
 
 ### Recent Changes
 

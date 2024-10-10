@@ -12,6 +12,8 @@ import {
   LocalStorageKey,
   localStorageKeys,
   syncStorageKeys,
+  bookmarkerDetails,
+  otherBookmarksBookmarkNodeTitle,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -63,30 +65,32 @@ export async function createBookmarkNodeAndStoreId(
   localStorageKey: LocalStorageKey,
   bookmarkNodeTitle: string,
 ) {
-  const syncRootBookmarkNodeId = await getStorageData<
-    chrome.bookmarks.BookmarkTreeNode["id"]
-  >(syncStorageKeys.rootBookmarkNodeId);
-  const syncPinnedTabGroupBookmarkNodeId = await getStorageData<
-    chrome.bookmarks.BookmarkTreeNode["id"]
-  >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
-  if (syncRootBookmarkNodeId) {
-    console.log("Hello-1");
-    await setStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
-      localStorageKeys.rootBookmarkNodeId,
-      syncRootBookmarkNodeId,
-    );
-    await removeStorageData(syncStorageKeys.rootBookmarkNodeId);
-  }
-  if (syncPinnedTabGroupBookmarkNodeId) {
-    console.log("Hello-2");
-    await setStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
-      localStorageKeys.pinnedTabGroupBookmarkNodeId,
-      syncPinnedTabGroupBookmarkNodeId,
-    );
-    await removeStorageData(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
-  }
   await navigator.locks.request(lockNames.createBookmarkNode, async () => {
     try {
+      const bookmarkTree = await chrome.bookmarks.getTree();
+      const otherBookmarksBookmarkNodeId = bookmarkTree[0].children?.find(
+        (bookmark) => bookmark.title === otherBookmarksBookmarkNodeTitle,
+      )?.id;
+      const syncRootBookmarkNodeId = await getStorageData<
+        chrome.bookmarks.BookmarkTreeNode["id"]
+      >(syncStorageKeys.rootBookmarkNodeId);
+      const syncPinnedTabGroupBookmarkNodeId = await getStorageData<
+        chrome.bookmarks.BookmarkTreeNode["id"]
+      >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
+      if (syncRootBookmarkNodeId) {
+        await setStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
+          localStorageKeys.rootBookmarkNodeId,
+          syncRootBookmarkNodeId,
+        );
+        await removeStorageData(syncStorageKeys.rootBookmarkNodeId);
+      }
+      if (syncPinnedTabGroupBookmarkNodeId) {
+        await setStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
+          localStorageKeys.pinnedTabGroupBookmarkNodeId,
+          syncPinnedTabGroupBookmarkNodeId,
+        );
+        await removeStorageData(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
+      }
       const bookmarkNodeId =
         await getStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
           localStorageKey,
@@ -96,15 +100,17 @@ export async function createBookmarkNodeAndStoreId(
         parentId = await getStorageData<
           chrome.bookmarks.BookmarkTreeNode["id"]
         >(localStorageKeys.rootBookmarkNodeId);
+      } else {
+        parentId = otherBookmarksBookmarkNodeId;
       }
       try {
         const bookmarkNode = (await chrome.bookmarks.get(bookmarkNodeId!))[0];
         // this isn't even necessary because `chrome.bookmarks.get` will error if our bookmark id is invalid...but just in case
-        if (!bookmarkNode) {
+        if (!bookmarkNode && parentId) {
           const bookmarkNodeId = (
             await chrome.bookmarks.create({
               title: bookmarkNodeTitle,
-              parentId,
+              parentId: parentId,
             })
           ).id;
           await setStorageData(localStorageKey, bookmarkNodeId);
@@ -114,6 +120,46 @@ export async function createBookmarkNodeAndStoreId(
           await chrome.bookmarks.create({ title: bookmarkNodeTitle, parentId })
         ).id;
         await setStorageData(localStorageKey, bookmarkNodeId);
+      }
+      const _bookmarkNodeId =
+        await getStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
+          localStorageKey,
+        );
+      if (_bookmarkNodeId && parentId) {
+        await insertBookmarker(_bookmarkNodeId);
+        const eligibleBookmarkNodes = (
+          await Promise.all(
+            (await chrome.bookmarks.getChildren(parentId)).map(
+              async (bookmarkNode) => {
+                const bookmarkNodeChildren = await chrome.bookmarks.getChildren(
+                  bookmarkNode.id,
+                );
+
+                return bookmarkNodeChildren.some(
+                  (bookmarkNode) =>
+                    bookmarkNode.title === bookmarkerDetails.title &&
+                    bookmarkNode.url === bookmarkerDetails.url,
+                )
+                  ? bookmarkNode
+                  : false;
+              },
+            ),
+          )
+        ).filter(Boolean);
+        await migrateAndDedupe(
+          eligibleBookmarkNodes as Array<chrome.bookmarks.BookmarkTreeNode>,
+          _bookmarkNodeId,
+        );
+        const bookmarkers: Array<chrome.bookmarks.BookmarkTreeNode> = (
+          await chrome.bookmarks.getChildren(_bookmarkNodeId)
+        ).filter(
+          (bookmarkNode) =>
+            bookmarkNode.title === bookmarkerDetails.title &&
+            bookmarkNode.url === bookmarkerDetails.url,
+        );
+        if (bookmarkers[0].id) {
+          await migrateAndDedupe(bookmarkers, bookmarkers[0].id);
+        }
       }
     } catch (error) {
       // no error handling here. we'll do that in the sidepanel ui
@@ -217,4 +263,44 @@ export function debounce(callback: () => void, timeout: number) {
       callback();
     }, timeout);
   };
+}
+
+export async function insertBookmarker(
+  bookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"],
+) {
+  // @maybe the error shouldn't be handled here
+  try {
+    await chrome.bookmarks.create({
+      title: bookmarkerDetails.title,
+      url: bookmarkerDetails.url,
+      parentId: bookmarkNodeId,
+      index: 0,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function migrateAndDedupe(
+  bookmarkNodes: Array<chrome.bookmarks.BookmarkTreeNode>,
+  masterBookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"],
+) {
+  // @maybe the error shouldn't be handled here
+  try {
+    for (const bookmarkNode of bookmarkNodes) {
+      if (bookmarkNode.id !== masterBookmarkNodeId) {
+        const bookmarkNodeChildren = await chrome.bookmarks.getChildren(
+          bookmarkNode.id,
+        );
+        for (const bookmarkNode of bookmarkNodeChildren) {
+          await chrome.bookmarks.move(bookmarkNode.id, {
+            parentId: masterBookmarkNodeId,
+          });
+        }
+        await chrome.bookmarks.remove(bookmarkNode.id);
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
 }

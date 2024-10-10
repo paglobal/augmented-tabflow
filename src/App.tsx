@@ -174,12 +174,17 @@ export function App() {
                   dialogLabel="Edit Tab Group"
                   dialogRef={editTabGroupDialogRefs.dialog}
                   submitButtonText="Save"
-                  formAction={(data: {
+                  formAction={async (data: {
                     title: chrome.tabGroups.TabGroup["title"];
                     color: chrome.tabGroups.Color;
                   }) => {
-                    // @maybe
-                    updateTabGroup(currentlyEditedTabGroupId(), data);
+                    // @handled
+                    try {
+                      await updateTabGroup(currentlyEditedTabGroupId(), data);
+                    } catch (error) {
+                      console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
+                    }
                   }}
                 >
                   {html`
@@ -225,7 +230,12 @@ export function App() {
                   submitButtonText="Save"
                   formAction={({ title }: { title: string }) => {
                     // @maybe
-                    createSession(title, true);
+                    try {
+                      createSession(title, true);
+                    } catch (error) {
+                      console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
+                    }
                   }}
                 >
                   {html`
@@ -240,9 +250,14 @@ export function App() {
                   dialogLabel="Create Empty Session"
                   dialogRef={newSessionDialogRef}
                   submitButtonText="Save"
-                  formAction={({ title }: { title: string }) => {
-                    // @maybe
-                    createSession(title);
+                  formAction={async ({ title }: { title: string }) => {
+                    // @handled
+                    try {
+                      await createSession(title);
+                    } catch (error) {
+                      console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
+                    }
                   }}
                 >
                   {html`
@@ -258,11 +273,19 @@ export function App() {
                   dialogRef={editSessionDialogRef}
                   submitButtonText="Save"
                   formAction={async ({ title }: { title: string }) => {
-                    // @maybe
-                    const _currentlyEditedSessionId =
-                      currentlyEditedSessionId() ?? true;
-                    await updateSessionTitle(_currentlyEditedSessionId, title);
-                    setCurrentlyEditedSessionId(null);
+                    // @handled
+                    try {
+                      const _currentlyEditedSessionId =
+                        currentlyEditedSessionId() ?? true;
+                      await updateSessionTitle(
+                        _currentlyEditedSessionId,
+                        title,
+                      );
+                      setCurrentlyEditedSessionId(null);
+                    } catch (error) {
+                      console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
+                    }
                   }}
                 >
                   {html`
@@ -309,13 +332,13 @@ export function App() {
                           marginTop: "1rem",
                         })}
                         variant="danger"
-                        @click=${() => {
+                        @click=${async () => {
                           // @handled
                           try {
                             const _currentlyDeletedSessionId =
                               currentlyDeletedSessionId();
                             if (_currentlyDeletedSessionId) {
-                              deleteSession(
+                              await deleteSession(
                                 _currentlyDeletedSessionId,
                                 currentlyDeletedSessionIsCurrentSession(),
                               );
