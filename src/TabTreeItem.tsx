@@ -33,7 +33,6 @@ export function TabTreeItem(props: {
           try {
             e.stopPropagation();
             await activateTab(tab);
-            (document.activeElement as HTMLElement).blur();
           } catch (error) {
             console.error(error);
             notifyWithErrorMessageAndReloadButton();

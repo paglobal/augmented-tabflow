@@ -104,7 +104,7 @@ export const onUpdatedPage =
 export const commands = {
   closeAllSessionWindows: "close-all-session-windows",
   exitCurrentSession: "exit-current-session",
-  openNavigationBox: "open-navigation-box",
+  openActionCenter: "open-action-center",
 };
 
 export const navigationBoxDimensions = { width: 780, height: 400 };

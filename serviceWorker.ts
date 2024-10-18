@@ -14,7 +14,6 @@ import {
   localStorageKeys,
   navigationBoxPathName,
   navigationBoxDimensions,
-  newTabUrls,
   bookmarkerDetails,
 } from "./constants";
 import {
@@ -205,7 +204,7 @@ chrome.tabs.onReplaced.addListener(async () => {
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
   // @error
   if (
     changeInfo.title ||
@@ -218,18 +217,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
       true,
     );
   }
-  if (changeInfo.url) {
-    const tab = await chrome.tabs.get(tabId);
-    if (newTabUrls.includes(tab.url ?? "")) {
-      const tabWindow = await chrome.windows.get(tab.windowId, {
-        windowTypes: ["normal"],
-      });
-      if (tabWindow.state === "fullscreen") {
-        await openNavigationBox(tab);
-      }
-    }
-  }
-
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
@@ -848,47 +835,9 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     if (currentSessionData) {
       openNewSession(null);
     }
-  } else if (command === commands.openNavigationBox) {
+  } else if (command === commands.openActionCenter) {
     if (tab) {
-      openNavigationBox(tab);
+      chrome.tabs.create({ url: "/sidePanel.html" });
     }
   }
 });
-
-async function openNavigationBox(tab: chrome.tabs.Tab) {
-  await setStorageData<chrome.tabs.Tab["id"]>(
-    sessionStorageKeys.currentlyNavigatedTabId,
-    tab.id,
-  );
-  chrome.windows.create(
-    {
-      url: navigationBoxPathName,
-      type: "popup",
-      width: navigationBoxDimensions.width,
-      height: navigationBoxDimensions.height,
-    },
-    async function (window) {
-      const screenWidth = await getStorageData<number>(
-        localStorageKeys.screenWidth,
-      );
-      const screenHeight = await getStorageData<number>(
-        localStorageKeys.screenHeight,
-      );
-      if (window && screenWidth !== undefined && screenHeight !== undefined) {
-        const centeredLeft = Math.round(
-          (screenWidth - (window.width ?? navigationBoxDimensions.width)) / 2,
-        );
-        const centeredTop = Math.round(
-          (screenHeight - (window.height ?? navigationBoxDimensions.height)) /
-            2,
-        );
-        if (window.id) {
-          chrome.windows.update(window.id, {
-            left: centeredLeft,
-            top: centeredTop,
-          });
-        }
-      }
-    },
-  );
-}

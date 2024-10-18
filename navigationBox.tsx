@@ -2,6 +2,7 @@ import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import {
   NavigateDialog,
+  navigateInputRef,
   setCurrentlyNavigatedTabId,
 } from "./src/NavigateDialog";
 import "./customElements";
@@ -91,10 +92,19 @@ initApp(App, async () => {
   const _currentlyNavigatedTabId = await getStorageData<chrome.tabs.Tab["id"]>(
     sessionStorageKeys.currentlyNavigatedTabId,
   );
-  if (!_currentlyNavigatedTabId && _window.id) {
-    chrome.windows.remove(_window.id);
+  if (!_currentlyNavigatedTabId) {
+    if (_window.id) {
+      chrome.windows.remove(_window.id);
+    }
 
     return;
   }
+  const currentlyNavigatedTab = await chrome.tabs.get(_currentlyNavigatedTabId);
   setCurrentlyNavigatedTabId(_currentlyNavigatedTabId);
+  if (navigateInputRef.value) {
+    navigateInputRef.value.value = currentlyNavigatedTab.url as string;
+    setTimeout(() => {
+      navigateInputRef.value?.select();
+    });
+  }
 });

@@ -6,8 +6,8 @@ import {
   protocolsEligibleForEncoding,
   sessionStorageKeys,
   stubPagePathName,
-  tabGroupTypes,
   titles,
+  tabGroupTypes,
   tlds,
 } from "../constants";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
@@ -608,3 +608,24 @@ export async function navigate(query: string) {
   }
   await navigateDialogRef.value?.hide();
 }
+
+export const [sessionLoading, setSessionLoading] = adaptState<boolean>(false);
+updateSessionLoading();
+
+async function updateSessionLoading(sessionLoading?: boolean) {
+  if (sessionLoading === undefined) {
+    sessionLoading =
+      (await getStorageData<boolean>(sessionStorageKeys.sessionLoading)) ??
+      false;
+  }
+  setSessionLoading(sessionLoading);
+}
+
+subscribeToStorageData<boolean>(
+  sessionStorageKeys.sessionLoading,
+  ({ newValue: sessionLoading }) => {
+    // @error
+    sessionLoading = sessionLoading ?? false;
+    updateSessionLoading(sessionLoading);
+  },
+);

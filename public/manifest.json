@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Augmented Tabflow",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "minimum_chrome_version": "116",
   "description": "Augment your tab workflow with extended tab, tab group and session managment.",
   "permissions": [
@@ -44,9 +44,9 @@
       "suggested_key": "Alt+Q",
       "description": "Exit current session"
     },
-    "open-navigation-box": {
-      "suggested_key": "Alt+L",
-      "description": "Open navigation box"
+    "open-action-center": {
+      "suggested_key": "Alt+A",
+      "description": "Open action center"
     }
   }
 }

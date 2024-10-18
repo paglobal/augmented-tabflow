@@ -18,10 +18,18 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - use local data to open tabs in appropriate window instances on session open
 - display other windows in vertical view
 - add two-finger swipe to switch windows
-- open side-panel in any new windows we create or move to
+- (maybe) open side-panel in any new windows we create or move to
+- show other windows in sidebar
+- time the re-initialization of pinned tabs more appropriately
+- add alert for not being able to go forward or backward
+- add badge for address
+- implement action center and add new shortcuts
+- fix loading issue with spinners
 
 ### Less Urgent
 
+- check code for repositioning and resizing of navigation box to reduce visual stutter
+- check `migrateAndDedupe` function
 - experiment with focusing the last active element on a page after activating the page
 - look into (false) loading states
 - report possible bug with menu navigation in shoelace (up and down arrow navigation)
@@ -94,3 +102,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 ### Recent Changes
 
 - fixed problem with pages loaded with file protocol and possibly other protocols
+- implemented navigation box
+- access to sessions across devices
+- better support for fullscreening

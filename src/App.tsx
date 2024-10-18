@@ -27,6 +27,7 @@ import { TabGroupTreeData } from "../sharedUtils";
 import { importTabGroupFromSessionTreeContent } from "./importTabGroupFromSessionTreeContent";
 import promiseWithOneTimeFallback from "./promiseWithOneTimeFallback";
 import { tabGroupTreeContent } from "./tabGroupTreeContent";
+import { SessionView } from "./SessionView";
 
 // disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -98,7 +99,7 @@ export function App() {
               <>
                 <SessionIndicator />
                 <Toolbar />
-                <Tree contentFn={tabGroupTreeContent} fullHeight></Tree>
+                <SessionView />
                 <Dialog
                   label="Sessions"
                   ref={sessionsTreeDialogRef}
