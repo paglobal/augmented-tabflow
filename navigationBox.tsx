@@ -7,11 +7,11 @@ import {
 } from "./src/NavigateDialog";
 import "./customElements";
 import {
-  localStorageKeys,
-  navigationBoxDimensions,
+  CurrentlyNavigatedTabId,
+  newTabNavigatedTabId,
   sessionStorageKeys,
 } from "./constants";
-import { getStorageData, setStorageData } from "./sharedUtils";
+import { getStorageData, setStorageData, wait } from "./sharedUtils";
 import { initApp } from "./src/utils";
 
 function App() {
@@ -45,14 +45,11 @@ function App() {
             ${(
               <>
                 <NavigateDialog
-                  onHide={async () => {
-                    const window = await chrome.windows.getCurrent();
-                    if (window.id) {
-                      await chrome.windows.remove(window.id);
-                    }
+                  onHide={() => {
+                    close();
                   }}
                   open={true}
-                  preventClosing={true}
+                  onlyInput={true}
                 />
               </>
             )}
@@ -62,49 +59,35 @@ function App() {
     </div>`;
 }
 
-async function centerWindow() {
-  const window = await chrome.windows.getCurrent();
-  const centeredLeft = Math.round(
-    (screen.width - (window.width ?? navigationBoxDimensions.width)) / 2,
-  );
-  const centeredTop = Math.round(
-    (screen.height - (window.height ?? navigationBoxDimensions.height)) / 2,
-  );
-  if (window.id) {
-    chrome.windows.update(window.id, {
-      left: centeredLeft,
-      top: centeredTop,
-    });
-  }
-  await setStorageData<number>(localStorageKeys.screenWidth, screen.width);
-  await setStorageData<number>(localStorageKeys.screenHeight, screen.height);
-}
-
 initApp(App, async () => {
   // @error
-  await centerWindow();
-  const _window = await chrome.windows.getCurrent();
-  window.addEventListener("blur", async () => {
-    if (_window.id) {
-      await chrome.windows.remove(_window.id);
+  document.addEventListener("visibilitychange", async () => {
+    if (document.hidden) {
+      close();
     }
   });
-  const _currentlyNavigatedTabId = await getStorageData<chrome.tabs.Tab["id"]>(
+  window.addEventListener("blur", async () => {
+    close();
+  });
+  const currentlyNavigatedTabId = await getStorageData<CurrentlyNavigatedTabId>(
     sessionStorageKeys.currentlyNavigatedTabId,
   );
-  if (!_currentlyNavigatedTabId) {
-    if (_window.id) {
-      chrome.windows.remove(_window.id);
-    }
-
-    return;
-  }
-  const currentlyNavigatedTab = await chrome.tabs.get(_currentlyNavigatedTabId);
-  setCurrentlyNavigatedTabId(_currentlyNavigatedTabId);
-  if (navigateInputRef.value) {
-    navigateInputRef.value.value = currentlyNavigatedTab.url as string;
-    setTimeout(() => {
+  if (!currentlyNavigatedTabId) {
+    await setStorageData<CurrentlyNavigatedTabId>(
+      sessionStorageKeys.currentlyNavigatedTabId,
+      newTabNavigatedTabId,
+    );
+  } else if (typeof currentlyNavigatedTabId === "number") {
+    const currentlyNavigatedTab = await chrome.tabs.get(
+      currentlyNavigatedTabId,
+    );
+    setCurrentlyNavigatedTabId(currentlyNavigatedTabId);
+    if (navigateInputRef.value) {
+      navigateInputRef.value.value = currentlyNavigatedTab.url as string;
+      await wait();
       navigateInputRef.value?.select();
-    });
+    }
+  } else {
+    setCurrentlyNavigatedTabId(currentlyNavigatedTabId);
   }
 });

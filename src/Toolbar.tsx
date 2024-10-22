@@ -15,6 +15,7 @@ import {
   deleteSessionDialogRef,
   importTabGroupFromSessionTreeDialogRef,
 } from "./App";
+import { navigationBoxPathName } from "../constants";
 
 export function Toolbar() {
   return () => {
@@ -40,7 +41,7 @@ export function Toolbar() {
           @click=${async () => {
             // @handled
             try {
-              await chrome.tabs.create({});
+              await chrome.tabs.create({ url: navigationBoxPathName });
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();

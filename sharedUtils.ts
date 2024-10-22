@@ -258,11 +258,11 @@ export function encodeTabDataAsUrl(options: {
 export function debounce(callback: () => void, timeout: number) {
   let timeoutId: number | undefined;
 
-  return () => {
+  return (newTimeout?: number) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       callback();
-    }, timeout);
+    }, newTimeout ?? timeout);
   };
 }
 
@@ -304,4 +304,22 @@ export async function migrateAndDedupe(
   } catch (error) {
     console.error(error);
   }
+}
+
+export function wait(timeout?: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
+}
+
+export async function withError<T>(
+  promise: Promise<T>,
+): Promise<[undefined, T] | [Error]> {
+  return promise
+    .then((data) => {
+      return [undefined, data] as [undefined, T];
+    })
+    .catch((error) => {
+      return [error];
+    });
 }

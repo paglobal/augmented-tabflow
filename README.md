@@ -18,20 +18,16 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - use local data to open tabs in appropriate window instances on session open
 - display other windows in vertical view
 - add two-finger swipe to switch windows
-- (maybe) open side-panel in any new windows we create or move to
-- show other windows in sidebar
+- open side panel in any new windows we create or move to via the side panel
+- show other windows in side panel
 - time the re-initialization of pinned tabs more appropriately
-- add alert for not being able to go forward or backward
-- add badge for address
-- implement action center and add new shortcuts
 - fix loading issue with spinners (support showing loaders on new tab page after this)
 - add button in toolbar for opening new window and look into issue with focusing any newly created windows
-- change from navigation box window to navigation box tab
-- add `Pop Out` button/shortcut on extension tab page
-- change all new tab buttons to open navigation box
+- add badge for address with reload, forward and back buttons
 
 ### Less Urgent
 
+- add setting for closing side panel on tab activation
 - add commands to group tabs according to domain, title similarity and other stuff
 - load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
 - add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group`)
@@ -43,8 +39,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 -
 - implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks` and/or `Reading List`
 - consider adding button to "look inside" tab groups and import individual tabs
-- (maybe) implement search for sessions and tabs (already implemented in browser for tabs)
-- (maybe) implement ability to sort sessions alphabetically or by date added
 -
 - break large files into smaller files (look at `NavigateDialog.tsx` and `tabGroupTreeContent.tsx`)
 - use `Array<T>` to type arrays
@@ -56,12 +50,11 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - refine and organise user-facing text. look for anything in quotation marks like "Error!" and such. make use of full stops
 - organise imports
 - capitalize all instances of `url`
+- change `setTimeouts` to `await wait()`
 -
-- implement manual theme switcher
-- implement omnibox opensearch stuff
 - add all chrome internal pages to search suggestions
 - use ctrl+click for alternate click behaviour eg. copy instead of move
-- implement group select and bulk actions
+- implement group select and bulk actions for various functionality
 - collapse tree items in export dialog when done with exporting tab or tab group
 - make session trees and other dialog trees react to the necessary app state changes
 -
@@ -74,12 +67,17 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - type drag-and-drop code
 - refine fallback code
+- add test suite
 - look out for instances of typescript `!`'s in the codebae
 -
+- (maybe) implement search for sessions and tabs (already implemented in browser for tabs)
+- (maybe) implement ability to sort sessions alphabetically or by date added
+- (maybe) implement action center and add new shortcuts
+- (maybe) add `Pop Out` button/shortcut on extension tab page
+- (maybe) implement manual theme switcher
+- (maybe) implement omnibox opensearch stuff
 - (maybe) reduce minimum chrome version
 - (maybe, please be careful) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
--
-- add test suite
 - (maybe) implement internationalization
 -
 - try updating the tld list from time to time
@@ -98,8 +96,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) document the fact that there's no need to restore old tabs
 - document the ability to modify keyboard shortcuts at the top
 - document use with your favourite window manager
-- direct users where/how to change position of the chrome sidepanel
-- shortcuts include: Open sesssion view in side panel (Alt+S), Open session view in new tab (Alt+A), Close all session windows (Alt+W), Exit current session (Alt+Q), Open new tab (Alt+T), Open new window (Alt+N), Edit current tab address (Alt+L)
+- direct users where/how to change position of the chrome side panel
+- shortcuts include: Open sesssion view in side panel (Alt+A), Close all session windows (Alt+W), Exit current session (Alt+Q), Open new tab (Alt+T), Open new window (Alt+N), Edit current tab address (Alt+L)
 - document `Ctrl+Shift+A` shortcut
 
 ### Recent Changes

@@ -102,12 +102,13 @@ export const onUpdatedPage =
   "https://www.paglobal.tech/pages/posts/augmented-tabflow-changelog.html";
 
 export const commands = {
+  openSidePanel: "open-side-panel",
   closeAllSessionWindows: "close-all-session-windows",
   exitCurrentSession: "exit-current-session",
-  openActionCenter: "open-action-center",
+  editCurrentTabURL: "edit-current-tab-url",
+  openNewTab: "open-new-tab",
+  openNewWindow: "open-new-window",
 };
-
-export const navigationBoxDimensions = { width: 780, height: 400 };
 
 export const bookmarkerDetails = {
   title:
@@ -116,6 +117,12 @@ export const bookmarkerDetails = {
 };
 
 export const otherBookmarksBookmarkNodeTitle = "Other bookmarks";
+
+export const newTabNavigatedTabId = "NEW_TAB" as const;
+
+export type CurrentlyNavigatedTabId =
+  | chrome.tabs.Tab["id"]
+  | typeof newTabNavigatedTabId;
 
 export const tlds = [
   "AAA",

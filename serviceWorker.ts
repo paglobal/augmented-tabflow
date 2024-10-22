@@ -12,9 +12,10 @@ import {
   tabGroupTypes,
   titles,
   localStorageKeys,
-  navigationBoxPathName,
-  navigationBoxDimensions,
   bookmarkerDetails,
+  CurrentlyNavigatedTabId,
+  navigationBoxPathName,
+  newTabNavigatedTabId,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -825,19 +826,41 @@ subscribeToMessage(
 
 chrome.commands.onCommand.addListener(async (command, tab) => {
   // @maybe
-  if (command === commands.closeAllSessionWindows) {
-    closeAllSessionWindows();
+  if (command === commands.openSidePanel) {
+    await chrome.sidePanel.open({});
+  } else if (command === commands.closeAllSessionWindows) {
+    await closeAllSessionWindows();
   } else if (command === commands.exitCurrentSession) {
     const currentSessionData =
       await getStorageData<chrome.bookmarks.BookmarkTreeNode | null>(
         sessionStorageKeys.currentSessionData,
       );
     if (currentSessionData) {
-      openNewSession(null);
+      await openNewSession(null);
     }
-  } else if (command === commands.openActionCenter) {
-    if (tab) {
-      chrome.tabs.create({ url: "/sidePanel.html" });
+  } else if (command === commands.editCurrentTabURL) {
+    if (tab?.id) {
+      await setStorageData<CurrentlyNavigatedTabId>(
+        sessionStorageKeys.currentlyNavigatedTabId,
+        tab.id,
+      );
+      await chrome.tabs.create({ url: navigationBoxPathName });
     }
+  } else if (command === commands.openNewTab) {
+    await setStorageData<CurrentlyNavigatedTabId>(
+      sessionStorageKeys.currentlyNavigatedTabId,
+      newTabNavigatedTabId,
+    );
+    await chrome.tabs.create({ url: navigationBoxPathName });
+  } else if (command === commands.openNewWindow) {
+    await setStorageData<CurrentlyNavigatedTabId>(
+      sessionStorageKeys.currentlyNavigatedTabId,
+      newTabNavigatedTabId,
+    );
+    await chrome.windows.create({
+      url: navigationBoxPathName,
+      focused: true,
+      type: "normal",
+    });
   }
 });

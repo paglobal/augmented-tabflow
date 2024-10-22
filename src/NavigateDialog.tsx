@@ -12,10 +12,11 @@ import {
   SlSelectEvent,
 } from "@shoelace-style/shoelace";
 import { Dialog } from "./Dialog";
-import { notifyWithErrorMessageAndReloadButton } from "./utils";
-import { debounce } from "../sharedUtils";
+import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
+import { debounce, wait } from "../sharedUtils";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import { navigate } from "./sessionService";
+import { CurrentlyNavigatedTabId } from "../constants";
 
 type Suggestions = Array<{
   value: string;
@@ -25,14 +26,13 @@ type Suggestions = Array<{
 
 export const navigateInputRef = createRef<SlInput>();
 export const navigateDialogRef = createRef<SlDialog>();
-export const [currentlyNavigatedTabId, setCurrentlyNavigatedTabId] = adaptState<
-  chrome.tabs.Tab["id"] | null
->(null);
+export const [currentlyNavigatedTabId, setCurrentlyNavigatedTabId] =
+  adaptState<CurrentlyNavigatedTabId | null>(null);
 
 export function NavigateDialog(props: {
   onHide?: () => void;
   open?: boolean;
-  preventClosing?: boolean;
+  onlyInput?: boolean;
 }) {
   const suggestionsDebounceTime = 500;
   const maxSuggestionsPerCategory = 5;
@@ -40,6 +40,9 @@ export function NavigateDialog(props: {
 
   const [navigationDropdownActive, setNavigationDropdownActive] =
     adaptState<boolean>(false);
+
+  const [previousNavigationInputValue, setPreviousNavigationInputValue] =
+    adaptState<string>("");
 
   const [historySuggestions, setHistorySuggestions] = adaptState<Suggestions>(
     [],
@@ -64,13 +67,7 @@ export function NavigateDialog(props: {
           type: "history" as "history",
           value: suggestedHistoryItem.url ?? "",
           title: suggestedHistoryItem.title,
-        }))
-        .filter(
-          (suggestedHistoryItem) =>
-            !suggestedHistoryItem.value.includes(
-              `chrome-extension://${chrome.runtime.id}`,
-            ),
-        );
+        }));
       setHistorySuggestions(historySuggestions);
     } catch (error) {
       console.error(error);
@@ -145,6 +142,12 @@ export function NavigateDialog(props: {
           return true;
         }
       })
+      .filter(
+        (suggestion) =>
+          !suggestion.obj.value.startsWith(
+            `chrome-extension://${chrome.runtime.id}`,
+          ),
+      )
       .slice(0, maxSuggestionsInTotal);
 
     return aggregateSuggestions;
@@ -156,7 +159,7 @@ export function NavigateDialog(props: {
     return (
       <Dialog
         open={props.open}
-        preventClosing={props.preventClosing}
+        preventClosing={props.onlyInput}
         label="Navigate"
         ref={navigateDialogRef}
         onAfterShow={() => {
@@ -167,66 +170,67 @@ export function NavigateDialog(props: {
         }}
         onHide={props.onHide}
       >
-        {html`
-          <sl-button-group
-            label="Navigation Tools"
-            style=${styleMap({
-              fontSize: "1rem",
-              marginTop: "-0.5rem",
-              paddingBottom: "0.5rem",
-              display: "flex",
-              justifyContent: "center",
-            })}
-          >
-            <sl-icon-button
-              name="arrow-left"
-              title="Go Back"
-              @click=${async () => {
-                // @handled
-                try {
-                  const _currentyNavigatedTabId = currentlyNavigatedTabId();
-                  if (_currentyNavigatedTabId) {
-                    await chrome.tabs.goBack(_currentyNavigatedTabId);
-                  }
-                } catch (error) {
-                  console.error(error);
-                  notifyWithErrorMessageAndReloadButton();
-                }
-              }}
-            ></sl-icon-button>
-            <sl-icon-button
-              name="arrow-right"
-              title="Go Forward"
-              @click=${async () => {
-                // @handled
-                try {
-                  const _currentyNavigatedTabId = currentlyNavigatedTabId();
-                  if (_currentyNavigatedTabId) {
-                    await chrome.tabs.goForward(_currentyNavigatedTabId);
-                  }
-                } catch (error) {
-                  console.error(error);
-                  notifyWithErrorMessageAndReloadButton();
-                }
-              }}
-            ></sl-icon-button>
-            <sl-icon-button
-              name="arrow-clockwise"
-              title="Reload Page"
-              @click=${async () => {
-                // @handled
-                try {
-                  const _currentyNavigatedTabId = currentlyNavigatedTabId();
-                  if (_currentyNavigatedTabId) {
-                    await chrome.tabs.reload(_currentyNavigatedTabId);
-                  }
-                } catch (error) {
-                  console.error(error);
-                  notifyWithErrorMessageAndReloadButton();
-                }
-              }}
-            ></sl-icon-button>
-          </sl-button-group>
+        {html`${props.onlyInput
+            ? null
+            : html`<sl-button-group
+                label="Navigation Tools"
+                style=${styleMap({
+                  fontSize: "1rem",
+                  marginTop: "-0.5rem",
+                  paddingBottom: "0.5rem",
+                  display: "flex",
+                  justifyContent: "center",
+                })}
+              >
+                <sl-icon-button
+                  name="arrow-left"
+                  title="Go Back"
+                  @click=${async () => {
+                    // @handled
+                    try {
+                      const _currentyNavigatedTabId = currentlyNavigatedTabId();
+                      if (typeof _currentyNavigatedTabId === "number") {
+                        await chrome.tabs.goBack(_currentyNavigatedTabId);
+                      }
+                    } catch (error) {
+                      console.error(error);
+                      notify("Cannot go back", "primary");
+                    }
+                  }}
+                ></sl-icon-button>
+                <sl-icon-button
+                  name="arrow-right"
+                  title="Go Forward"
+                  @click=${async () => {
+                    // @handled
+                    try {
+                      const _currentyNavigatedTabId = currentlyNavigatedTabId();
+                      if (typeof _currentyNavigatedTabId === "number") {
+                        await chrome.tabs.goForward(_currentyNavigatedTabId);
+                      }
+                    } catch (error) {
+                      console.error(error);
+                      notify("Cannot go forward", "primary");
+                    }
+                  }}
+                ></sl-icon-button>
+                <sl-icon-button
+                  name="arrow-clockwise"
+                  title="Reload Page"
+                  @click=${async () => {
+                    // @handled
+                    try {
+                      const _currentyNavigatedTabId = currentlyNavigatedTabId();
+                      if (typeof _currentyNavigatedTabId === "number") {
+                        await chrome.tabs.reload(_currentyNavigatedTabId);
+                      }
+                    } catch (error) {
+                      console.error(error);
+                      notifyWithErrorMessageAndReloadButton();
+                    }
+                  }}
+                ></sl-icon-button>
+              </sl-button-group>`}
           <sl-popup
             placement="bottom"
             sync="width"
@@ -236,6 +240,9 @@ export function NavigateDialog(props: {
           >
             <sl-input
               ${ref(navigateInputRef)}
+              style=${styleMap({
+                marginTop: props.onlyInput ? "1rem" : undefined,
+              })}
               slot="anchor"
               placeholder="Search"
               autofocus
@@ -251,23 +258,31 @@ export function NavigateDialog(props: {
                 }
               }}
               @keydown=${(e: KeyboardEvent) => {
+                const navigationInputValue = navigateInputRef.value?.value;
+                if (navigationInputValue !== undefined) {
+                  setPreviousNavigationInputValue(navigationInputValue);
+                }
                 if (e.key === "ArrowDown" || e.key === "Tab") {
                   const newCurrentMenuItem = navigateSuggestionsMenuRef.value
                     ?.firstElementChild as SlMenuItem | null;
-                  if (newCurrentMenuItem) {
+                  if (newCurrentMenuItem && navigateInputRef.value) {
                     newCurrentMenuItem?.focus();
                     navigateSuggestionsMenuRef.value?.setCurrentItem(
                       newCurrentMenuItem,
                     );
+                    if (e.key === "ArrowDown") {
+                      navigateInputRef.value.value = newCurrentMenuItem.value;
+                    }
                   }
                 } else if (e.key === "ArrowUp") {
                   const newCurrentMenuItem = navigateSuggestionsMenuRef.value
                     ?.lastElementChild as SlMenuItem | null;
-                  if (newCurrentMenuItem) {
+                  if (newCurrentMenuItem && navigateInputRef.value) {
                     newCurrentMenuItem?.focus();
                     navigateSuggestionsMenuRef.value?.setCurrentItem(
                       newCurrentMenuItem,
                     );
+                    navigateInputRef.value.value = newCurrentMenuItem.value;
                   }
                 } else if (e.key === "Enter") {
                   navigate(navigateInputRef.value?.value ?? "");
@@ -309,13 +324,55 @@ export function NavigateDialog(props: {
                           suggestion.obj.value
                         }`}
                         value=${suggestion.obj.value}
-                        @keydown=${(e: KeyboardEvent) => {
+                        @keydown=${async (e: KeyboardEvent) => {
                           if (
                             navigateInputRef.value &&
-                            e.key !== "Tab" &&
-                            e.key !== "ArrowDown"
+                            // TODO: recheck this condition
+                            e.key !== "Tab"
                           ) {
+                            const currentMenuItem =
+                              navigateSuggestionsMenuRef.value?.getCurrentItem();
+                            if (
+                              (e.key === "ArrowDown" &&
+                                currentMenuItem ===
+                                  navigateSuggestionsMenuRef.value
+                                    ?.lastElementChild) ||
+                              (e.key === "ArrowUp" &&
+                                currentMenuItem ===
+                                  navigateSuggestionsMenuRef.value
+                                    ?.firstElementChild)
+                            ) {
+                              e.stopPropagation();
+                              navigateInputRef.value.value =
+                                previousNavigationInputValue();
+                            } else {
+                              if (e.key === "ArrowDown") {
+                                navigateInputRef.value.value =
+                                  (
+                                    (navigateSuggestionsMenuRef.value?.getCurrentItem()
+                                      ?.nextElementSibling ??
+                                      navigateSuggestionsMenuRef.value
+                                        ?.firstElementChild) as SlMenuItem
+                                  )?.value ?? "";
+                              }
+                              if (e.key === "ArrowUp") {
+                                navigateInputRef.value.value =
+                                  (
+                                    (navigateSuggestionsMenuRef.value?.getCurrentItem()
+                                      ?.previousElementSibling ??
+                                      navigateSuggestionsMenuRef.value
+                                        ?.lastElementChild) as SlMenuItem
+                                  )?.value ?? "";
+                              }
+                            }
                             navigateInputRef.value.focus();
+                            await wait();
+                            const inputValueLength =
+                              navigateInputRef.value.value.length;
+                            navigateInputRef.value.setSelectionRange(
+                              inputValueLength,
+                              inputValueLength,
+                            );
                           }
                         }}
                         @mousemove=${() => {
@@ -357,8 +414,7 @@ export function NavigateDialog(props: {
                   })}
                 </sl-menu>`
               : null}
-          </sl-popup>
-        `}
+          </sl-popup> `}
       </Dialog>
     );
   };

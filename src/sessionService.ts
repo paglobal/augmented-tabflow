@@ -9,6 +9,8 @@ import {
   titles,
   tabGroupTypes,
   tlds,
+  navigationBoxPathName,
+  newTabNavigatedTabId,
 } from "../constants";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -113,6 +115,7 @@ export async function addTabToTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
   const tab = await chrome.tabs.create({
     pinned: tabGroup.type === tabGroupTypes.pinned ? true : false,
+    url: navigationBoxPathName,
   });
   if (tabGroup.type === tabGroupTypes.normal) {
     chrome.tabs.group({
@@ -140,7 +143,10 @@ export async function activateTab(tab: chrome.tabs.Tab) {
 export async function createTabGroup(tab?: chrome.tabs.Tab) {
   // @maybe
   if (!tab) {
-    tab = await chrome.tabs.create({ active: true });
+    tab = await chrome.tabs.create({
+      active: true,
+      url: navigationBoxPathName,
+    });
   }
   const tabGroupId = await chrome.tabs.group({
     tabIds: tab.id as number,
@@ -561,7 +567,7 @@ export async function moveTabOrTabGroupToWindow(
   // @maybe
   let stubTabId: chrome.tabs.Tab["id"] | undefined;
   if (!windowId) {
-    const window = await chrome.windows.create();
+    const window = await chrome.windows.create({ focused: true });
     stubTabId = (await chrome.tabs.query({ windowId: window?.id }))[0].id;
     windowId = window?.id;
   }
@@ -595,8 +601,13 @@ export async function navigate(query: string) {
         : undefined;
     } catch (error) {}
   }
-  const _currentlyNavigatedTabId = currentlyNavigatedTabId();
-  if (_currentlyNavigatedTabId) {
+  let _currentlyNavigatedTabId = currentlyNavigatedTabId();
+  if (_currentlyNavigatedTabId === newTabNavigatedTabId) {
+    _currentlyNavigatedTabId = (
+      await chrome.tabs.create({ active: false, url })
+    ).id;
+  }
+  if (typeof _currentlyNavigatedTabId === "number") {
     if (url) {
       await chrome.tabs.update(_currentlyNavigatedTabId, { url });
     } else {
@@ -605,6 +616,7 @@ export async function navigate(query: string) {
         tabId: _currentlyNavigatedTabId,
       });
     }
+    await chrome.tabs.update(_currentlyNavigatedTabId, { active: true });
   }
   await navigateDialogRef.value?.hide();
 }
