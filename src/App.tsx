@@ -26,7 +26,6 @@ import { sessionWindowsTreeContent } from "./sessionWindowsTreeContent";
 import { TabGroupTreeData } from "../sharedUtils";
 import { importTabGroupFromSessionTreeContent } from "./importTabGroupFromSessionTreeContent";
 import promiseWithOneTimeFallback from "./promiseWithOneTimeFallback";
-import { tabGroupTreeContent } from "./tabGroupTreeContent";
 import { SessionView } from "./SessionView";
 
 // disable animations for all tree items

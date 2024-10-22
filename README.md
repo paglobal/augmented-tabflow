@@ -24,25 +24,26 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add alert for not being able to go forward or backward
 - add badge for address
 - implement action center and add new shortcuts
-- fix loading issue with spinners
+- fix loading issue with spinners (support showing loaders on new tab page after this)
+- add button in toolbar for opening new window and look into issue with focusing any newly created windows
+- change from navigation box window to navigation box tab
+- add `Pop Out` button/shortcut on extension tab page
+- change all new tab buttons to open navigation box
 
 ### Less Urgent
 
-- check code for repositioning and resizing of navigation box to reduce visual stutter
-- check `migrateAndDedupe` function
-- experiment with focusing the last active element on a page after activating the page
-- look into (false) loading states
-- report possible bug with menu navigation in shoelace (up and down arrow navigation)
+- add commands to group tabs according to domain, title similarity and other stuff
 - load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
 - add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group`)
 - add options for merging tab groups with other tab groups under `Ungroup Tabs` (ie. where do you want to move them to? `Ungrouped Tabs` or some other tab group?)
 - add dialog for giving name and color to new tab groups created from `Ungrouped Tabs` or `Pinned Tabs`
 - implement recently closed tab groups feature
 - support moving pinned and ungrouped tab groups to new windows
+- add option for showing more options for tabs and tab groups
 -
 - implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks` and/or `Reading List`
 - consider adding button to "look inside" tab groups and import individual tabs
-- (maybe) implement search for sessions and tabs (already implemented in browser)
+- (maybe) implement search for sessions and tabs (already implemented in browser for tabs)
 - (maybe) implement ability to sort sessions alphabetically or by date added
 -
 - break large files into smaller files (look at `NavigateDialog.tsx` and `tabGroupTreeContent.tsx`)
@@ -60,11 +61,11 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - implement omnibox opensearch stuff
 - add all chrome internal pages to search suggestions
 - use ctrl+click for alternate click behaviour eg. copy instead of move
-- (maybe) add `Pop Out` button for picture-in-picture
 - implement group select and bulk actions
 - collapse tree items in export dialog when done with exporting tab or tab group
 - make session trees and other dialog trees react to the necessary app state changes
 -
+- check `migrateAndDedupe` function
 - implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 - type `sendMessage` and `subscribeToMessage` for automatic inference
@@ -97,6 +98,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) document the fact that there's no need to restore old tabs
 - document the ability to modify keyboard shortcuts at the top
 - document use with your favourite window manager
+- direct users where/how to change position of the chrome sidepanel
+- shortcuts include: Open sesssion view in side panel (Alt+S), Open session view in new tab (Alt+A), Close all session windows (Alt+W), Exit current session (Alt+Q), Open new tab (Alt+T), Open new window (Alt+N), Edit current tab address (Alt+L)
 - document `Ctrl+Shift+A` shortcut
 
 ### Recent Changes

@@ -1,5 +1,4 @@
 import { html } from "lit";
-import "@shoelace-style/shoelace/dist/components/tree-item/tree-item.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { PromethiumNode, adaptEffect, adaptState } from "promethium-js";
 import { createRef, ref } from "lit/directives/ref.js";
