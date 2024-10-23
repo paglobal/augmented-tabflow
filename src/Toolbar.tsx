@@ -16,6 +16,7 @@ import {
   importTabGroupFromSessionTreeDialogRef,
 } from "./App";
 import { navigationBoxPathName } from "../constants";
+import { openNavigationBox } from "../sharedUtils";
 
 export function Toolbar() {
   return () => {
@@ -41,7 +42,7 @@ export function Toolbar() {
           @click=${async () => {
             // @handled
             try {
-              await chrome.tabs.create({ url: navigationBoxPathName });
+              await openNavigationBox();
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();

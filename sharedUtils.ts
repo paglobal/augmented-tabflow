@@ -1,8 +1,8 @@
 import {
   SyncStorageKey,
   SessionStorageKey,
-  AreaName,
   TabGroupType,
+  AreaName,
   tabGroupTypes,
   sessionStorageKeys,
   MessageType,
@@ -14,6 +14,9 @@ import {
   syncStorageKeys,
   bookmarkerDetails,
   otherBookmarksBookmarkNodeTitle,
+  CurrentlyNavigatedTabId,
+  newTabNavigatedTabId,
+  navigationBoxPathName,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -322,4 +325,41 @@ export async function withError<T>(
     .catch((error) => {
       return [error];
     });
+}
+
+export async function openNavigationBox<
+  T extends {
+    active?: boolean;
+    pinned?: boolean;
+    newWindow?: boolean;
+    tabId?: chrome.tabs.Tab["id"];
+  },
+>(
+  options?: T,
+): Promise<
+  T["newWindow"] extends true
+    ? chrome.windows.Window | undefined
+    : chrome.tabs.Tab | undefined
+> {
+  await setStorageData<CurrentlyNavigatedTabId>(
+    sessionStorageKeys.currentlyNavigatedTabId,
+    options?.tabId ?? newTabNavigatedTabId,
+  );
+  if (options?.newWindow) {
+    return (await chrome.windows.create({
+      url: navigationBoxPathName,
+      focused: true,
+      type: "normal",
+    })) as T["newWindow"] extends true
+      ? chrome.windows.Window | undefined
+      : chrome.tabs.Tab | undefined;
+  } else {
+    return (await chrome.tabs.create({
+      url: navigationBoxPathName,
+      active: options?.active,
+      pinned: options?.pinned,
+    })) as T["newWindow"] extends true
+      ? chrome.windows.Window | undefined
+      : chrome.tabs.Tab | undefined;
+  }
 }

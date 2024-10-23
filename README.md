@@ -19,15 +19,16 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - display other windows in vertical view
 - add two-finger swipe to switch windows
 - open side panel in any new windows we create or move to via the side panel
+- add button in toolbar for opening new windows
+- look into issue with focusing any newly created windows
 - show other windows in side panel
 - time the re-initialization of pinned tabs more appropriately
 - fix loading issue with spinners (support showing loaders on new tab page after this)
-- add button in toolbar for opening new window and look into issue with focusing any newly created windows
 - add badge for address with reload, forward and back buttons
+- double click to close side panel afterwards
 
 ### Less Urgent
 
-- add setting for closing side panel on tab activation
 - add commands to group tabs according to domain, title similarity and other stuff
 - load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
 - add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group`)
@@ -60,6 +61,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 -
 - check `migrateAndDedupe` function
 - implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
+- use more thoughtful error messages
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 - type `sendMessage` and `subscribeToMessage` for automatic inference
 - notify users of errors that happen in service workers through message `chrome.runtime.message`
@@ -70,6 +72,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add test suite
 - look out for instances of typescript `!`'s in the codebae
 -
+- (maybe) add setting for closing side panel on tab activation
 - (maybe) implement search for sessions and tabs (already implemented in browser for tabs)
 - (maybe) implement ability to sort sessions alphabetically or by date added
 - (maybe) implement action center and add new shortcuts

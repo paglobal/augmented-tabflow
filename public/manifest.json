@@ -33,7 +33,7 @@
     "default_path": "sidePanel.html"
   },
   "commands": {
-    "_execute_action": {
+    "open-side-panel": {
       "suggested_key": "Alt+A",
       "description": "Open augmented tabflow side panel"
     },

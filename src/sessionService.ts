@@ -9,8 +9,8 @@ import {
   titles,
   tabGroupTypes,
   tlds,
-  navigationBoxPathName,
   newTabNavigatedTabId,
+  CurrentlyNavigatedTabId,
 } from "../constants";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -21,6 +21,7 @@ import {
   sendMessage,
   saveCurrentSessionDataIntoBookmarkNode,
   encodeTabDataAsUrl,
+  openNavigationBox,
 } from "../sharedUtils";
 import {
   currentlyEjectedTabOrTabGroup,
@@ -113,14 +114,13 @@ export async function collapseTabGroup(tabGroup: TabGroupTreeData[number]) {
 
 export async function addTabToTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
-  const tab = await chrome.tabs.create({
+  const tab = await openNavigationBox({
     pinned: tabGroup.type === tabGroupTypes.pinned ? true : false,
-    url: navigationBoxPathName,
   });
-  if (tabGroup.type === tabGroupTypes.normal) {
+  if (tabGroup.type === tabGroupTypes.normal && tab?.id) {
     chrome.tabs.group({
       groupId: tabGroup.id,
-      tabIds: tab.id as number,
+      tabIds: tab.id,
     });
   }
 }
@@ -143,18 +143,17 @@ export async function activateTab(tab: chrome.tabs.Tab) {
 export async function createTabGroup(tab?: chrome.tabs.Tab) {
   // @maybe
   if (!tab) {
-    tab = await chrome.tabs.create({
-      active: true,
-      url: navigationBoxPathName,
-    });
+    tab = await openNavigationBox({ active: true });
   }
-  const tabGroupId = await chrome.tabs.group({
-    tabIds: tab.id as number,
-    createProperties: {
-      windowId: tab.windowId,
-    },
-  });
-  await chrome.tabGroups.move(tabGroupId, { index: -1 });
+  if (tab) {
+    const tabGroupId = await chrome.tabs.group({
+      tabIds: tab.id as number,
+      createProperties: {
+        windowId: tab.windowId,
+      },
+    });
+    await chrome.tabGroups.move(tabGroupId, { index: -1 });
+  }
 }
 
 export async function updateTabGroup(
@@ -601,6 +600,9 @@ export async function navigate(query: string) {
         : undefined;
     } catch (error) {}
   }
+  const navigationBoxTab = (
+    await chrome.tabs.query({ active: true, currentWindow: true })
+  )[0];
   let _currentlyNavigatedTabId = currentlyNavigatedTabId();
   if (_currentlyNavigatedTabId === newTabNavigatedTabId) {
     _currentlyNavigatedTabId = (
@@ -616,7 +618,14 @@ export async function navigate(query: string) {
         tabId: _currentlyNavigatedTabId,
       });
     }
-    await chrome.tabs.update(_currentlyNavigatedTabId, { active: true });
+    await chrome.tabs.group({
+      tabIds: _currentlyNavigatedTabId,
+      groupId: navigationBoxTab.groupId,
+    });
+    await chrome.tabs.update(_currentlyNavigatedTabId, {
+      active: true,
+      pinned: navigationBoxTab.pinned,
+    });
   }
   await navigateDialogRef.value?.hide();
 }

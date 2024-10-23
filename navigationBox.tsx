@@ -11,7 +11,7 @@ import {
   newTabNavigatedTabId,
   sessionStorageKeys,
 } from "./constants";
-import { getStorageData, setStorageData, wait } from "./sharedUtils";
+import { getStorageData, wait } from "./sharedUtils";
 import { initApp } from "./src/utils";
 
 function App() {
@@ -72,12 +72,7 @@ initApp(App, async () => {
   const currentlyNavigatedTabId = await getStorageData<CurrentlyNavigatedTabId>(
     sessionStorageKeys.currentlyNavigatedTabId,
   );
-  if (!currentlyNavigatedTabId) {
-    await setStorageData<CurrentlyNavigatedTabId>(
-      sessionStorageKeys.currentlyNavigatedTabId,
-      newTabNavigatedTabId,
-    );
-  } else if (typeof currentlyNavigatedTabId === "number") {
+  if (typeof currentlyNavigatedTabId === "number") {
     const currentlyNavigatedTab = await chrome.tabs.get(
       currentlyNavigatedTabId,
     );
@@ -88,6 +83,6 @@ initApp(App, async () => {
       navigateInputRef.value?.select();
     }
   } else {
-    setCurrentlyNavigatedTabId(currentlyNavigatedTabId);
+    setCurrentlyNavigatedTabId(newTabNavigatedTabId);
   }
 });

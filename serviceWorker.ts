@@ -26,6 +26,7 @@ import {
   saveCurrentSessionDataIntoBookmarkNode,
   encodeTabDataAsUrl,
   insertBookmarker,
+  openNavigationBox,
 } from "./sharedUtils";
 
 chrome.sidePanel
@@ -840,27 +841,11 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     }
   } else if (command === commands.editCurrentTabURL) {
     if (tab?.id) {
-      await setStorageData<CurrentlyNavigatedTabId>(
-        sessionStorageKeys.currentlyNavigatedTabId,
-        tab.id,
-      );
-      await chrome.tabs.create({ url: navigationBoxPathName });
+      openNavigationBox({ tabId: tab.id });
     }
   } else if (command === commands.openNewTab) {
-    await setStorageData<CurrentlyNavigatedTabId>(
-      sessionStorageKeys.currentlyNavigatedTabId,
-      newTabNavigatedTabId,
-    );
-    await chrome.tabs.create({ url: navigationBoxPathName });
+    openNavigationBox();
   } else if (command === commands.openNewWindow) {
-    await setStorageData<CurrentlyNavigatedTabId>(
-      sessionStorageKeys.currentlyNavigatedTabId,
-      newTabNavigatedTabId,
-    );
-    await chrome.windows.create({
-      url: navigationBoxPathName,
-      focused: true,
-      type: "normal",
-    });
+    openNavigationBox({ newWindow: true });
   }
 });
