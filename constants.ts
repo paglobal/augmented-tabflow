@@ -113,6 +113,7 @@ export const commands = {
   openNewWindow: "open-new-window",
 };
 
+// please don't modify!
 export const bookmarkerDetails = {
   title:
     "PLEASE DO NOT TOUCH! NOT UNLESS YOU ABSOLUTELY KNOW WHAT YOU'RE DOING OR JUST DON'T CARE!!!",

@@ -568,7 +568,9 @@ export async function moveTabOrTabGroupToWindow(
   // @maybe
   let stubTabId: chrome.tabs.Tab["id"] | undefined;
   if (!windowId) {
-    const window = await chrome.windows.create({ focused: true });
+    const window = await chrome.windows.create({
+      focused: false,
+    });
     stubTabId = (await chrome.tabs.query({ windowId: window?.id }))[0].id;
     windowId = window?.id;
   }

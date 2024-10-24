@@ -19,8 +19,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add two-finger swipe to switch windows
 - open side panel in any new windows we create or move to via the side panel
 - focus first window after whole process
-- add button in toolbar for opening new windows
-- look into issue with focusing any newly created windows
 - show other windows in side panel
 - time the re-initialization of pinned tabs more appropriately
 - create recently updated page that shows recent changes

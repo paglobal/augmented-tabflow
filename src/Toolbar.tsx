@@ -15,7 +15,6 @@ import {
   deleteSessionDialogRef,
   importTabGroupFromSessionTreeDialogRef,
 } from "./App";
-import { navigationBoxPathName } from "../constants";
 import { openNavigationBox } from "../sharedUtils";
 
 export function Toolbar() {
@@ -51,11 +50,24 @@ export function Toolbar() {
         ></sl-icon-button>
         <sl-icon-button
           name="plus-circle"
-          title="Add Tab Group"
+          title="New Tab Group"
           @click=${async () => {
             // @handled
             try {
               await createTabGroup();
+            } catch (error) {
+              console.error(error);
+              notifyWithErrorMessageAndReloadButton();
+            }
+          }}
+        ></sl-icon-button>
+        <sl-icon-button
+          name="plus-square"
+          title="New Window"
+          @click=${async () => {
+            // @handled
+            try {
+              await openNavigationBox({ newWindow: true });
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
