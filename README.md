@@ -11,18 +11,18 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Urgent
 
-- implement local persistence pertaining to window instances (bookmarkNodeId => windowInstanceNumber)
+- implement local persistence pertaining to window instances (bookmarkNodeId => windowInstanceNumber for all sessions and pinned session as well)
 - check how many windows are around before putting their tabs in them
 - update local data on every session save
 - use local data to open tabs in appropriate window instances on session open
 - display other windows in vertical view
 - add two-finger swipe to switch windows
 - open side panel in any new windows we create or move to via the side panel
+- focus first window after whole process
 - add button in toolbar for opening new windows
 - look into issue with focusing any newly created windows
 - show other windows in side panel
 - time the re-initialization of pinned tabs more appropriately
-- fix loading issue with spinners (support showing loaders on new tab page after this)
 - create recently updated page that shows recent changes
 - show donation stuff on updated page
 - restore certain pieces of state such as user's `currentSession` from local storage on `onUpdated` callback

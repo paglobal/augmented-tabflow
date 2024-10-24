@@ -534,6 +534,13 @@ async function getTabGroupTreeData() {
   const tabs = await chrome.tabs.query({
     windowType: "normal",
   });
+  for (const tab of tabs) {
+    if (tab.status === "loading") {
+      await updateTabGroupTreeDataAndCurrentSessionData();
+
+      break;
+    }
+  }
   const tabGroupTreeData = tabs.reduce<TabGroupTreeData>(
     (tabGroupTreeData, currentTab) => {
       let url: URL | undefined;

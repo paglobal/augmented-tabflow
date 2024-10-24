@@ -273,12 +273,7 @@ export function TabTreeItem(props: {
               {
                 <TreeItemColorPatchOrIcon
                   pageUrl={tab.url}
-                  showSpinner={
-                    tab.status === "loading" &&
-                    !newTabUrls.includes(tab.url as string)
-                      ? true
-                      : false
-                  }
+                  showSpinner={tab.status === "loading" ? true : false}
                 />
               }
               {tab.title}
