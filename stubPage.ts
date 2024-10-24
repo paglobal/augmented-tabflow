@@ -14,9 +14,9 @@ if (url !== null) {
 if (active) {
   sendMessage({ type: messageTypes.restoreTab });
 }
-document.addEventListener("click", () => {
-  sendMessage({ type: messageTypes.restoreTab });
+document.addEventListener("click", async () => {
+  await sendMessage({ type: messageTypes.restoreTab });
 });
-document.addEventListener("keypress", () => {
-  sendMessage({ type: messageTypes.restoreTab });
+document.addEventListener("keypress", async () => {
+  await sendMessage({ type: messageTypes.restoreTab });
 });

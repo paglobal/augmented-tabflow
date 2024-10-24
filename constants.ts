@@ -85,6 +85,7 @@ export const messageTypes = {
   moveTabOrTabGroupToWindow: "message-3",
   closeAllSessionWindows: "message-4",
   updateTabGroupTreeDataAndCurrentSessionData: "message-5",
+  closeSidePanel: "message-6",
 } as const satisfies Record<string, MessageType>;
 
 export const tabGroupTreeDataUpdateDebounceTimeout = 200;
@@ -92,6 +93,8 @@ export const tabGroupTreeDataUpdateDebounceTimeout = 200;
 export const stubPagePathName = "/stubPage.html";
 
 export const navigationBoxPathName = "/navigationBox.html";
+
+export const sidePanelPathName = "/sidePanel.html";
 
 export const protocolsEligibleForEncoding = ["https:", "http:"];
 

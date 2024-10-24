@@ -23,6 +23,7 @@ export function TreeItem(props: {
   selected?: boolean;
   onExpand?: (e: Event) => void;
   onCollapse?: (e: Event) => void;
+  onDoubleClick?: (e: MouseEvent) => void;
   onSelect?: (e: MouseEvent) => void;
   draggableOptions?: Partial<DraggableOptions>;
   dropTargetOptions?: Partial<DropTargetOptions>;
@@ -130,6 +131,7 @@ export function TreeItem(props: {
         @sl-expand=${props.onExpand}
         @sl-collapse=${props.onCollapse}
         @click=${props.onSelect}
+        @dblclick=${props.onDoubleClick}
       >
         <div
           class="actions-container"

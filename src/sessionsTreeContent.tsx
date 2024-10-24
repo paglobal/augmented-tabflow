@@ -148,11 +148,11 @@ export function sessionsTreeContent() {
       </TreeItem>,
       <TreeItem
         tooltipContent="Close All Session Windows"
-        onSelect={(e: Event) => {
+        onSelect={async (e: Event) => {
           // @handled
           try {
             e.stopPropagation();
-            sendMessage({ type: messageTypes.closeAllSessionWindows });
+            await sendMessage({ type: messageTypes.closeAllSessionWindows });
           } catch (error) {
             console.error(error);
             notifyWithErrorMessageAndReloadButton();

@@ -13,9 +13,6 @@ import {
   titles,
   localStorageKeys,
   bookmarkerDetails,
-  CurrentlyNavigatedTabId,
-  navigationBoxPathName,
-  newTabNavigatedTabId,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -452,6 +449,12 @@ subscribeToMessage(messageTypes.openNewSession, async (newSessionData) => {
 subscribeToMessage(messageTypes.restoreTab, async (_, sender) => {
   // @error
   await restoreTabIfBlank(sender.tab?.id);
+});
+
+subscribeToMessage(messageTypes.closeSidePanel, async () => {
+  // @error
+  await chrome.sidePanel.setOptions({ enabled: false });
+  await chrome.sidePanel.setOptions({ enabled: true });
 });
 
 export async function moveTabOrTabGroupToWindow(

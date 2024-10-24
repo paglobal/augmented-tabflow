@@ -11,9 +11,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Urgent
 
-- always aggregate all `Ungrouped` tab group data after importing or exporting (apply functions from above)
--
 - implement local persistence pertaining to window instances (bookmarkNodeId => windowInstanceNumber)
+- check how many windows are around before putting their tabs in them
 - update local data on every session save
 - use local data to open tabs in appropriate window instances on session open
 - display other windows in vertical view
@@ -24,11 +23,15 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - show other windows in side panel
 - time the re-initialization of pinned tabs more appropriately
 - fix loading issue with spinners (support showing loaders on new tab page after this)
-- add badge for address with reload, forward and back buttons
-- double click to close side panel afterwards
+- create recently updated page that shows recent changes
+- show donation stuff on updated page
+- restore certain pieces of state such as user's `currentSession` from local storage on `onUpdated` callback
 
 ### Less Urgent
 
+- fix slight color change issue on tree item text hover
+- implement omnibox opensearch stuff with `activeTab` permission restrictions in mind
+- add badge for address (maybe) with reload, forward and back buttons
 - add commands to group tabs according to domain, title similarity and other stuff
 - load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
 - add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group`)
@@ -59,6 +62,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - collapse tree items in export dialog when done with exporting tab or tab group
 - make session trees and other dialog trees react to the necessary app state changes
 -
+- use `updateComplete` instead of `setTimeout` for waiting for components to change their state
+- always aggregate all `Ungrouped` tab group data after importing or exporting (apply functions from above)
 - check `migrateAndDedupe` function
 - implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
 - use more thoughtful error messages
@@ -78,7 +83,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) implement action center and add new shortcuts
 - (maybe) add `Pop Out` button/shortcut on extension tab page
 - (maybe) implement manual theme switcher
-- (maybe) implement omnibox opensearch stuff
 - (maybe) reduce minimum chrome version
 - (maybe, please be careful) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
 - (maybe) implement internationalization
@@ -90,6 +94,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - upload new video
 - link to chrome keyboard shortcuts page and other necessary pages
 - attribute projects that made this project possible
+- update screenshots. show some fullscreen, some with sessions, some with tabs, etc
 
 ### Help Dialog
 
@@ -102,6 +107,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - direct users where/how to change position of the chrome side panel
 - shortcuts include: Open sesssion view in side panel (Alt+A), Close all session windows (Alt+W), Exit current session (Alt+Q), Open new tab (Alt+T), Open new window (Alt+N), Edit current tab address (Alt+L)
 - document `Ctrl+Shift+A` shortcut
+- document how to force updates
+- document how side panel takes focus from page
 
 ### Recent Changes
 
@@ -109,3 +116,4 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - implemented navigation box
 - access to sessions across devices
 - better support for fullscreening
+- you can now edit tabs from the sidebar directly

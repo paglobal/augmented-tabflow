@@ -10,7 +10,6 @@ import {
   tabGroupTypes,
   tlds,
   newTabNavigatedTabId,
-  CurrentlyNavigatedTabId,
 } from "../constants";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -384,7 +383,10 @@ export async function openNewSession(
 ) {
   // @maybe
   await sessionsTreeDialogRef.value?.hide();
-  sendMessage({ type: messageTypes.openNewSession, data: newSessionData });
+  await sendMessage({
+    type: messageTypes.openNewSession,
+    data: newSessionData,
+  });
 }
 
 export async function moveOrCopyToSession(
@@ -618,10 +620,12 @@ export async function navigate(query: string) {
         tabId: _currentlyNavigatedTabId,
       });
     }
-    await chrome.tabs.group({
-      tabIds: _currentlyNavigatedTabId,
-      groupId: navigationBoxTab.groupId,
-    });
+    if (navigationBoxTab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
+      await chrome.tabs.group({
+        tabIds: _currentlyNavigatedTabId,
+        groupId: navigationBoxTab.groupId,
+      });
+    }
     await chrome.tabs.update(_currentlyNavigatedTabId, {
       active: true,
       pinned: navigationBoxTab.pinned,

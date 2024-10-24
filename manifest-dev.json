@@ -13,7 +13,8 @@
     "bookmarks",
     "favicon",
     "history",
-    "search"
+    "search",
+    "activeTab"
   ],
   "host_permissions": ["*://suggestqueries.google.com/*"],
   "icons": {

@@ -2,7 +2,7 @@ import { html } from "lit";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import { TreeItem } from "./TreeItem";
-import { type TabGroupTreeData } from "../sharedUtils";
+import { sendMessage, type TabGroupTreeData } from "../sharedUtils";
 import { activateTab, createTabGroup } from "./sessionService";
 import {
   moveOrCopyTabToSessionTreeDialogRef,
@@ -10,7 +10,12 @@ import {
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEjectedTabOrTabGroup,
 } from "./App";
-import { lockNames, newTabUrls, tabGroupTypes } from "../constants";
+import {
+  lockNames,
+  messageTypes,
+  newTabUrls,
+  tabGroupTypes,
+} from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
   navigateDialogRef,
@@ -33,6 +38,17 @@ export function TabTreeItem(props: {
           try {
             e.stopPropagation();
             await activateTab(tab);
+          } catch (error) {
+            console.error(error);
+            notifyWithErrorMessageAndReloadButton();
+          }
+        }}
+        onDoubleClick={async (e: MouseEvent) => {
+          // @handled
+          try {
+            e.stopPropagation();
+            await activateTab(tab);
+            await sendMessage({ type: messageTypes.closeSidePanel });
           } catch (error) {
             console.error(error);
             notifyWithErrorMessageAndReloadButton();
