@@ -76,12 +76,12 @@ subscribeToStorageData<TabGroupTreeData>(
 export async function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
   if (tabGroup.type === tabGroupTypes.ungrouped) {
-    await setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, false);
+    await setStorageData(localStorageKeys.ungroupedTabGroupCollapsed, false);
     await sendMessage({
       type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
     });
   } else if (tabGroup.type === tabGroupTypes.pinned) {
-    await setStorageData(sessionStorageKeys.pinnedTabGroupCollapsed, false);
+    await setStorageData(localStorageKeys.pinnedTabGroupCollapsed, false);
     await sendMessage({
       type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
     });
@@ -95,12 +95,12 @@ export async function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
 export async function collapseTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
   if (tabGroup.type === tabGroupTypes.ungrouped) {
-    await setStorageData(sessionStorageKeys.ungroupedTabGroupCollapsed, true);
+    await setStorageData(localStorageKeys.ungroupedTabGroupCollapsed, true);
     await sendMessage({
       type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
     });
   } else if (tabGroup.type === tabGroupTypes.pinned) {
-    await setStorageData(sessionStorageKeys.pinnedTabGroupCollapsed, true);
+    await setStorageData(localStorageKeys.pinnedTabGroupCollapsed, true);
     await sendMessage({
       type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
     });

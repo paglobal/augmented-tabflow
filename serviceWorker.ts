@@ -598,7 +598,7 @@ async function getTabGroupTreeData() {
     }
   });
   const ungroupedTabGroupCollapsed = await getStorageData<boolean>(
-    sessionStorageKeys.ungroupedTabGroupCollapsed,
+    localStorageKeys.ungroupedTabGroupCollapsed,
   );
   if (ungroupedTabs.length) {
     tabGroupTreeData.push({
@@ -632,7 +632,7 @@ async function getTabGroupTreeData() {
     }
   });
   const pinnedTabGroupCollapsed = await getStorageData<boolean>(
-    sessionStorageKeys.pinnedTabGroupCollapsed,
+    localStorageKeys.pinnedTabGroupCollapsed,
   );
   if (pinnedTabs.length) {
     tabGroupTreeData.unshift({
@@ -727,6 +727,10 @@ async function reinitializePinnedTabs() {
   if (pinnedTabGroupBookmarkNodeId) {
     const pinnedTabGroupBookmarkNodeChildren =
       await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
+    await setStorageData(
+      localStorageKeys.pinnedTabGroupBookmarkLength,
+      pinnedTabGroupBookmarkNodeChildren.length,
+    );
     for (const tabData of pinnedTabGroupBookmarkNodeChildren) {
       if (
         tabData.title === bookmarkerDetails.title &&
@@ -774,6 +778,23 @@ async function applyUpdates() {
         }
       });
       await setStorageData(sessionStorageKeys.startup, false);
+    } else {
+      const pinnedTabGroupBookmarkNodeId = await getStorageData<
+        chrome.bookmarks.BookmarkTreeNode["id"]
+      >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
+      if (pinnedTabGroupBookmarkNodeId) {
+        const pinnedTabGroupBookmarkNodeChildren =
+          await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
+        const pinnedTabGroupBookmarkLength = await getStorageData<number>(
+          localStorageKeys.pinnedTabGroupBookmarkLength,
+        );
+        if (
+          pinnedTabGroupBookmarkNodeChildren.length !==
+          pinnedTabGroupBookmarkLength
+        ) {
+          await reinitializePinnedTabs();
+        }
+      }
     }
     const tabGroupTreeData = await getTabGroupTreeData();
     await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);

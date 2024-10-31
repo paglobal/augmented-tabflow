@@ -9,18 +9,15 @@ export const sessionStorageKeys = {
   currentSessionData: "session-2",
   debounceTabGroupTreeDataUpdates: "session-3",
   tabGroupTreeDataUpdateTimeoutId: "session-4",
-  ungroupedTabGroupCollapsed: "session-5",
-  previousUnsavedSessionTabGroupTreeData: "session-6",
-  // TODO: get on this as soon as you can
-  recentlyClosedTabGroups: "session-7",
-  readyToUpdateCurrentSessionData: "session-8",
-  pinnedTabGroupCollapsed: "session-9",
-  sessionLoading: "session-10",
-  currentlyRemovedTabId: "session-11",
-  stubTabId: "session-12",
-  removingOldSessionTabs: "session-13",
-  startup: "session-14",
-  currentlyNavigatedTabId: "session-15",
+  previousUnsavedSessionTabGroupTreeData: "session-5",
+  recentlyClosedTabGroups: "session-6",
+  readyToUpdateCurrentSessionData: "session-7",
+  sessionLoading: "session-8",
+  currentlyRemovedTabId: "session-9",
+  stubTabId: "session-10",
+  removingOldSessionTabs: "session-11",
+  startup: "session-12",
+  currentlyNavigatedTabId: "session-13",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;
@@ -36,8 +33,12 @@ export const localStorageKeys = {
   rootBookmarkNodeId: "local-1",
   pinnedTabGroupBookmarkNodeId: "local-2",
   fullscreen: "local-3",
-  screenWidth: "local-4",
-  screenHeight: "local-5",
+  ungroupedTabGroupCollapsed: "local-4",
+  pinnedTabGroupCollapsed: "local-5",
+  currentSessionData_updateBackup: "local-6",
+  recentlyClosedTabGroups_updateBackup: "local-7",
+  startup_updateBackup: "local-8",
+  pinnedTabGroupBookmarkLength: "local-9",
 } as const satisfies Record<string, LocalStorageKey>;
 
 export type TabGroupType = `tabGroup-${number}`;

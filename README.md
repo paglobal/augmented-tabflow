@@ -9,37 +9,36 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ## Task List
 
-### Urgent
+### Now
 
-- implement local persistence pertaining to window instances (bookmarkNodeId => windowInstanceNumber for all sessions and pinned session as well)
-- check how many windows are around before putting their tabs in them
-- update local data on every session save
-- use local data to open tabs in appropriate window instances on session open
-- display other windows in vertical view
-- add two-finger swipe to switch windows
+- add two-finger swipe to switch between tab group colors
 - open side panel in any new windows we create or move to via the side panel
-- focus first window after whole process
-- show other windows in side panel
-- time the re-initialization of pinned tabs more appropriately
+- show `Ungrouped` and `Pinned` accross all windows
+-
 - create recently updated page that shows recent changes
 - show donation stuff on updated page
 - restore certain pieces of state such as user's `currentSession` from local storage on `onUpdated` callback
+- group `Ungrouped` tab group on import
+-
+- create tab page and implement shortcut command for it
+- keep record of `AntecedentTabIdPair` for when navigation box and tab page are closed
+- edit button for tabs doesn't fit when audio icon and favicon are showing, while session is open
+- change icon for `Add Tab Group`
 
-### Less Urgent
+### Later
 
-- fix slight color change issue on tree item text hover
 - implement omnibox opensearch stuff with `activeTab` permission restrictions in mind
 - add badge for address (maybe) with reload, forward and back buttons
 - add commands to group tabs according to domain, title similarity and other stuff
 - load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
-- add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group`)
-- add options for merging tab groups with other tab groups under `Ungroup Tabs` (ie. where do you want to move them to? `Ungrouped Tabs` or some other tab group?)
-- add dialog for giving name and color to new tab groups created from `Ungrouped Tabs` or `Pinned Tabs`
+- add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group` or even ungrouping it)
+- add options for merging tab groups with other tab groups under `Add To Tab Group` (ie. where do you want to move them to? `Ungrouped Tabs` or some other tab group?)
 - implement recently closed tab groups feature
 - support moving pinned and ungrouped tab groups to new windows
-- add option for showing more options for tabs and tab groups
 -
 - implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks` and/or `Reading List`
+- Use the `Move Or Copy Tab To Session` dialog
+- Show whether or not the tab was successfully added to or is already on `Reading List`
 - consider adding button to "look inside" tab groups and import individual tabs
 -
 - break large files into smaller files (look at `NavigateDialog.tsx` and `tabGroupTreeContent.tsx`)
@@ -54,12 +53,15 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - capitalize all instances of `url`
 - change `setTimeouts` to `await wait()`
 -
+- add last icon(s) in toolbar for `Settings` and `Actions` or `Settings And Actions`
 - add all chrome internal pages to search suggestions
 - use ctrl+click for alternate click behaviour eg. copy instead of move
 - implement group select and bulk actions for various functionality
 - collapse tree items in export dialog when done with exporting tab or tab group
 - make session trees and other dialog trees react to the necessary app state changes
 -
+- fix slight color change issue on tree item text hover
+- fix possible issue where icon buttons don't show up when the `TreeItemIcon` is hovered over
 - use `updateComplete` instead of `setTimeout` for waiting for components to change their state
 - always aggregate all `Ungrouped` tab group data after importing or exporting (apply functions from above)
 - check `migrateAndDedupe` function
@@ -75,7 +77,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add test suite
 - look out for instances of typescript `!`'s in the codebae
 -
-- (maybe) add setting for closing side panel on tab activation
+- (maybe) add option for showing more options for tabs and tab groups
 - (maybe) implement search for sessions and tabs (already implemented in browser for tabs)
 - (maybe) implement ability to sort sessions alphabetically or by date added
 - (maybe) implement action center and add new shortcuts
@@ -107,11 +109,15 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - document `Ctrl+Shift+A` shortcut
 - document how to force updates
 - document how side panel takes focus from page
+- document double-click to close side panel
 
 ### Recent Changes
 
+- fixed false loading states
+- fixed false favicons
 - fixed problem with pages loaded with file protocol and possibly other protocols
 - implemented navigation box
 - access to sessions across devices
 - better support for fullscreening
 - you can now edit tabs from the sidebar directly
+- double-click to close side panel

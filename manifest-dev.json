@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Augmented Tabflow",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "minimum_chrome_version": "116",
   "description": "Augment your tab workflow with extended tab, tab group and session managment.",
   "permissions": [
@@ -34,9 +34,12 @@
     "default_path": "sidePanel.html"
   },
   "commands": {
-    "open-side-panel": {
+    "_execute_action": {
+      "suggested_key": "Alt+T"
+    },
+    "open-tab-page": {
       "suggested_key": "Alt+A",
-      "description": "Open augmented tabflow side panel"
+      "description": "Open Augmented Tabflow tab page"
     },
     "close-all-session-windows": {
       "suggested_key": "Alt+W",
