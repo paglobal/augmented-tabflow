@@ -95,18 +95,22 @@ export const stubPagePathName = "/stubPage.html";
 
 export const navigationBoxPathName = "/navigationBox.html";
 
-export const sidePanelPathName = "/sidePanel.html";
+export const sessionManagerTabPageUrl = "/sessionManager.html?tabPage=true";
+
+export const sessionManagerPathName = "/sessionManager.html";
 
 export const protocolsEligibleForEncoding = ["https:", "http:"];
 
 export const onInstalledPage =
-  "https://www.paglobal.tech/pages/projects/augmented-tabflow.html";
+  "https://paglobal.online/pages/projects/augmented-tabflow.html";
 
-export const onUpdatedPage =
-  "https://www.paglobal.tech/pages/posts/augmented-tabflow-changelog.html";
+export const recentUpdateListPage = "/recentUpdates.html";
+
+export const extensiveUpdateListPage =
+  "https://paglobal.online/pages/posts/augmented-tabflow-changelog.html";
 
 export const commands = {
-  openSidePanel: "open-side-panel",
+  openTabPage: "open-tab-page",
   closeAllSessionWindows: "close-all-session-windows",
   exitCurrentSession: "exit-current-session",
   editCurrentTabURL: "edit-current-tab-url",

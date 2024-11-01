@@ -8,6 +8,15 @@ initApp(
   App,
   async () => {
     // @error
+    const params = new URLSearchParams(document.location.search);
+    const tabPage = params.get("tabPage");
+    if (tabPage) {
+      document.addEventListener("visibilitychange", async () => {
+        if (document.hidden) {
+          close();
+        }
+      });
+    }
     await createBookmarkNodeAndStoreId(
       localStorageKeys.rootBookmarkNodeId,
       titles.rootBookmarkNode,

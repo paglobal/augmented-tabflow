@@ -6,10 +6,11 @@ export default defineConfig({
     outDir: "dist",
     rollupOptions: {
       input: {
-        sidePanel: resolve(__dirname, "sidePanel.html"),
+        sessionManager: resolve(__dirname, "sessionManager.html"),
         serviceWorker: resolve(__dirname, "serviceWorker.ts"),
         stubPage: resolve(__dirname, "stubPage.html"),
         navigationBox: resolve(__dirname, "navigationBox.html"),
+        recentUpdates: resolve(__dirname, "recentUpdates.html"),
       },
       output: {
         entryFileNames: "[name].js",

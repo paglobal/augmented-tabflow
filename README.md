@@ -13,26 +13,28 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 - add two-finger swipe to switch between tab group colors
 - open side panel in any new windows we create or move to via the side panel
-- show `Ungrouped` and `Pinned` accross all windows
--
-- create recently updated page that shows recent changes
-- show donation stuff on updated page
+- show tab group spaces underneath
+- custom color scheme for tab group spaces
+- (maybe) add nice color transition
 - restore certain pieces of state such as user's `currentSession` from local storage on `onUpdated` callback
-- group `Ungrouped` tab group on import
 -
-- create tab page and implement shortcut command for it
-- keep record of `AntecedentTabIdPair` for when navigation box and tab page are closed
-- edit button for tabs doesn't fit when audio icon and favicon are showing, while session is open
+- filter `SessionManager` and `NavigationBox` from tab group tree
+- keep record of `AntecedentTabIdInfo` for when navigation box and tab page are open
 - change icon for `Add Tab Group`
+- group `Ungrouped` tab groups on import
+- edit button for tabs doesn't fit when audio icon and favicon are showing, while session is open
+- add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group` or even ungrouping it)
+- add options for merging tab groups with other tab groups under `Add To Tab Group` (ie. where do you want to move them to? `Ungrouped Tabs` or some other tab group?)
+- move new tab group to beginning
+- fix improper grouping in tab page
 
 ### Later
 
+- implement sharing of sessions through plain copied text and through files (`Create Session From File/Text` and `Share Session`)
 - implement omnibox opensearch stuff with `activeTab` permission restrictions in mind
 - add badge for address (maybe) with reload, forward and back buttons
 - add commands to group tabs according to domain, title similarity and other stuff
 - load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
-- add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group` or even ungrouping it)
-- add options for merging tab groups with other tab groups under `Add To Tab Group` (ie. where do you want to move them to? `Ungrouped Tabs` or some other tab group?)
 - implement recently closed tab groups feature
 - support moving pinned and ungrouped tab groups to new windows
 -
@@ -61,7 +63,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - make session trees and other dialog trees react to the necessary app state changes
 -
 - fix slight color change issue on tree item text hover
-- fix possible issue where icon buttons don't show up when the `TreeItemIcon` is hovered over
 - use `updateComplete` instead of `setTimeout` for waiting for components to change their state
 - always aggregate all `Ungrouped` tab group data after importing or exporting (apply functions from above)
 - check `migrateAndDedupe` function
@@ -77,6 +78,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add test suite
 - look out for instances of typescript `!`'s in the codebae
 -
+- (maybe) limit number of toasts to be show at a time
 - (maybe) add option for showing more options for tabs and tab groups
 - (maybe) implement search for sessions and tabs (already implemented in browser for tabs)
 - (maybe) implement ability to sort sessions alphabetically or by date added
@@ -86,6 +88,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) reduce minimum chrome version
 - (maybe, please be careful) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
 - (maybe) implement internationalization
+- (maybe) support moving whole windows
 -
 - try updating the tld list from time to time
 
@@ -98,7 +101,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Help Dialog
 
-- add reference to new youtube video
 - attribute projects that made this project possible
 - document behaviour concerning interacting with bookmarking from mobile
 - (maybe) document the fact that there's no need to restore old tabs
@@ -110,9 +112,14 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - document how to force updates
 - document how side panel takes focus from page
 - document double-click to close side panel
+- have button to open recent updates page
+- add donate
+- document tab page
 
 ### Recent Changes
 
+- fix slight hover issue with favicons
+- add donate button
 - fixed false loading states
 - fixed false favicons
 - fixed problem with pages loaded with file protocol and possibly other protocols
@@ -121,3 +128,5 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - better support for fullscreening
 - you can now edit tabs from the sidebar directly
 - double-click to close side panel
+- create recent updates extension page
+- added session manager tab page

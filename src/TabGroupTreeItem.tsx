@@ -214,18 +214,19 @@ export function TabGroupTreeItem(props: {
           ${tabGroup.type !== tabGroupTypes.normal
             ? html`
                 <sl-icon-button
-                  name="folder"
+                  name="folder-plus"
                   title="Group Tabs"
-                  @click=${(e: Event) => {
+                  @click=${async (e: Event) => {
                     // @handled
                     try {
                       e.stopPropagation();
-                      chrome.tabs.group({
+                      const newTabGroupId = await chrome.tabs.group({
                         tabIds: tabGroup.tabs.map((tab) => tab.id) as [
                           number,
                           ...number[],
                         ],
                       });
+                      // await chrome.tabGroups.move(newTabGroupId, { index: -1 });
                     } catch (error) {
                       console.error(error);
                       notifyWithErrorMessageAndReloadButton();

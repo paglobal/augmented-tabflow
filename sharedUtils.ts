@@ -259,7 +259,7 @@ export function encodeTabDataAsUrl(options: {
 }
 
 export function debounce(callback: () => void, timeout: number) {
-  let timeoutId: number | undefined;
+  let timeoutId: number | undefined | NodeJS.Timeout;
 
   return (newTimeout?: number) => {
     clearTimeout(timeoutId);

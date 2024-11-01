@@ -55,10 +55,10 @@ export function notifyWithErrorMessageAndReloadButton() {
 
 export function initApp(
   App: (props: Object) => () => PromethiumNode,
-  initFn: () => void,
+  initFn?: () => void,
   setThemeMode?: Setter<ThemeMode>,
 ) {
-  initFn();
+  initFn?.();
   if (window.matchMedia) {
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       setThemeMode?.("dark");

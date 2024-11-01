@@ -15,8 +15,8 @@ importers:
         specifier: ^1.0.3
         version: 1.0.3
       '@shoelace-style/shoelace':
-        specifier: ^2.15.0
-        version: 2.15.0(@types/react@18.2.79)
+        specifier: ^2.18.0
+        version: 2.18.0(@types/react@18.2.79)
       fuzzysort:
         specifier: ^3.0.2
         version: 3.0.2
@@ -27,6 +27,9 @@ importers:
         specifier: ^0.14.2
         version: 0.14.2
     devDependencies:
+      '@types/node':
+        specifier: ^22.8.6
+        version: 22.8.6
       chrome-types:
         specifier: ^0.1.250
         version: 0.1.250
@@ -41,7 +44,7 @@ importers:
         version: 5.3.3
       vite:
         specifier: ^5.1.5
-        version: 5.1.5
+        version: 5.1.5(@types/node@22.8.6)
 
 packages:
 
@@ -300,12 +303,15 @@ packages:
   '@shoelace-style/localize@3.1.2':
     resolution: {integrity: sha512-Hf45HeO+vdQblabpyZOTxJ4ZeZsmIUYXXPmoYrrR4OJ5OKxL+bhMz5mK8JXgl7HsoEowfz7+e248UGi861de9Q==}
 
-  '@shoelace-style/shoelace@2.15.0':
-    resolution: {integrity: sha512-Lcg938Y8U2VsHqIYewzlt+H1rbrXC4GRSUkTJgXyF8/0YAOlI+srd5OSfIw+/LYmwLP2Peyh398Kae/6tg4PDA==}
+  '@shoelace-style/shoelace@2.18.0':
+    resolution: {integrity: sha512-uzpL0+8Qm8aE2ArcXBcKHkaPc6l7ymuVaN6xJM0yd2o3talcoXpuP+gRBsgggSZKuuJEa+JkEuLDdzzFnE/+jw==}
     engines: {node: '>=14.17.0'}
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
+
+  '@types/node@22.8.6':
+    resolution: {integrity: sha512-tosuJYKrIqjQIlVCM4PEGxOmyg3FCPa/fViuJChnGeEIhjA46oy8FMVoF9su1/v8PNs2a8Q0iFNyOx0uOF91nw==}
 
   '@types/prop-types@15.7.13':
     resolution: {integrity: sha512-hCZTSvwbzWGvhqxp/RqVqwU999pBf2vp7hzIjiYOsl8wqOmUxkQ6ddw1cV3l8811+kdUFus/q4d1Y3E3SyEifA==}
@@ -593,6 +599,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  undici-types@6.19.8:
+    resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
+
   vite@5.1.5:
     resolution: {integrity: sha512-BdN1xh0Of/oQafhU+FvopafUp6WaYenLU/NFoL5WyJL++GxkNfieKzBhM24H3HVsPQrlAqB7iJYTHabzaRed5Q==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -823,7 +832,7 @@ snapshots:
 
   '@shoelace-style/localize@3.1.2': {}
 
-  '@shoelace-style/shoelace@2.15.0(@types/react@18.2.79)':
+  '@shoelace-style/shoelace@2.18.0(@types/react@18.2.79)':
     dependencies:
       '@ctrl/tinycolor': 4.0.2
       '@floating-ui/dom': 1.5.4
@@ -837,6 +846,10 @@ snapshots:
       - '@types/react'
 
   '@types/estree@1.0.5': {}
+
+  '@types/node@22.8.6':
+    dependencies:
+      undici-types: 6.19.8
 
   '@types/prop-types@15.7.13': {}
 
@@ -1140,12 +1153,15 @@ snapshots:
 
   typescript@5.3.3: {}
 
-  vite@5.1.5:
+  undici-types@6.19.8: {}
+
+  vite@5.1.5(@types/node@22.8.6):
     dependencies:
       esbuild: 0.19.12
       postcss: 8.4.35
       rollup: 4.12.1
     optionalDependencies:
+      '@types/node': 22.8.6
       fsevents: 2.3.3
 
   vscode-css-languageservice@4.3.0:

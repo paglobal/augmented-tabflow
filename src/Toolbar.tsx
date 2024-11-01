@@ -49,7 +49,7 @@ export function Toolbar() {
           }}
         ></sl-icon-button>
         <sl-icon-button
-          name="plus-circle"
+          name="folder-plus"
           title="New Tab Group"
           @click=${async () => {
             // @handled

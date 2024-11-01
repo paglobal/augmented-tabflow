@@ -70,6 +70,7 @@ export function TreeItemColorPatchOrIcon(props: {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                pointerEvents: "none",
               })}
               slot=${ifDefined(props.slot)}
             >

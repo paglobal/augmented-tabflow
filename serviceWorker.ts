@@ -3,7 +3,7 @@ import {
   commands,
   lockNames,
   onInstalledPage,
-  onUpdatedPage,
+  recentUpdateListPage,
   messageTypes,
   sessionStorageKeys,
   stubPagePathName,
@@ -13,6 +13,8 @@ import {
   titles,
   localStorageKeys,
   bookmarkerDetails,
+  sessionManagerTabPageUrl,
+  sessionManagerPathName,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -38,7 +40,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     });
   } else if (details.reason === "update") {
     await chrome.tabs.create({
-      url: onUpdatedPage,
+      url: recentUpdateListPage,
     });
   }
   await createBookmarkNodeAndStoreId(
@@ -727,10 +729,6 @@ async function reinitializePinnedTabs() {
   if (pinnedTabGroupBookmarkNodeId) {
     const pinnedTabGroupBookmarkNodeChildren =
       await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
-    await setStorageData(
-      localStorageKeys.pinnedTabGroupBookmarkLength,
-      pinnedTabGroupBookmarkNodeChildren.length,
-    );
     for (const tabData of pinnedTabGroupBookmarkNodeChildren) {
       if (
         tabData.title === bookmarkerDetails.title &&
@@ -785,11 +783,22 @@ async function applyUpdates() {
       if (pinnedTabGroupBookmarkNodeId) {
         const pinnedTabGroupBookmarkNodeChildren =
           await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
+        const pinnedTabGroupBookmarkNodeChildrenLength =
+          pinnedTabGroupBookmarkNodeChildren.filter(
+            (bookmarkNode) =>
+              !bookmarkNode.url?.startsWith(
+                `chrome-extension://${chrome.runtime.id}`,
+              ),
+          ).length;
         const pinnedTabGroupBookmarkLength = await getStorageData<number>(
           localStorageKeys.pinnedTabGroupBookmarkLength,
         );
+        console.log({
+          pinnedTabGroupBookmarkNodeChildrenLength,
+          pinnedTabGroupBookmarkLength,
+        });
         if (
-          pinnedTabGroupBookmarkNodeChildren.length !==
+          pinnedTabGroupBookmarkNodeChildrenLength !==
           pinnedTabGroupBookmarkLength
         ) {
           await reinitializePinnedTabs();
@@ -800,6 +809,22 @@ async function applyUpdates() {
     await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
     await updateCurrentSessionData();
     await removeSessionFolderFromDefaultBookmarkSuggestion();
+    const pinnedTabGroupBookmarkNodeId = await getStorageData<
+      chrome.bookmarks.BookmarkTreeNode["id"]
+    >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
+    if (pinnedTabGroupBookmarkNodeId) {
+      const pinnedTabGroupBookmarkNodeChildren =
+        await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
+      await setStorageData(
+        localStorageKeys.pinnedTabGroupBookmarkLength,
+        pinnedTabGroupBookmarkNodeChildren.filter(
+          (bookmarkNode) =>
+            !bookmarkNode.url?.startsWith(
+              `chrome-extension://${chrome.runtime.id}`,
+            ),
+        ).length,
+      );
+    }
     const sessionLoading = await getStorageData<boolean>(
       sessionStorageKeys.sessionLoading,
     );
@@ -858,8 +883,21 @@ subscribeToMessage(
 
 chrome.commands.onCommand.addListener(async (command, tab) => {
   // @maybe
-  if (command === commands.openSidePanel) {
-    await chrome.sidePanel.open({});
+  if (command === commands.openTabPage) {
+    const tabPages = await chrome.tabs.query({
+      active: true,
+      url: [
+        `chrome-extension://${chrome.runtime.id}${sessionManagerTabPageUrl}`,
+        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}`,
+      ],
+    });
+    if (tabPages.length) {
+      await chrome.tabs.remove(
+        tabPages.map((tabPage) => tabPage.id) as number[],
+      );
+    } else {
+      await chrome.tabs.create({ url: sessionManagerTabPageUrl });
+    }
   } else if (command === commands.closeAllSessionWindows) {
     await closeAllSessionWindows();
   } else if (command === commands.exitCurrentSession) {

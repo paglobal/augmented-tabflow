@@ -32,7 +32,7 @@
     "default_title": "Augmented Tabflow"
   },
   "side_panel": {
-    "default_path": "sidePanel.html"
+    "default_path": "sessionManager.html"
   },
   "commands": {
     "_execute_action": {

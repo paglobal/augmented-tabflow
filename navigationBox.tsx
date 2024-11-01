@@ -43,15 +43,13 @@ function App() {
             })}
           >
             ${(
-              <>
-                <NavigateDialog
-                  onHide={() => {
-                    close();
-                  }}
-                  open={true}
-                  onlyInput={true}
-                />
-              </>
+              <NavigateDialog
+                onHide={() => {
+                  close();
+                }}
+                open={true}
+                onlyInput={true}
+              />
             )}
           </div>
         </div>
@@ -65,9 +63,6 @@ initApp(App, async () => {
     if (document.hidden) {
       close();
     }
-  });
-  window.addEventListener("blur", async () => {
-    close();
   });
   const currentlyNavigatedTabId = await getStorageData<CurrentlyNavigatedTabId>(
     sessionStorageKeys.currentlyNavigatedTabId,
