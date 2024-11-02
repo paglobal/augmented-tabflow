@@ -7,11 +7,12 @@ import {
 } from "./src/NavigateDialog";
 import "./customElements";
 import {
+  AntecedentTabInfo,
   CurrentlyNavigatedTabId,
   newTabNavigatedTabId,
   sessionStorageKeys,
 } from "./constants";
-import { getStorageData, wait } from "./sharedUtils";
+import { getStorageData, setStorageData, wait, withError } from "./sharedUtils";
 import { initApp } from "./src/utils";
 
 function App() {
@@ -59,6 +60,25 @@ function App() {
 
 initApp(App, async () => {
   // @error
+  const [error, currentTab] = await withError(chrome.tabs.getCurrent());
+  if (error) {
+    // @handle
+  }
+  const [_error, antecedentTabInfo] = await withError(
+    getStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo),
+  );
+  if (_error) {
+    // @handle
+  }
+  const [__error] = await withError(
+    setStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo, {
+      id: currentTab?.id,
+      precedentTabId: antecedentTabInfo?.precedentTabId,
+    }),
+  );
+  if (__error) {
+    // @handle
+  }
   document.addEventListener("visibilitychange", async () => {
     if (document.hidden) {
       close();

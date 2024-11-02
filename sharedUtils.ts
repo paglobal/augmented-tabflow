@@ -17,6 +17,7 @@ import {
   CurrentlyNavigatedTabId,
   newTabNavigatedTabId,
   navigationBoxPathName,
+  AntecedentTabInfo,
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
@@ -332,18 +333,27 @@ export async function openNavigationBox<
     active?: boolean;
     pinned?: boolean;
     newWindow?: boolean;
-    tabId?: chrome.tabs.Tab["id"];
+    navigatedTabId?: chrome.tabs.Tab["id"];
+    precedentTabId: chrome.tabs.Tab["id"];
   },
 >(
-  options?: T,
+  options: T,
 ): Promise<
   T["newWindow"] extends true
     ? chrome.windows.Window | undefined
     : chrome.tabs.Tab | undefined
 > {
+  const [error] = await withError(
+    setStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo, {
+      precedentTabId: options.precedentTabId,
+    }),
+  );
+  if (error) {
+    // @handle
+  }
   await setStorageData<CurrentlyNavigatedTabId>(
     sessionStorageKeys.currentlyNavigatedTabId,
-    options?.tabId ?? newTabNavigatedTabId,
+    options?.navigatedTabId ?? newTabNavigatedTabId,
   );
   if (options?.newWindow) {
     return (await chrome.windows.create({

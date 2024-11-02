@@ -15,7 +15,7 @@ import {
   deleteSessionDialogRef,
   importTabGroupFromSessionTreeDialogRef,
 } from "./App";
-import { openNavigationBox } from "../sharedUtils";
+import { openNavigationBox, withError } from "../sharedUtils";
 
 export function Toolbar() {
   return () => {
@@ -41,7 +41,13 @@ export function Toolbar() {
           @click=${async () => {
             // @handled
             try {
-              await openNavigationBox();
+              const [error, currentTab] = await withError(
+                chrome.tabs.getCurrent(),
+              );
+              if (error) {
+                //@handle
+              }
+              await openNavigationBox({ precedentTabId: currentTab?.id });
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
@@ -67,7 +73,16 @@ export function Toolbar() {
           @click=${async () => {
             // @handled
             try {
-              await openNavigationBox({ newWindow: true });
+              const [error, currentTab] = await withError(
+                chrome.tabs.getCurrent(),
+              );
+              if (error) {
+                //@handle
+              }
+              await openNavigationBox({
+                newWindow: true,
+                precedentTabId: currentTab?.id,
+              });
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();

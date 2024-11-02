@@ -4,6 +4,11 @@ export type SessionStorageKey = `session-${number}`;
 
 export type SessionData = chrome.bookmarks.BookmarkTreeNode | null;
 
+export type AntecedentTabInfo = {
+  id?: chrome.tabs.Tab["id"];
+  precedentTabId?: chrome.tabs.Tab["id"];
+} | null;
+
 export const sessionStorageKeys = {
   tabGroupTreeData: "session-1",
   currentSessionData: "session-2",
@@ -18,6 +23,7 @@ export const sessionStorageKeys = {
   removingOldSessionTabs: "session-11",
   startup: "session-12",
   currentlyNavigatedTabId: "session-13",
+  antecedentTabInfo: "session-14",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;
@@ -108,6 +114,11 @@ export const recentUpdateListPage = "/recentUpdates.html";
 
 export const extensiveUpdateListPage =
   "https://paglobal.online/pages/posts/augmented-tabflow-changelog.html";
+
+export const sessionManagerUrls = [
+  `chrome-extension://${chrome.runtime.id}${sessionManagerTabPageUrl}`,
+  `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}`,
+];
 
 export const commands = {
   openTabPage: "open-tab-page",

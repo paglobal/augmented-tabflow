@@ -14,7 +14,8 @@ import {
   localStorageKeys,
   bookmarkerDetails,
   sessionManagerTabPageUrl,
-  sessionManagerPathName,
+  AntecedentTabInfo,
+  sessionManagerUrls,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -26,6 +27,7 @@ import {
   encodeTabDataAsUrl,
   insertBookmarker,
   openNavigationBox,
+  withError,
 } from "./sharedUtils";
 
 chrome.sidePanel
@@ -133,6 +135,24 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
   // @error
   await restoreTabIfBlank(activeInfo.tabId);
   await updateTabGroupTreeDataAndCurrentSessionData();
+  const [error, antecedentTabInfo] = await withError(
+    getStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo),
+  );
+  if (error) {
+    // @handle
+  } else {
+    if (antecedentTabInfo?.id && antecedentTabInfo.id !== activeInfo.tabId) {
+      const [error] = await withError(
+        setStorageData<AntecedentTabInfo>(
+          sessionStorageKeys.antecedentTabInfo,
+          null,
+        ),
+      );
+      if (error) {
+        // @handle
+      }
+    }
+  }
 });
 
 chrome.tabs.onAttached.addListener(async () => {
@@ -187,13 +207,39 @@ chrome.tabs.onMoved.addListener(async () => {
   await updateTabGroupTreeDataAndCurrentSessionData();
 });
 
-chrome.tabs.onRemoved.addListener(async () => {
+chrome.tabs.onRemoved.addListener(async (tabId) => {
   // @error
   await setStorageData(
     sessionStorageKeys.readyToUpdateCurrentSessionData,
     true,
   );
   await updateTabGroupTreeDataAndCurrentSessionData();
+  const [error, antecedentTabInfo] = await withError(
+    getStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo),
+  );
+  if (error) {
+    // @handle
+  } else {
+    if (antecedentTabInfo?.id === tabId && antecedentTabInfo?.precedentTabId) {
+      const [error] = await withError(
+        chrome.tabs.update(antecedentTabInfo.precedentTabId, {
+          active: true,
+        }),
+      );
+      if (error) {
+        // @handle
+      }
+      const [_error] = await withError(
+        setStorageData<AntecedentTabInfo>(
+          sessionStorageKeys.antecedentTabInfo,
+          null,
+        ),
+      );
+      if (_error) {
+        // @handle
+      }
+    }
+  }
 });
 
 chrome.tabs.onReplaced.addListener(async () => {
@@ -793,10 +839,6 @@ async function applyUpdates() {
         const pinnedTabGroupBookmarkLength = await getStorageData<number>(
           localStorageKeys.pinnedTabGroupBookmarkLength,
         );
-        console.log({
-          pinnedTabGroupBookmarkNodeChildrenLength,
-          pinnedTabGroupBookmarkLength,
-        });
         if (
           pinnedTabGroupBookmarkNodeChildrenLength !==
           pinnedTabGroupBookmarkLength
@@ -884,18 +926,20 @@ subscribeToMessage(
 chrome.commands.onCommand.addListener(async (command, tab) => {
   // @maybe
   if (command === commands.openTabPage) {
-    const tabPages = await chrome.tabs.query({
-      active: true,
-      url: [
-        `chrome-extension://${chrome.runtime.id}${sessionManagerTabPageUrl}`,
-        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}`,
-      ],
-    });
-    if (tabPages.length) {
-      await chrome.tabs.remove(
-        tabPages.map((tabPage) => tabPage.id) as number[],
-      );
+    if (tab?.id && tab.url && sessionManagerUrls.includes(tab.url)) {
+      await chrome.tabs.remove(tab.id);
     } else {
+      const [error] = await withError(
+        setStorageData<AntecedentTabInfo>(
+          sessionStorageKeys.antecedentTabInfo,
+          {
+            precedentTabId: tab?.id,
+          },
+        ),
+      );
+      if (error) {
+        // @handle
+      }
       await chrome.tabs.create({ url: sessionManagerTabPageUrl });
     }
   } else if (command === commands.closeAllSessionWindows) {
@@ -910,11 +954,11 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     }
   } else if (command === commands.editCurrentTabURL) {
     if (tab?.id) {
-      openNavigationBox({ tabId: tab.id });
+      openNavigationBox({ navigatedTabId: tab.id, precedentTabId: tab.id });
     }
   } else if (command === commands.openNewTab) {
-    openNavigationBox();
+    openNavigationBox({ precedentTabId: tab?.id });
   } else if (command === commands.openNewWindow) {
-    openNavigationBox({ newWindow: true });
+    openNavigationBox({ newWindow: true, precedentTabId: tab?.id });
   }
 });

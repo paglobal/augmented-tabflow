@@ -10,6 +10,7 @@ import {
   tabGroupTypes,
   tlds,
   newTabNavigatedTabId,
+  AntecedentTabInfo,
 } from "../constants";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -21,6 +22,7 @@ import {
   saveCurrentSessionDataIntoBookmarkNode,
   encodeTabDataAsUrl,
   openNavigationBox,
+  withError,
 } from "../sharedUtils";
 import {
   currentlyEjectedTabOrTabGroup,
@@ -113,8 +115,13 @@ export async function collapseTabGroup(tabGroup: TabGroupTreeData[number]) {
 
 export async function addTabToTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
+  const [error, currentTab] = await withError(chrome.tabs.getCurrent());
+  if (error) {
+    //@handle
+  }
   const tab = await openNavigationBox({
     pinned: tabGroup.type === tabGroupTypes.pinned ? true : false,
+    precedentTabId: currentTab?.id,
   });
   if (tabGroup.type === tabGroupTypes.normal && tab?.id) {
     chrome.tabs.group({
@@ -142,7 +149,14 @@ export async function activateTab(tab: chrome.tabs.Tab) {
 export async function createTabGroup(tab?: chrome.tabs.Tab) {
   // @maybe
   if (!tab) {
-    tab = await openNavigationBox({ active: true });
+    const [error, currentTab] = await withError(chrome.tabs.getCurrent());
+    if (error) {
+      //@handle
+    }
+    tab = await openNavigationBox({
+      active: true,
+      precedentTabId: currentTab?.id,
+    });
   }
   if (tab) {
     const tabGroupId = await chrome.tabs.group({
@@ -574,7 +588,6 @@ export async function moveTabOrTabGroupToWindow(
     stubTabId = (await chrome.tabs.query({ windowId: window?.id }))[0].id;
     windowId = window?.id;
   }
-  await chrome.sidePanel.open({ windowId });
   sendMessage({
     type: messageTypes.moveTabOrTabGroupToWindow,
     data: {
@@ -614,6 +627,21 @@ export async function navigate(query: string) {
     ).id;
   }
   if (typeof _currentlyNavigatedTabId === "number") {
+    const [error, antecedentTabInfo] = await withError(
+      getStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo),
+    );
+    if (error) {
+      // @handle
+    }
+    const [_error] = await withError(
+      setStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo, {
+        id: _currentlyNavigatedTabId,
+        precedentTabId: antecedentTabInfo?.precedentTabId,
+      }),
+    );
+    if (_error) {
+      // @handle
+    }
     if (url) {
       await chrome.tabs.update(_currentlyNavigatedTabId, { url });
     } else {

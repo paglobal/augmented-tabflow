@@ -12,14 +12,11 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 ### Now
 
 - add two-finger swipe to switch between tab group colors
-- open side panel in any new windows we create or move to via the side panel
 - show tab group spaces underneath
 - custom color scheme for tab group spaces
 - (maybe) add nice color transition
 - restore certain pieces of state such as user's `currentSession` from local storage on `onUpdated` callback
 -
-- filter `SessionManager` and `NavigationBox` from tab group tree
-- keep record of `AntecedentTabIdInfo` for when navigation box and tab page are open
 - change icon for `Add Tab Group`
 - group `Ungrouped` tab groups on import
 - edit button for tabs doesn't fit when audio icon and favicon are showing, while session is open
@@ -50,8 +47,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - migrate fully to JSX
 - general code inspection and refactoring
 - inspect and verify types across entire codebase
-- refine and organise user-facing text. look for anything in quotation marks like "Error!" and such. make use of full stops
 - organise imports
+- refine and organise user-facing text. look for anything in quotation marks like "Error!" and such. make use of full stops
 - capitalize all instances of `url`
 - change `setTimeouts` to `await wait()`
 -
@@ -66,7 +63,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - use `updateComplete` instead of `setTimeout` for waiting for components to change their state
 - always aggregate all `Ungrouped` tab group data after importing or exporting (apply functions from above)
 - check `migrateAndDedupe` function
-- implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `until` and `chrome`
+- implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `@handled`, `@handle`, `until` and `chrome`
 - use more thoughtful error messages
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 - type `sendMessage` and `subscribeToMessage` for automatic inference
@@ -76,8 +73,10 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - type drag-and-drop code
 - refine fallback code
 - add test suite
-- look out for instances of typescript `!`'s in the codebae
+- look out for instances of typescript `!`'s in the codebase
+- look out for uses of typescript `as`'s in the codebase
 -
+- (maybe) filter `SessionManager` and `NavigationBox` from tab group tree
 - (maybe) limit number of toasts to be show at a time
 - (maybe) add option for showing more options for tabs and tab groups
 - (maybe) implement search for sessions and tabs (already implemented in browser for tabs)
