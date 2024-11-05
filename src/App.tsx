@@ -8,7 +8,7 @@ import { SlDialog, SlInput, SlSelect } from "@shoelace-style/shoelace";
 import { Toolbar } from "./Toolbar";
 import { Help } from "./Help";
 import { Dialog } from "./Dialog";
-import { SessionIndicator } from "./SessionIndicator";
+import { SessionSwitcher } from "./SessionSwitcher";
 import { DialogForm } from "./DialogForm";
 import { Tree } from "./Tree";
 import { NavigateDialog } from "./NavigateDialog";
@@ -96,7 +96,7 @@ export function App() {
           >
             ${(
               <>
-                <SessionIndicator />
+                <SessionSwitcher />
                 <Toolbar />
                 <SessionView />
                 <Dialog

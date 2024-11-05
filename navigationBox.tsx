@@ -84,6 +84,9 @@ initApp(App, async () => {
       close();
     }
   });
+  window.addEventListener("blur", async () => {
+    close();
+  });
   const currentlyNavigatedTabId = await getStorageData<CurrentlyNavigatedTabId>(
     sessionStorageKeys.currentlyNavigatedTabId,
   );

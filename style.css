@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  scrollbar-color: var(--sl-color-neutral-500) var(--sl-color-neutral-0);
 }
 
 html,
@@ -31,14 +32,7 @@ html,
 body,
 #app {
   background: var(--sl-color-neutral-0);
-}
-
-html,
-body,
-:root,
-#app {
   overflow-x: hidden;
-  scrollbar-color: var(--sl-color-neutral-500) var(--sl-color-neutral-0);
 }
 
 @media only screen and (max-width: 350px) {

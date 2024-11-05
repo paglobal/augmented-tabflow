@@ -24,7 +24,6 @@ export function Toolbar() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        gap: "0.5rem",
       })}
     >
       <sl-button-group

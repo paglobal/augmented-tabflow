@@ -259,13 +259,13 @@ export function encodeTabDataAsUrl(options: {
   }
 }
 
-export function debounce(callback: () => void, timeout: number) {
+export function debounce<T>(callback: (args?: T) => void, timeout: number) {
   let timeoutId: number | undefined | NodeJS.Timeout;
 
-  return (newTimeout?: number) => {
+  return (args?: T, newTimeout?: number) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
-      callback();
+      callback(args);
     }, newTimeout ?? timeout);
   };
 }

@@ -8,14 +8,14 @@ export const [themeMode, setThemeMode] = adaptState<ThemeMode>("light");
 
 export const tabGroupColors = () => ({
   grey: themeMode() === "dark" ? "#DADBE0" : "#5E6268",
-  blue: "#85A8F8",
-  red: "#FF7980",
-  yellow: "#FFDF63",
-  green: "#54D796",
-  pink: "#FF5CCA",
-  purple: "#DB54F8",
-  cyan: "#41DDED",
-  orange: "#FFAA6F",
+  blue: themeMode() === "dark" ? "#85A8F8" : "#244BE8",
+  red: themeMode() === "dark" ? "#FF7980" : "#F2001B",
+  yellow: themeMode() === "dark" ? "#FFDF63" : "#FFAE00",
+  green: themeMode() === "dark" ? "#54D796" : "#008E3A",
+  pink: themeMode() === "dark" ? "#FF5CCA" : "#EB0082",
+  purple: themeMode() === "dark" ? "#DB54F8" : "#BE00F3",
+  cyan: themeMode() === "dark" ? "#41DDED" : "#008084",
+  orange: themeMode() === "dark" ? "#FFAA6F" : "#FF8739",
 });
 
 // copied from "https://shoelace.style/components/alert" and slightly modified

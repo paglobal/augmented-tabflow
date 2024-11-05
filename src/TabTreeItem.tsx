@@ -2,7 +2,7 @@ import { html } from "lit";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import { TreeItem } from "./TreeItem";
-import { sendMessage, type TabGroupTreeData } from "../sharedUtils";
+import { TabGroupTreeData } from "../sharedUtils";
 import { activateTab, createTabGroup } from "./sessionService";
 import {
   moveOrCopyTabToSessionTreeDialogRef,
@@ -10,12 +10,7 @@ import {
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEjectedTabOrTabGroup,
 } from "./App";
-import {
-  lockNames,
-  messageTypes,
-  newTabUrls,
-  tabGroupTypes,
-} from "../constants";
+import { lockNames, tabGroupTypes } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
   navigateDialogRef,
@@ -48,10 +43,11 @@ export function TabTreeItem(props: {
           try {
             e.stopPropagation();
             await activateTab(tab);
-            await sendMessage({ type: messageTypes.closeSidePanel });
+            close();
           } catch (error) {
             console.error(error);
-            notifyWithErrorMessageAndReloadButton();
+            // @revisit
+            // notifyWithErrorMessageAndReloadButton();
           }
         }}
         draggableOptions={{
@@ -202,7 +198,7 @@ export function TabTreeItem(props: {
                 ></sl-icon-button>
               `}
           <sl-icon-button
-            name="plus-circle"
+            name="folder-plus"
             title="Add Tab To New Group"
             @click=${async (e: Event) => {
               // @handled
@@ -248,14 +244,15 @@ export function TabTreeItem(props: {
           <sl-icon-button
             name="x-lg"
             title="Close"
-            @click=${(e: Event) => {
+            @click=${async (e: Event) => {
               // @handled
               try {
                 e.stopPropagation();
-                chrome.tabs.remove(tab.id as number);
+                await chrome.tabs.remove(tab.id as number);
               } catch (error) {
                 console.error(error);
-                notifyWithErrorMessageAndReloadButton();
+                // @revisit
+                // notifyWithErrorMessageAndReloadButton();
               }
             }}
           ></sl-icon-button>

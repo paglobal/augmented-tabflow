@@ -226,7 +226,13 @@ export function TabGroupTreeItem(props: {
                           ...number[],
                         ],
                       });
-                      // await chrome.tabGroups.move(newTabGroupId, { index: -1 });
+                      const pinnedTabGroup = await chrome.tabs.query({
+                        pinned: true,
+                        currentWindow: true,
+                      });
+                      await chrome.tabGroups.move(newTabGroupId, {
+                        index: pinnedTabGroup.length,
+                      });
                     } catch (error) {
                       console.error(error);
                       notifyWithErrorMessageAndReloadButton();

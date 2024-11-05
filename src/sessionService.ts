@@ -40,6 +40,17 @@ import { currentlyNavigatedTabId, navigateDialogRef } from "./NavigateDialog";
 export const [tabGroupTreeData, setTabGroupTreeData] =
   adaptState<TabGroupTreeData>([]);
 
+export const [currentTabGroupSpaceIndex, setCurrentTabGroupSpaceIndex] =
+  adaptState<number>(0);
+
+type BaseTabGroupObjectArray = Array<
+  { color: chrome.tabGroups.TabGroup["color"] | "sky" } | undefined
+>;
+
+export const [tabGroups, setTabGroups] = adaptState<BaseTabGroupObjectArray>(
+  [],
+);
+
 updateTabGroupTreeData();
 
 async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
@@ -63,7 +74,47 @@ async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
       !(tabGroup.windowId && tabGroup.windowId !== currentWindowId) &&
       tabGroup.tabs.length,
   );
+  let currentTabGroupSpaceIndex =
+    (await getStorageData<number>(
+      sessionStorageKeys.currentTabGroupSpaceIndex,
+    )) ?? 0;
+  const tabGroups = (
+    [
+      { color: "sky" },
+      ...(await chrome.tabGroups.query({})),
+    ] as BaseTabGroupObjectArray
+  ).filter((tabGroup, index, tabGroups) => {
+    const _tabGroupIndex = tabGroups.findIndex(
+      (_tabGroup) => _tabGroup?.color === tabGroup?.color,
+    );
+    if (_tabGroupIndex !== -1 && _tabGroupIndex === index) {
+      return true;
+    } else {
+      false;
+    }
+  });
+  if (currentTabGroupSpaceIndex < 0) {
+    await setStorageData<number>(
+      sessionStorageKeys.currentTabGroupSpaceIndex,
+      tabGroups.length - 1,
+    );
+    currentTabGroupSpaceIndex = tabGroups.length - 1;
+  } else if (currentTabGroupSpaceIndex > tabGroups.length - 1) {
+    await setStorageData<number>(
+      sessionStorageKeys.currentTabGroupSpaceIndex,
+      0,
+    );
+    currentTabGroupSpaceIndex = 0;
+  }
+  tabGroupTreeData = tabGroupTreeData.filter(
+    (tabGroup) =>
+      tabGroups[currentTabGroupSpaceIndex]?.color === "sky" ||
+      tabGroup.id === chrome.tabGroups.TAB_GROUP_ID_NONE ||
+      tabGroup.color === tabGroups[currentTabGroupSpaceIndex]?.color,
+  );
   setTabGroupTreeData(tabGroupTreeData);
+  setCurrentTabGroupSpaceIndex(currentTabGroupSpaceIndex);
+  setTabGroups(tabGroups);
 }
 
 subscribeToStorageData<TabGroupTreeData>(
@@ -72,6 +123,13 @@ subscribeToStorageData<TabGroupTreeData>(
     // @error
     tabGroupTreeData = tabGroupTreeData ?? [];
     updateTabGroupTreeData(tabGroupTreeData);
+  },
+);
+
+subscribeToStorageData(
+  sessionStorageKeys.currentTabGroupSpaceIndex,
+  async () => {
+    updateTabGroupTreeData();
   },
 );
 
@@ -148,6 +206,8 @@ export async function activateTab(tab: chrome.tabs.Tab) {
 
 export async function createTabGroup(tab?: chrome.tabs.Tab) {
   // @maybe
+  let moveToBeginning =
+    tab?.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE ? true : false;
   if (!tab) {
     const [error, currentTab] = await withError(chrome.tabs.getCurrent());
     if (error) {
@@ -165,7 +225,17 @@ export async function createTabGroup(tab?: chrome.tabs.Tab) {
         windowId: tab.windowId,
       },
     });
-    await chrome.tabGroups.move(tabGroupId, { index: -1 });
+    if (moveToBeginning) {
+      const pinnedTabGroup = await chrome.tabs.query({
+        pinned: true,
+        currentWindow: true,
+      });
+      await chrome.tabGroups.move(tabGroupId, {
+        index: pinnedTabGroup.length,
+      });
+    } else {
+      await chrome.tabGroups.move(tabGroupId, { index: -1 });
+    }
   }
 }
 
@@ -542,18 +612,18 @@ export async function importTabGroupFromSession(
     });
     tabIds.push(tab.id);
   }
-  if (!ungrouped && tabIds.length) {
+  if (tabIds.length) {
     const tabGroupTitle = tabGroupData.title.split("-").slice(1).join("-");
-    const tabGroupColor = tabGroupData.title.split(
-      "-",
-    )[0] as chrome.tabGroups.Color;
+    let tabGroupColor = tabGroupData.title.split("-")[0] as
+      | chrome.tabGroups.Color
+      | "Ungrouped";
     const tabGroupId = await chrome.tabs.group({
       tabIds: tabIds as [number, ...number[]],
     });
     await chrome.tabGroups.update(tabGroupId, {
-      color: tabGroupColor,
+      color: tabGroupColor === "Ungrouped" ? "grey" : tabGroupColor,
       collapsed: true,
-      title: tabGroupTitle,
+      title: tabGroupColor === "Ungrouped" ? "Ungrouped" : tabGroupTitle,
     });
   }
   if (copy === false) {
@@ -583,7 +653,7 @@ export async function moveTabOrTabGroupToWindow(
   let stubTabId: chrome.tabs.Tab["id"] | undefined;
   if (!windowId) {
     const window = await chrome.windows.create({
-      focused: false,
+      focused: true,
     });
     stubTabId = (await chrome.tabs.query({ windowId: window?.id }))[0].id;
     windowId = window?.id;
@@ -617,9 +687,7 @@ export async function navigate(query: string) {
         : undefined;
     } catch (error) {}
   }
-  const navigationBoxTab = (
-    await chrome.tabs.query({ active: true, currentWindow: true })
-  )[0];
+  const navigationBoxTab = await chrome.tabs.getCurrent();
   let _currentlyNavigatedTabId = currentlyNavigatedTabId();
   if (_currentlyNavigatedTabId === newTabNavigatedTabId) {
     _currentlyNavigatedTabId = (
@@ -650,7 +718,10 @@ export async function navigate(query: string) {
         tabId: _currentlyNavigatedTabId,
       });
     }
-    if (navigationBoxTab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
+    if (
+      navigationBoxTab?.groupId &&
+      navigationBoxTab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE
+    ) {
       await chrome.tabs.group({
         tabIds: _currentlyNavigatedTabId,
         groupId: navigationBoxTab.groupId,
@@ -658,7 +729,7 @@ export async function navigate(query: string) {
     }
     await chrome.tabs.update(_currentlyNavigatedTabId, {
       active: true,
-      pinned: navigationBoxTab.pinned,
+      pinned: navigationBoxTab?.pinned,
     });
   }
   await navigateDialogRef.value?.hide();

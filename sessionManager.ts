@@ -13,9 +13,10 @@ import {
   localStorageKeys,
   AntecedentTabInfo,
   sessionStorageKeys,
-  sessionManagerUrls,
+  sessionManagerPathName,
 } from "./constants";
 import "./customElements";
+import { cycleTabGroupSpaces } from "./src/TabGroupSpaceSwitcher";
 
 initApp(
   App,
@@ -24,6 +25,10 @@ initApp(
     const [error, currentTab] = await withError(chrome.tabs.getCurrent());
     if (error) {
       // @handle
+    }
+    if (currentTab) {
+      await chrome.sidePanel.setOptions({ enabled: false });
+      await chrome.sidePanel.setOptions({ enabled: true });
     }
     const [_error, antecedentTabInfo] = await withError(
       getStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo),
@@ -41,22 +46,29 @@ initApp(
       // @handle
     }
     const tabPages = await chrome.tabs.query({
-      url: sessionManagerUrls,
+      url: `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}`,
     });
     for (const tabPage of tabPages) {
       if (tabPage.id && tabPage.id !== currentTab?.id) {
         await chrome.tabs.remove(tabPage.id);
       }
     }
-    const params = new URLSearchParams(document.location.search);
-    const tabPage = params.get("tabPage");
-    if (tabPage) {
-      document.addEventListener("visibilitychange", async () => {
-        if (document.hidden) {
-          close();
+    document.addEventListener(
+      "wheel",
+      function (e) {
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
+          return;
         }
-      });
-    }
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          if (e.deltaX > 0) {
+            cycleTabGroupSpaces("next");
+          } else if (e.deltaX < 0) {
+            cycleTabGroupSpaces("prev");
+          }
+        }
+      },
+      { passive: true },
+    );
     await createBookmarkNodeAndStoreId(
       localStorageKeys.rootBookmarkNodeId,
       titles.rootBookmarkNode,

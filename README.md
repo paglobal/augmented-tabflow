@@ -11,23 +11,20 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
-- add two-finger swipe to switch between tab group colors
-- show tab group spaces underneath
 - custom color scheme for tab group spaces
-- (maybe) add nice color transition
+- add color scheme across all pages
+- change active tab to correspond to current tab space
+- new tab groups should correspond to current tab space
 - restore certain pieces of state such as user's `currentSession` from local storage on `onUpdated` callback
 -
-- change icon for `Add Tab Group`
-- group `Ungrouped` tab groups on import
-- edit button for tabs doesn't fit when audio icon and favicon are showing, while session is open
-- add option for adding tab to other tab groups under `Add To Tab Group` (ie. add to some other tab group or a `New Tab Group` or even ungrouping it)
-- add options for merging tab groups with other tab groups under `Add To Tab Group` (ie. where do you want to move them to? `Ungrouped Tabs` or some other tab group?)
-- move new tab group to beginning
-- fix improper grouping in tab page
+- add `Grouping Options` for tabs and tab groups to reduce clutter (ie. add to some other tab group or a `New Tab Group` or even ungrouping or pinning it)
 
 ### Later
 
-- implement sharing of sessions through plain copied text and through files (`Create Session From File/Text` and `Share Session`)
+- add window manipulation options through action buttons (eg. support moving whole windows)
+- fix slight color change issue on tree item text hover
+- always aggregate all `Ungrouped` tab group data after importing or exporting
+- implement sharing of sessions through plain copied text and through files (`Create Session From Text`, `Create Tab Group From Text`, `Share Session` and `Share TabGroup`)
 - implement omnibox opensearch stuff with `activeTab` permission restrictions in mind
 - add badge for address (maybe) with reload, forward and back buttons
 - add commands to group tabs according to domain, title similarity and other stuff
@@ -59,11 +56,10 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - collapse tree items in export dialog when done with exporting tab or tab group
 - make session trees and other dialog trees react to the necessary app state changes
 -
-- fix slight color change issue on tree item text hover
-- use `updateComplete` instead of `setTimeout` for waiting for components to change their state
-- always aggregate all `Ungrouped` tab group data after importing or exporting (apply functions from above)
+- implement `pathNameToUrl` utility
 - check `migrateAndDedupe` function
-- implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `@handled`, `@handle`, `until` and `chrome`
+- use `updateComplete` instead of `setTimeout` for waiting for components to change their state
+- implement better and more ergonomic error handling and fallbacks. look for keywords `async`, `await`, `error`, `@`, `@error`, `@fallback`, `@maybe`, `@handled`, `@handle`, `@revisit`, `until` and `chrome`
 - use more thoughtful error messages
 - type `setStorageData`, `subscribeToStorageData` and `getStorageData` for automatic inference
 - type `sendMessage` and `subscribeToMessage` for automatic inference
@@ -75,8 +71,9 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add test suite
 - look out for instances of typescript `!`'s in the codebase
 - look out for uses of typescript `as`'s in the codebase
+- add `| Undefined` to all `Array` types
 -
-- (maybe) filter `SessionManager` and `NavigationBox` from tab group tree
+- (maybe) add splitscreen button for windows
 - (maybe) limit number of toasts to be show at a time
 - (maybe) add option for showing more options for tabs and tab groups
 - (maybe) implement search for sessions and tabs (already implemented in browser for tabs)
@@ -87,19 +84,22 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) reduce minimum chrome version
 - (maybe, please be careful) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
 - (maybe) implement internationalization
-- (maybe) support moving whole windows
 -
 - try updating the tld list from time to time
 
 ### Store Listing
 
+- advise users to always look out for updates and probably suggest how
+- remove old video
 - upload new video
-- link to chrome keyboard shortcuts page and other necessary pages
 - attribute projects that made this project possible
-- update screenshots. show some fullscreen, some with sessions, some with tabs, etc
+- update screenshots. show some fullscreen, some with sessions, show some with split screen, some with tabs, etc
+- acknowledge that certain features are only supported and directly enabled by the extension (eg. fullscreen and splitscreen)
+- blends with your browser (light and dark modes)
 
-### Help Dialog
+### Help Page
 
+- create help page and remove help dialog
 - attribute projects that made this project possible
 - document behaviour concerning interacting with bookmarking from mobile
 - (maybe) document the fact that there's no need to restore old tabs
@@ -114,11 +114,17 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - have button to open recent updates page
 - add donate
 - document tab page
+- link to chrome keyboard shortcuts page and other necessary pages
 
-### Recent Changes
+### Recent Changes Page
 
-- fix slight hover issue with favicons
+- extract `heading` and other utils for use in help page as well
 - add donate button
+- explain mismatch between `Recent` and `Extensive` on `Extensive`
+-
+- ungrouped tab groups imported from other sessions now import as regular tab group with the title `Ungrouped`
+- implemented tab group spaces
+- fixed slight hover issue with favicons
 - fixed false loading states
 - fixed false favicons
 - fixed problem with pages loaded with file protocol and possibly other protocols

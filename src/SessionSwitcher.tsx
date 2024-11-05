@@ -8,7 +8,7 @@ import {
   currentSessionDataNotAvailable,
 } from "./sessionService";
 
-export function SessionIndicator() {
+export function SessionSwitcher() {
   return () => {
     const _currentSessionData = currentSessionData();
     const currentSessionTitle =
@@ -24,8 +24,7 @@ export function SessionIndicator() {
 
     return html`<div
       style=${styleMap({
-        paddingTop: "1.5rem",
-        paddingBottom: "0.5rem",
+        paddingTop: "0.75rem",
       })}
     >
       <sl-button

@@ -6,6 +6,8 @@ import {
   currentSessionDataNotAvailable,
   sessionLoading,
 } from "./sessionService";
+import promiseWithOneTimeFallback from "./promiseWithOneTimeFallback";
+import { TabGroupSpaceSwitcher } from "./TabGroupSpaceSwitcher";
 
 export function SessionView() {
   return () => {
@@ -13,7 +15,18 @@ export function SessionView() {
       currentSessionData() === currentSessionDataNotAvailable ? (
       <Tree contentFn={fallbackTreeContent}></Tree>
     ) : (
-      <Tree contentFn={tabGroupTreeContent} fullHeight></Tree>
+      <>
+        <Tree
+          contentFn={() =>
+            promiseWithOneTimeFallback(
+              tabGroupTreeContent(),
+              fallbackTreeContent(),
+            )
+          }
+          fullHeight
+        />
+        <TabGroupSpaceSwitcher />
+      </>
     );
   };
 }

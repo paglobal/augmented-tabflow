@@ -24,6 +24,7 @@ export const sessionStorageKeys = {
   startup: "session-12",
   currentlyNavigatedTabId: "session-13",
   antecedentTabInfo: "session-14",
+  currentTabGroupSpaceIndex: "session-15",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export type SyncStorageKey = `sync-${number}`;
@@ -45,6 +46,7 @@ export const localStorageKeys = {
   recentlyClosedTabGroups_updateBackup: "local-7",
   startup_updateBackup: "local-8",
   pinnedTabGroupBookmarkLength: "local-9",
+  currentTabGroupSpaceIndex_backup: "local-10",
 } as const satisfies Record<string, LocalStorageKey>;
 
 export type TabGroupType = `tabGroup-${number}`;
@@ -92,16 +94,13 @@ export const messageTypes = {
   moveTabOrTabGroupToWindow: "message-3",
   closeAllSessionWindows: "message-4",
   updateTabGroupTreeDataAndCurrentSessionData: "message-5",
-  closeSidePanel: "message-6",
 } as const satisfies Record<string, MessageType>;
 
-export const tabGroupTreeDataUpdateDebounceTimeout = 200;
+export const tabGroupTreeDataUpdateDebounceTimeout = 100;
 
 export const stubPagePathName = "/stubPage.html";
 
 export const navigationBoxPathName = "/navigationBox.html";
-
-export const sessionManagerTabPageUrl = "/sessionManager.html?tabPage=true";
 
 export const sessionManagerPathName = "/sessionManager.html";
 
@@ -114,11 +113,6 @@ export const recentUpdateListPage = "/recentUpdates.html";
 
 export const extensiveUpdateListPage =
   "https://paglobal.online/pages/posts/augmented-tabflow-changelog.html";
-
-export const sessionManagerUrls = [
-  `chrome-extension://${chrome.runtime.id}${sessionManagerTabPageUrl}`,
-  `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}`,
-];
 
 export const commands = {
   openTabPage: "open-tab-page",

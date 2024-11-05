@@ -13,9 +13,9 @@ import {
   titles,
   localStorageKeys,
   bookmarkerDetails,
-  sessionManagerTabPageUrl,
   AntecedentTabInfo,
-  sessionManagerUrls,
+  sessionManagerPathName,
+  navigationBoxPathName,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -278,6 +278,7 @@ chrome.windows.onCreated.addListener(async (window) => {
   if (window.type === "normal" && window.id) {
     await chrome.windows.update(window.id, {
       state: fullscreen ? "fullscreen" : "maximized",
+      focused: true,
     });
   }
 });
@@ -499,12 +500,6 @@ subscribeToMessage(messageTypes.restoreTab, async (_, sender) => {
   await restoreTabIfBlank(sender.tab?.id);
 });
 
-subscribeToMessage(messageTypes.closeSidePanel, async () => {
-  // @error
-  await chrome.sidePanel.setOptions({ enabled: false });
-  await chrome.sidePanel.setOptions({ enabled: true });
-});
-
 export async function moveTabOrTabGroupToWindow(
   currentlyEjectedTabOrTabGroup:
     | chrome.tabs.Tab
@@ -579,9 +574,17 @@ subscribeToMessage(messageTypes.closeAllSessionWindows, async () => {
 async function getTabGroupTreeData() {
   // @maybe
   const tabGroups = await chrome.tabGroups.query({});
-  const tabs = await chrome.tabs.query({
-    windowType: "normal",
-  });
+  const tabs = (
+    await chrome.tabs.query({
+      windowType: "normal",
+    })
+  ).filter(
+    (tab) =>
+      tab.url !==
+        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}` &&
+      tab.url !==
+        `chrome-extension://${chrome.runtime.id}${navigationBoxPathName}`,
+  );
   for (const tab of tabs) {
     if (tab.status === "loading") {
       await updateTabGroupTreeDataAndCurrentSessionData();
@@ -626,11 +629,19 @@ async function getTabGroupTreeData() {
     },
     [],
   );
-  const ungroupedTabs = await chrome.tabs.query({
-    groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
-    windowType: "normal",
-    pinned: false,
-  });
+  const ungroupedTabs = (
+    await chrome.tabs.query({
+      groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
+      windowType: "normal",
+      pinned: false,
+    })
+  ).filter(
+    (tab) =>
+      tab.url !==
+        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}` &&
+      tab.url !==
+        `chrome-extension://${chrome.runtime.id}${navigationBoxPathName}`,
+  );
   ungroupedTabs.forEach((tab) => {
     let url: URL | undefined;
     if (tab.url) {
@@ -649,7 +660,7 @@ async function getTabGroupTreeData() {
     localStorageKeys.ungroupedTabGroupCollapsed,
   );
   if (ungroupedTabs.length) {
-    tabGroupTreeData.push({
+    tabGroupTreeData.unshift({
       id: chrome.tabGroups.TAB_GROUP_ID_NONE,
       type: tabGroupTypes.ungrouped,
       color: null as unknown as chrome.tabGroups.Color,
@@ -660,11 +671,19 @@ async function getTabGroupTreeData() {
       tabs: ungroupedTabs,
     });
   }
-  const pinnedTabs = await chrome.tabs.query({
-    groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
-    windowType: "normal",
-    pinned: true,
-  });
+  const pinnedTabs = (
+    await chrome.tabs.query({
+      groupId: chrome.tabGroups.TAB_GROUP_ID_NONE,
+      windowType: "normal",
+      pinned: true,
+    })
+  ).filter(
+    (tab) =>
+      tab.url !==
+        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}` &&
+      tab.url !==
+        `chrome-extension://${chrome.runtime.id}${navigationBoxPathName}`,
+  );
   pinnedTabs.forEach((tab) => {
     let url: URL | undefined;
     if (tab.url) {
@@ -926,7 +945,11 @@ subscribeToMessage(
 chrome.commands.onCommand.addListener(async (command, tab) => {
   // @maybe
   if (command === commands.openTabPage) {
-    if (tab?.id && tab.url && sessionManagerUrls.includes(tab.url)) {
+    if (
+      tab?.id &&
+      tab.url ===
+        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}`
+    ) {
       await chrome.tabs.remove(tab.id);
     } else {
       const [error] = await withError(
@@ -940,7 +963,7 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
       if (error) {
         // @handle
       }
-      await chrome.tabs.create({ url: sessionManagerTabPageUrl });
+      await chrome.tabs.create({ url: sessionManagerPathName });
     }
   } else if (command === commands.closeAllSessionWindows) {
     await closeAllSessionWindows();
