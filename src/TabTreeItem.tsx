@@ -10,7 +10,7 @@ import {
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEjectedTabOrTabGroup,
 } from "./App";
-import { lockNames, tabGroupTypes } from "../constants";
+import { lockNames, newTabUrls, tabGroupTypes } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
   navigateDialogRef,
@@ -270,7 +270,12 @@ export function TabTreeItem(props: {
               {
                 <TreeItemColorPatchOrIcon
                   pageUrl={tab.url}
-                  showSpinner={tab.status === "loading" ? true : false}
+                  showSpinner={
+                    tab.status === "loading" &&
+                    !newTabUrls.includes(tab.url ?? "")
+                      ? true
+                      : false
+                  }
                 />
               }
               {tab.title}

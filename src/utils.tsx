@@ -1,6 +1,7 @@
 import { SlAlert } from "@shoelace-style/shoelace";
 import { render } from "lit";
-import { PromethiumNode, Setter, adaptState } from "promethium-js";
+import { PromethiumNode, adaptState, adaptSyncEffect } from "promethium-js";
+import { currentTabGroupSpaceColor } from "./sessionService";
 
 type ThemeMode = "light" | "dark";
 
@@ -56,25 +57,44 @@ export function notifyWithErrorMessageAndReloadButton() {
 export function initApp(
   App: (props: Object) => () => PromethiumNode,
   initFn?: () => void,
-  setThemeMode?: Setter<ThemeMode>,
 ) {
   initFn?.();
   if (window.matchMedia) {
+    adaptSyncEffect(() => {
+      const _currentTabGroupSpaceColor = currentTabGroupSpaceColor();
+      const colorMap: Record<string, string> = {
+        grey: "teal",
+      };
+      const baseAccentColor = _currentTabGroupSpaceColor
+        ? colorMap[_currentTabGroupSpaceColor] ?? _currentTabGroupSpaceColor
+        : "sky";
+      const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+      for (const shade of shades) {
+        document.documentElement.style.setProperty(
+          `--sl-color-primary-${shade}`,
+          `var(--sl-color-${baseAccentColor}-${shade})`,
+        );
+      }
+      document.documentElement.style.setProperty(
+        "--sl-input-focus-ring-color",
+        "var(--sl-color-primary-200)",
+      );
+    });
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setThemeMode?.("dark");
+      setThemeMode("dark");
       document.documentElement.classList.add("sl-theme-dark");
     } else {
-      setThemeMode?.("light");
+      setThemeMode("light");
       document.documentElement.classList.remove("sl-theme-dark");
     }
     window
       .matchMedia("(prefers-color-scheme: dark)")
       .addEventListener("change", () => {
         if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          setThemeMode?.("dark");
+          setThemeMode("dark");
           document.documentElement.classList.add("sl-theme-dark");
         } else {
-          setThemeMode?.("light");
+          setThemeMode("light");
           document.documentElement.classList.remove("sl-theme-dark");
         }
       });

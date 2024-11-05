@@ -11,12 +11,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
-- custom color scheme for tab group spaces
-- add color scheme across all pages
-- change active tab to correspond to current tab space
-- new tab groups should correspond to current tab space
 - restore certain pieces of state such as user's `currentSession` from local storage on `onUpdated` callback
--
 - add `Grouping Options` for tabs and tab groups to reduce clutter (ie. add to some other tab group or a `New Tab Group` or even ungrouping or pinning it)
 
 ### Later
@@ -100,6 +95,9 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 ### Help Page
 
 - create help page and remove help dialog
+- show help page on install
+-
+- add donate elements to help page (link to personal site)
 - attribute projects that made this project possible
 - document behaviour concerning interacting with bookmarking from mobile
 - (maybe) document the fact that there's no need to restore old tabs
@@ -112,7 +110,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - document how side panel takes focus from page
 - document double-click to close side panel
 - have button to open recent updates page
-- add donate
 - document tab page
 - link to chrome keyboard shortcuts page and other necessary pages
 
@@ -121,6 +118,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - extract `heading` and other utils for use in help page as well
 - add donate button
 - explain mismatch between `Recent` and `Extensive` on `Extensive`
+- add link to help page
 -
 - ungrouped tab groups imported from other sessions now import as regular tab group with the title `Ungrouped`
 - implemented tab group spaces

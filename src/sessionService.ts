@@ -1,4 +1,4 @@
-import { adaptState } from "promethium-js";
+import { adaptMemo, adaptState } from "promethium-js";
 import {
   bookmarkerDetails,
   localStorageKeys,
@@ -11,6 +11,8 @@ import {
   tlds,
   newTabNavigatedTabId,
   AntecedentTabInfo,
+  sessionManagerPathName,
+  navigationBoxPathName,
 } from "../constants";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -51,6 +53,10 @@ export const [tabGroups, setTabGroups] = adaptState<BaseTabGroupObjectArray>(
   [],
 );
 
+export const currentTabGroupSpaceColor = adaptMemo(() => {
+  return tabGroups()[currentTabGroupSpaceIndex()]?.color;
+});
+
 updateTabGroupTreeData();
 
 async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
@@ -74,7 +80,7 @@ async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
       !(tabGroup.windowId && tabGroup.windowId !== currentWindowId) &&
       tabGroup.tabs.length,
   );
-  let currentTabGroupSpaceIndex =
+  let _currentTabGroupSpaceIndex =
     (await getStorageData<number>(
       sessionStorageKeys.currentTabGroupSpaceIndex,
     )) ?? 0;
@@ -93,27 +99,58 @@ async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
       false;
     }
   });
-  if (currentTabGroupSpaceIndex < 0) {
+  if (_currentTabGroupSpaceIndex < 0) {
     await setStorageData<number>(
       sessionStorageKeys.currentTabGroupSpaceIndex,
       tabGroups.length - 1,
     );
-    currentTabGroupSpaceIndex = tabGroups.length - 1;
-  } else if (currentTabGroupSpaceIndex > tabGroups.length - 1) {
+    _currentTabGroupSpaceIndex = tabGroups.length - 1;
+  } else if (_currentTabGroupSpaceIndex > tabGroups.length - 1) {
     await setStorageData<number>(
       sessionStorageKeys.currentTabGroupSpaceIndex,
       0,
     );
-    currentTabGroupSpaceIndex = 0;
+    _currentTabGroupSpaceIndex = 0;
   }
   tabGroupTreeData = tabGroupTreeData.filter(
     (tabGroup) =>
-      tabGroups[currentTabGroupSpaceIndex]?.color === "sky" ||
+      tabGroups[_currentTabGroupSpaceIndex]?.color === "sky" ||
       tabGroup.id === chrome.tabGroups.TAB_GROUP_ID_NONE ||
-      tabGroup.color === tabGroups[currentTabGroupSpaceIndex]?.color,
+      tabGroup.color === tabGroups[_currentTabGroupSpaceIndex]?.color,
   );
+  const activeTab = (
+    await chrome.tabs.query({ active: true, currentWindow: true })
+  )[0];
+  if (
+    activeTab.url !==
+      `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}` &&
+    activeTab.url !==
+      `chrome-extension://${chrome.runtime.id}${navigationBoxPathName}`
+  ) {
+    if (_currentTabGroupSpaceIndex !== currentTabGroupSpaceIndex()) {
+      let activeTab: chrome.tabs.Tab | undefined;
+      for (const tabGroup of tabGroupTreeData) {
+        for (const tab of tabGroup.tabs) {
+          if (tab.active) {
+            activeTab = tab;
+          }
+        }
+      }
+      if (!activeTab) {
+        for (const tabGroup of tabGroupTreeData) {
+          if (tabGroup.id !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
+            const firstTabInTabGroup = tabGroup.tabs[0];
+            if (firstTabInTabGroup.id && !firstTabInTabGroup.active) {
+              await chrome.tabs.update(firstTabInTabGroup.id, { active: true });
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
   setTabGroupTreeData(tabGroupTreeData);
-  setCurrentTabGroupSpaceIndex(currentTabGroupSpaceIndex);
+  setCurrentTabGroupSpaceIndex(_currentTabGroupSpaceIndex);
   setTabGroups(tabGroups);
 }
 
@@ -206,8 +243,6 @@ export async function activateTab(tab: chrome.tabs.Tab) {
 
 export async function createTabGroup(tab?: chrome.tabs.Tab) {
   // @maybe
-  let moveToBeginning =
-    tab?.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE ? true : false;
   if (!tab) {
     const [error, currentTab] = await withError(chrome.tabs.getCurrent());
     if (error) {
@@ -218,23 +253,19 @@ export async function createTabGroup(tab?: chrome.tabs.Tab) {
       precedentTabId: currentTab?.id,
     });
   }
-  if (tab) {
+  if (tab && tab.id) {
     const tabGroupId = await chrome.tabs.group({
-      tabIds: tab.id as number,
+      tabIds: tab.id,
       createProperties: {
         windowId: tab.windowId,
       },
     });
-    if (moveToBeginning) {
-      const pinnedTabGroup = await chrome.tabs.query({
-        pinned: true,
-        currentWindow: true,
+    await chrome.tabGroups.move(tabGroupId, { index: -1 });
+    const _currentTabGroupSpaceColor = currentTabGroupSpaceColor();
+    if (_currentTabGroupSpaceColor && _currentTabGroupSpaceColor !== "sky") {
+      await chrome.tabGroups.update(tabGroupId, {
+        color: _currentTabGroupSpaceColor,
       });
-      await chrome.tabGroups.move(tabGroupId, {
-        index: pinnedTabGroup.length,
-      });
-    } else {
-      await chrome.tabGroups.move(tabGroupId, { index: -1 });
     }
   }
 }
@@ -620,8 +651,17 @@ export async function importTabGroupFromSession(
     const tabGroupId = await chrome.tabs.group({
       tabIds: tabIds as [number, ...number[]],
     });
+    const _currentTabGroupSpaceColor = currentTabGroupSpaceColor();
+    if (_currentTabGroupSpaceColor && _currentTabGroupSpaceColor !== "sky") {
+      await chrome.tabGroups.update(tabGroupId, {
+        color: _currentTabGroupSpaceColor,
+      });
+    } else {
+      await chrome.tabGroups.update(tabGroupId, {
+        color: tabGroupColor === "Ungrouped" ? "grey" : tabGroupColor,
+      });
+    }
     await chrome.tabGroups.update(tabGroupId, {
-      color: tabGroupColor === "Ungrouped" ? "grey" : tabGroupColor,
       collapsed: true,
       title: tabGroupColor === "Ungrouped" ? "Ungrouped" : tabGroupTitle,
     });

@@ -14,18 +14,6 @@ body,
   --sl-font-serif: system-ui, serif;
   --sl-font-mono: system-ui, monospace;
   font-family: system-ui;
-  /* --sl-color-primary-50: rgb(251 249 249); */
-  /* --sl-color-primary-100: rgb(243 234 234); */
-  /* --sl-color-primary-200: rgb(234 219 218); */
-  /* --sl-color-primary-300: rgb(223 202 200); */
-  /* --sl-color-primary-400: rgb(210 179 177); */
-  /* --sl-color-primary-500: rgb(192 149 146); */
-  /* --sl-color-primary-600: rgb(173 118 114); */
-  /* --sl-color-primary-700: rgb(157 89 85); */
-  /* --sl-color-primary-800: rgb(143 66 60); */
-  /* --sl-color-primary-900: rgb(112 39 34); */
-  /* --sl-color-primary-950: rgb(69 24 21); */
-  /* --sl-input-focus-ring-color: var(--sl-color-primary-600); */
 }
 
 html,

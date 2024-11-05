@@ -6,6 +6,7 @@ import {
   addTabToTabGroup,
   closeTabGroup,
   collapseTabGroup,
+  currentTabGroupSpaceColor,
   expandTabGroup,
 } from "./sessionService";
 import {
@@ -226,13 +227,19 @@ export function TabGroupTreeItem(props: {
                           ...number[],
                         ],
                       });
-                      const pinnedTabGroup = await chrome.tabs.query({
-                        pinned: true,
-                        currentWindow: true,
-                      });
                       await chrome.tabGroups.move(newTabGroupId, {
-                        index: pinnedTabGroup.length,
+                        index: -1,
                       });
+                      const _currentTabGroupSpaceColor =
+                        currentTabGroupSpaceColor();
+                      if (
+                        _currentTabGroupSpaceColor &&
+                        _currentTabGroupSpaceColor !== "sky"
+                      ) {
+                        await chrome.tabGroups.update(newTabGroupId, {
+                          color: _currentTabGroupSpaceColor,
+                        });
+                      }
                     } catch (error) {
                       console.error(error);
                       notifyWithErrorMessageAndReloadButton();

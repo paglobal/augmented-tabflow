@@ -469,6 +469,7 @@ async function openNewSession(newSessionData?: SessionData) {
     await setStorageData(sessionStorageKeys.currentSessionData, newSessionData);
     await setStorageData(sessionStorageKeys.sessionLoading, true);
     await setStorageData(sessionStorageKeys.recentlyClosedTabGroups, []);
+    await setStorageData(sessionStorageKeys.currentTabGroupSpaceIndex, 0);
     await removeOldSessionTabs(tabGroupTreeData);
     if (newSessionData) {
       await createSessionTabsFromSessionData(newSessionData);
