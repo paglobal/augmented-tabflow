@@ -1,61 +1,55 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import "./customElements";
-import { initApp } from "./src/utils";
+import {
+  infoHeader,
+  initApp,
+  infoList,
+  infoListStyles,
+  infoButton,
+} from "./src/utils";
 import { Dialog } from "./src/Dialog";
 import { createRef } from "lit/directives/ref.js";
 import { SlDialog } from "@shoelace-style/shoelace";
-import { extensiveUpdateListPage } from "./constants";
+import { extensiveUpdateListPage, helpPathName } from "./constants";
 
 function RecentUpdates() {
-  const header = (version: string, noBottomPadding?: boolean) => {
-    return html`
-      <p
-        style=${styleMap({
-          fontSize: "1.1rem",
-          paddingTop: "1.6rem",
-          paddingBottom: noBottomPadding ? undefined : "1.6rem",
-          textDecoration: "underline",
-        })}
-      >
-        ${version}
-      </p>
-    `;
-  };
-
-  const updateList = (text: string) => {
-    return html`<ul>
-      ${text.split("\n").map((textSegment) => html`<li>${textSegment}</li>`)}
-    </ul>`;
-  };
-
   return () => html`
-    <style>
-      div ul li {
-        padding-bottom: 0.8rem;
-        line-height: 150%;
-      }
-      div ul li:last-child {
-        padding-bottom: 0;
-      }
-    </style>
-    ${header("Recent Updates", true)} ${header("0.8.1")}
-    ${updateList(`Fixed an issue with restoring pinned tabs.
-Fixed an issue with the height of dialogs that occurs when the sidepanel is expanded beyond a certain width.`)} ${header(
+    ${infoListStyles()} ${infoHeader("Recent Updates", true)}
+    ${infoHeader("0.9.0 to 0.12.0")} ${infoList(`
+- new updates page
+- new help page
+- persist session on extension updates
+- ungrouped tab groups imported from other sessions now import as regular tab group with the title "Ungrouped"
+- implemented tab group spaces
+- fixed slight hover issue with favicons
+- fixed false loading states
+- fixed false favicons
+- fixed problem with pages loaded with file protocol and possibly other protocols
+- implemented navigation box
+- access to sessions across devices
+- better support for fullscreening
+- you can now edit tabs from the sidebar directly
+- double-click to close side panel
+- create recent updates extension page
+- added session manager tab page
+`)} ${infoHeader("0.8.1")} ${infoList(`
+- Fixed an issue with restoring pinned tabs.
+- Fixed an issue with the height of dialogs that occurs when the sidepanel is expanded beyond a certain width.`)} ${infoHeader(
       "0.8.0",
     )}
-    ${updateList(`Added a changelog page.
-Added more information to the help dialog.`)}
-    <sl-button
-      variant="primary"
-      style=${styleMap({
-        marginTop: "1.6rem",
-      })}
-      @click=${async () => {
+    ${infoList(`
+- Added a changelog page.
+- Added more information to the help dialog.`)} ${infoButton(
+      "Check out extensive list of updates here",
+      async () => {
         await chrome.tabs.create({ url: extensiveUpdateListPage });
-      }}
-      >Check out extensive list of updates here</sl-button
-    >
+      },
+    )}
+    <br />
+    ${infoButton("Help", async () => {
+      await chrome.tabs.create({ url: helpPathName });
+    })}
   `;
 }
 

@@ -6,7 +6,6 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { setDefaultAnimation } from "@shoelace-style/shoelace/dist/utilities/animation-registry.js";
 import { SlDialog, SlInput, SlSelect } from "@shoelace-style/shoelace";
 import { Toolbar } from "./Toolbar";
-import { Help } from "./Help";
 import { Dialog } from "./Dialog";
 import { SessionSwitcher } from "./SessionSwitcher";
 import { DialogForm } from "./DialogForm";
@@ -37,7 +36,6 @@ export const editTabGroupDialogRefs = {
   input: createRef<SlInput>(),
   select: createRef<SlSelect>(),
 };
-export const helpDialogRef = createRef<SlDialog>();
 export const saveCurrentSessionDialogRef = createRef<SlDialog>();
 export const newSessionDialogRef = createRef<SlDialog>();
 export const editSessionDialogRef = createRef<SlDialog>();
@@ -166,9 +164,6 @@ export function App() {
                       )
                     }
                   />
-                </Dialog>
-                <Dialog label="Help" ref={helpDialogRef} noTopBodyMargin>
-                  <Help />
                 </Dialog>
                 <DialogForm
                   dialogLabel="Edit Tab Group"

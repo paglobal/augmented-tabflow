@@ -133,6 +133,8 @@ export const navigationBoxPathName = "/navigationBox.html";
 
 export const sessionManagerPathName = "/sessionManager.html";
 
+export const helpPathName = "/help.html";
+
 export const protocolsEligibleForEncoding = ["https:", "http:"];
 
 export const onInstalledPage =

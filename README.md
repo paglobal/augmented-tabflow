@@ -11,6 +11,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
+- add donate button at the bottom of `recentUpdates` page
+- create `updateAvailable` page and open it when update is available
 - add `Grouping Options` for tabs and tab groups to reduce clutter
 
 ### Later
@@ -91,47 +93,20 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - update screenshots. show some fullscreen, some with sessions, show some with split screen, some with tabs, etc
 - acknowledge that certain features are only supported and directly enabled by the extension (eg. fullscreen and splitscreen)
 - blends with your browser (light and dark modes)
+- document use with your favourite window manager
 
 ### Help Page
 
-- create help page and remove help dialog
-- show help page on install
--
-- add donate elements to help page (link to personal site)
-- attribute projects that made this project possible
-- document behaviour concerning interacting with bookmarking from mobile
-- (maybe) document the fact that there's no need to restore old tabs
-- document the ability to modify keyboard shortcuts at the top
 - document use with your favourite window manager
+- show help page on install
+- add donate button at a cool place
+- attribute projects that made this project possible
+- document the ability to modify keyboard shortcuts at the top
 - direct users where/how to change position of the chrome side panel
-- shortcuts include: Open sesssion view in side panel (Alt+A), Close all session windows (Alt+W), Exit current session (Alt+Q), Open new tab (Alt+T), Open new window (Alt+N), Edit current tab address (Alt+L)
+- shortcuts include: Open sesssion view in side panel (Alt+T), Close all session windows (Alt+W), Exit current session (Alt+Q), Open new tab (Ctrl+T), Open new window (Ctrl+N), Edit current tab address (Ctrl+L), Open tab page (Alt+A)
 - document `Ctrl+Shift+A` shortcut
-- document how to force updates
-- document how side panel takes focus from page
 - document double-click to close side panel
 - have button to open recent updates page
-- document tab page
 - link to chrome keyboard shortcuts page and other necessary pages
 - document how pinned tabs persist accross both sessions and tab group spaces button ungrouped tabs persist across only tab group spaces
-
-### Recent Changes Page
-
-- extract `heading` and other utils for use in help page as well
-- add donate button
-- explain mismatch between `Recent` and `Extensive` on `Extensive`
-- add link to help page
--
-- persist session on extension updates
-- ungrouped tab groups imported from other sessions now import as regular tab group with the title `Ungrouped`
-- implemented tab group spaces
-- fixed slight hover issue with favicons
-- fixed false loading states
-- fixed false favicons
-- fixed problem with pages loaded with file protocol and possibly other protocols
-- implemented navigation box
-- access to sessions across devices
-- better support for fullscreening
-- you can now edit tabs from the sidebar directly
-- double-click to close side panel
-- create recent updates extension page
-- added session manager tab page
+- document swiping through tab group spaces

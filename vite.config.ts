@@ -11,6 +11,7 @@ export default defineConfig({
         stubPage: resolve(__dirname, "stubPage.html"),
         navigationBox: resolve(__dirname, "navigationBox.html"),
         recentUpdates: resolve(__dirname, "recentUpdates.html"),
+        help: resolve(__dirname, "help.html"),
       },
       output: {
         entryFileNames: "[name].js",

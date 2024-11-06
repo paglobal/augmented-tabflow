@@ -1,7 +1,8 @@
 import { SlAlert } from "@shoelace-style/shoelace";
-import { render } from "lit";
+import { html, render } from "lit";
 import { PromethiumNode, adaptState, adaptSyncEffect } from "promethium-js";
 import { currentTabGroupSpaceColor } from "./sessionService";
+import { styleMap } from "lit/directives/style-map.js";
 
 type ThemeMode = "light" | "dark";
 
@@ -53,6 +54,58 @@ export function notifyWithErrorMessageAndReloadButton() {
       button.addEventListener("click", () => location.reload()),
     );
 }
+
+export const infoHeader = (version: string, noBottomPadding?: boolean) => {
+  return html`
+    <p
+      style=${styleMap({
+        fontSize: "1.1rem",
+        paddingTop: "1.6rem",
+        paddingBottom: noBottomPadding ? undefined : "1.6rem",
+        textDecoration: "underline",
+      })}
+    >
+      ${version}
+    </p>
+  `;
+};
+
+export const infoListStyles = () => {
+  return html`
+    <style>
+      div ul li {
+        padding-bottom: 0.8rem;
+        line-height: 150%;
+      }
+      div ul li:last-child {
+        padding-bottom: 0;
+      }
+    </style>
+  `;
+};
+
+export const infoList = (text: string) => {
+  return html`<ul>
+    ${text
+      .split("\n- ")
+      .map((textSegment) => html`<li>${textSegment}</li>`)
+      .slice(1)}
+  </ul>`;
+};
+
+export const infoButton = (text: string, onClick: () => void) => {
+  return html`
+    <sl-button
+      variant="primary"
+      style=${styleMap({
+        marginTop: "1.6rem",
+        display: "inline-block",
+      })}
+      @click=${onClick}
+      >${text}</sl-button
+    >
+  `;
+};
 
 export function initApp(
   App: (props: Object) => () => PromethiumNode,

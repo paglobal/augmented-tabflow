@@ -14,7 +14,6 @@ import {
   deleteSessionDialogRef,
   editSessionDialogRef,
   editSessionInputRef,
-  helpDialogRef,
   newSessionDialogRef,
   saveCurrentSessionDialogRef,
   setCurrentlyDeletedSessionId,
@@ -24,7 +23,7 @@ import {
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { sendMessage } from "../sharedUtils";
-import { messageTypes } from "../constants";
+import { helpPathName, messageTypes } from "../constants";
 
 export function sessionsTreeContent() {
   // @handled
@@ -134,7 +133,7 @@ export function sessionsTreeContent() {
           // @handled
           try {
             e.stopPropagation();
-            await helpDialogRef.value?.show();
+            await chrome.tabs.create({ url: helpPathName });
           } catch (error) {
             console.error(error);
             notifyWithErrorMessageAndReloadButton();

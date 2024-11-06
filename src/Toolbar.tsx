@@ -7,7 +7,6 @@ import {
 } from "./sessionService";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
-  helpDialogRef,
   editSessionInputRef,
   editSessionDialogRef,
   setCurrentlyDeletedSessionId,
@@ -16,6 +15,7 @@ import {
   importTabGroupFromSessionTreeDialogRef,
 } from "./App";
 import { openNavigationBox, withError } from "../sharedUtils";
+import { helpPathName } from "../constants";
 
 export function Toolbar() {
   return () => {
@@ -191,7 +191,7 @@ export function Toolbar() {
           @click=${async () => {
             // @handled
             try {
-              await helpDialogRef.value?.show();
+              await chrome.tabs.create({ url: helpPathName });
             } catch (error) {
               console.error(error);
               notifyWithErrorMessageAndReloadButton();
