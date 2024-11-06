@@ -11,8 +11,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
-- restore certain pieces of state such as user's `currentSession` from local storage on `onUpdated` callback
-- add `Grouping Options` for tabs and tab groups to reduce clutter (ie. add to some other tab group or a `New Tab Group` or even ungrouping or pinning it)
+- add `Grouping Options` for tabs and tab groups to reduce clutter
 
 ### Later
 
@@ -60,7 +59,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - type `sendMessage` and `subscribeToMessage` for automatic inference
 - notify users of errors that happen in service workers through message `chrome.runtime.message`
 - handle errors in timeouts as well
-- (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - type drag-and-drop code
 - refine fallback code
 - add test suite
@@ -68,6 +66,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - look out for uses of typescript `as`'s in the codebase
 - add `| Undefined` to all `Array` types
 -
+- (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
+- (maybe) reconcile newly opened session with last recorded session
 - (maybe) add splitscreen button for windows
 - (maybe) limit number of toasts to be show at a time
 - (maybe) add option for showing more options for tabs and tab groups
@@ -112,6 +112,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - have button to open recent updates page
 - document tab page
 - link to chrome keyboard shortcuts page and other necessary pages
+- document how pinned tabs persist accross both sessions and tab group spaces button ungrouped tabs persist across only tab group spaces
 
 ### Recent Changes Page
 
@@ -120,6 +121,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - explain mismatch between `Recent` and `Extensive` on `Extensive`
 - add link to help page
 -
+- persist session on extension updates
 - ungrouped tab groups imported from other sessions now import as regular tab group with the title `Ungrouped`
 - implemented tab group spaces
 - fixed slight hover issue with favicons

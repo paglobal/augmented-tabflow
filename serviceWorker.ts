@@ -16,6 +16,8 @@ import {
   AntecedentTabInfo,
   sessionManagerPathName,
   navigationBoxPathName,
+  SessionStorageKey,
+  sessionStorageBackupInfoArray,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -28,11 +30,43 @@ import {
   insertBookmarker,
   openNavigationBox,
   withError,
+  subscribeToStorageData,
 } from "./sharedUtils";
 
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error));
+
+function backupSessionStorageDataToLocalStorage() {
+  for (const sessionStorageBackupInfo of sessionStorageBackupInfoArray) {
+    subscribeToStorageData(
+      sessionStorageBackupInfo.key,
+      async ({ newValue }) => {
+        await setStorageData(`local-${sessionStorageBackupInfo.key}`, newValue);
+      },
+    );
+  }
+}
+
+async function restoreSessionStorageDataFromLocalStorage() {
+  const sessionLoading = await getStorageData<boolean>(
+    `local-${sessionStorageKeys.sessionLoading}`,
+  );
+  for (const sessionStorageBackupInfo of sessionStorageBackupInfoArray) {
+    const backedUpData = await getStorageData(
+      `local-${sessionStorageBackupInfo.key}`,
+    );
+    if (
+      sessionLoading &&
+      sessionStorageBackupInfo.restoreIfSessionLoading === false
+    ) {
+      continue;
+    }
+    await setStorageData(sessionStorageBackupInfo.key, backedUpData);
+  }
+}
+
+backupSessionStorageDataToLocalStorage();
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   // @error
@@ -41,6 +75,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       url: onInstalledPage,
     });
   } else if (details.reason === "update") {
+    await restoreSessionStorageDataFromLocalStorage();
     await chrome.tabs.create({
       url: recentUpdateListPage,
     });
@@ -857,7 +892,7 @@ async function applyUpdates() {
               ),
           ).length;
         const pinnedTabGroupBookmarkLength = await getStorageData<number>(
-          localStorageKeys.pinnedTabGroupBookmarkLength,
+          sessionStorageKeys.pinnedTabGroupBookmarkLength,
         );
         if (
           pinnedTabGroupBookmarkNodeChildrenLength !==
@@ -878,7 +913,7 @@ async function applyUpdates() {
       const pinnedTabGroupBookmarkNodeChildren =
         await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
       await setStorageData(
-        localStorageKeys.pinnedTabGroupBookmarkLength,
+        sessionStorageKeys.pinnedTabGroupBookmarkLength,
         pinnedTabGroupBookmarkNodeChildren.filter(
           (bookmarkNode) =>
             !bookmarkNode.url?.startsWith(

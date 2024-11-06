@@ -25,7 +25,41 @@ export const sessionStorageKeys = {
   currentlyNavigatedTabId: "session-13",
   antecedentTabInfo: "session-14",
   currentTabGroupSpaceIndex: "session-15",
+  pinnedTabGroupBookmarkLength: "session-16",
 } as const satisfies Record<string, SessionStorageKey>;
+
+export const sessionStorageBackupInfoArray: Array<{
+  key: SessionStorageKey;
+  restoreIfSessionLoading: boolean;
+}> = [
+  {
+    key: sessionStorageKeys.currentSessionData,
+    restoreIfSessionLoading: false,
+  },
+  {
+    key: sessionStorageKeys.previousUnsavedSessionTabGroupTreeData,
+    restoreIfSessionLoading: true,
+  },
+  {
+    key: sessionStorageKeys.recentlyClosedTabGroups,
+    restoreIfSessionLoading: true,
+  },
+  { key: sessionStorageKeys.sessionLoading, restoreIfSessionLoading: true },
+  { key: sessionStorageKeys.startup, restoreIfSessionLoading: true },
+  {
+    key: sessionStorageKeys.currentlyNavigatedTabId,
+    restoreIfSessionLoading: true,
+  },
+  { key: sessionStorageKeys.antecedentTabInfo, restoreIfSessionLoading: true },
+  {
+    key: sessionStorageKeys.currentTabGroupSpaceIndex,
+    restoreIfSessionLoading: true,
+  },
+  {
+    key: sessionStorageKeys.pinnedTabGroupBookmarkLength,
+    restoreIfSessionLoading: true,
+  },
+];
 
 export type SyncStorageKey = `sync-${number}`;
 
@@ -34,7 +68,7 @@ export const syncStorageKeys = {
   pinnedTabGroupBookmarkNodeId: "sync-2",
 } as const satisfies Record<string, SyncStorageKey>;
 
-export type LocalStorageKey = `local-${number}`;
+export type LocalStorageKey = `local-${number}` | `local-${SessionStorageKey}`;
 
 export const localStorageKeys = {
   rootBookmarkNodeId: "local-1",
@@ -42,11 +76,6 @@ export const localStorageKeys = {
   fullscreen: "local-3",
   ungroupedTabGroupCollapsed: "local-4",
   pinnedTabGroupCollapsed: "local-5",
-  currentSessionData_updateBackup: "local-6",
-  recentlyClosedTabGroups_updateBackup: "local-7",
-  startup_updateBackup: "local-8",
-  pinnedTabGroupBookmarkLength: "local-9",
-  currentTabGroupSpaceIndex_backup: "local-10",
 } as const satisfies Record<string, LocalStorageKey>;
 
 export type TabGroupType = `tabGroup-${number}`;
