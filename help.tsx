@@ -1,21 +1,56 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import "./customElements";
-import { infoHeader, initApp, infoList, infoListStyles } from "./src/utils";
+import {
+  infoHeader,
+  initApp,
+  infoList,
+  infoListStyles,
+  infoButton,
+} from "./src/utils";
 import { Dialog } from "./src/Dialog";
 import { createRef } from "lit/directives/ref.js";
 import { SlDialog } from "@shoelace-style/shoelace";
-import { titles } from "./constants";
+import {
+  changeSidePanelPositionPage,
+  donationsPage,
+  homePage,
+  keyboardShortcutsPage,
+  recentUpdateListPage,
+  titles,
+} from "./constants";
 
 function Help() {
   return () => html`
     ${infoListStyles()} ${infoHeader("Help", true)}
-    ${infoHeader(
-      "Here are a few things you need to know when working with this extension",
-    )}
-    ${infoList(`
-- It allows you to save your sessions as bookmarks that are automatically
+    ${infoButton("Keyboard Shortcuts", async () => {
+      await chrome.tabs.create({ url: keyboardShortcutsPage });
+    })}
+    ${infoButton("Change Side Panel Position", async () => {
+      await chrome.tabs.create({ url: changeSidePanelPositionPage });
+    })}
+    ${infoButton("Recent Updates", async () => {
+      await chrome.tabs.create({ url: recentUpdateListPage });
+    })}
+    ${infoButton("Donate", async () => {
+      await chrome.tabs.create({ url: donationsPage });
+    })}
+    ${infoButton("Homepage", async () => {
+      await chrome.tabs.create({ url: homePage });
+    })}
+    ${infoHeader("Recommended shortcuts")} ${infoList(`
+- Open sesssion manager - Alt+A
+- Toggle between side panel and popup as default extension action - Alt+T
+- Close all session windows - Ctrl+Shift+W
+- Exit current session - Ctrl+Shift+Q
+- Open new tab - Ctrl+T
+- Open new window - Ctrl+N
+- Edit current tab URL - Ctrl+L
+- Open new tab group - Ctrl+G
+`)} ${infoHeader("General information and tips")} ${infoList(`
+- This extension allows you to save your sessions as bookmarks that are automatically
   updated anytime you make a change to your current active saved session.
+- You can use the side panel or the action popup for interacting with tabs, tab groups and sessions.
 - If you're experiencing problems editing tab groups, you might want to update
   to the latest version of Chrome.
 - Sessions normally consist of all tabs from all "normal" windows (no
@@ -48,6 +83,10 @@ function Help() {
 - Please make sure to use other bookmark folders or your reading list to share pages with your
   mobile phone browser in order to avoid modifying the contents of the "${titles.rootBookmarkNode}"
   folder.
+- Tab group spaces are used to aggregate tab groups of similar colors.
+- Switch between them with the tab group space buttons below or by swiping left and right with two fingers.
+- Ungrouped tabs persist between tab group spaces but pinned tabs persist between both tab group spaces and sessions.
+- Double-click on any tab to activate the tab and close the side panel in the process.
 - The rest is pretty intuitive. You'll figure it out.
 - I hope you enjoy this extension. Go forth and be productive!
 `)}
@@ -89,8 +128,9 @@ function App() {
                 label="Recent Updates"
                 ref={recentUpdatesDialogRef}
                 noTopBodyMargin
-                open={true}
-                preventClosing={true}
+                open
+                preventClosing
+                preventClosingWithEscape
               >
                 <Help />
               </Dialog>

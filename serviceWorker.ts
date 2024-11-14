@@ -2,7 +2,6 @@ import {
   SessionData,
   commands,
   lockNames,
-  onInstalledPage,
   recentUpdateListPage,
   messageTypes,
   sessionStorageKeys,
@@ -16,8 +15,8 @@ import {
   AntecedentTabInfo,
   sessionManagerPathName,
   navigationBoxPathName,
-  SessionStorageKey,
   sessionStorageBackupInfoArray,
+  helpPathName,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -32,10 +31,6 @@ import {
   withError,
   subscribeToStorageData,
 } from "./sharedUtils";
-
-chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => console.error(error));
 
 function backupSessionStorageDataToLocalStorage() {
   for (const sessionStorageBackupInfo of sessionStorageBackupInfoArray) {
@@ -72,7 +67,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   // @error
   if (details.reason === "install") {
     await chrome.tabs.create({
-      url: onInstalledPage,
+      url: helpPathName,
     });
   } else if (details.reason === "update") {
     await restoreSessionStorageDataFromLocalStorage();
@@ -616,14 +611,12 @@ async function getTabGroupTreeData() {
     })
   ).filter(
     (tab) =>
-      tab.url !==
-        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}` &&
-      tab.url !==
-        `chrome-extension://${chrome.runtime.id}${navigationBoxPathName}`,
+      tab.url !== chrome.runtime.getURL(sessionManagerPathName) &&
+      tab.url !== chrome.runtime.getURL(navigationBoxPathName),
   );
   for (const tab of tabs) {
     if (tab.status === "loading") {
-      await updateTabGroupTreeDataAndCurrentSessionData();
+      await updateTabGroupTreeDataAndCurrentSessionData(5000);
 
       break;
     }
@@ -673,10 +666,8 @@ async function getTabGroupTreeData() {
     })
   ).filter(
     (tab) =>
-      tab.url !==
-        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}` &&
-      tab.url !==
-        `chrome-extension://${chrome.runtime.id}${navigationBoxPathName}`,
+      tab.url !== chrome.runtime.getURL(sessionManagerPathName) &&
+      tab.url !== chrome.runtime.getURL(navigationBoxPathName),
   );
   ungroupedTabs.forEach((tab) => {
     let url: URL | undefined;
@@ -715,10 +706,8 @@ async function getTabGroupTreeData() {
     })
   ).filter(
     (tab) =>
-      tab.url !==
-        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}` &&
-      tab.url !==
-        `chrome-extension://${chrome.runtime.id}${navigationBoxPathName}`,
+      tab.url !== chrome.runtime.getURL(sessionManagerPathName) &&
+      tab.url !== chrome.runtime.getURL(navigationBoxPathName),
   );
   pinnedTabs.forEach((tab) => {
     let url: URL | undefined;
@@ -876,6 +865,12 @@ async function applyUpdates() {
           await chrome.windows.update(sessionWindow.id, { state: newState });
         }
       });
+      const openPanelOnActionClick = await getStorageData<boolean>(
+        localStorageKeys.openPanelOnActionClick,
+      );
+      await chrome.sidePanel.setPanelBehavior({
+        openPanelOnActionClick: openPanelOnActionClick ?? true,
+      });
       await setStorageData(sessionStorageKeys.startup, false);
     } else {
       const pinnedTabGroupBookmarkNodeId = await getStorageData<
@@ -931,7 +926,7 @@ async function applyUpdates() {
   });
 }
 
-async function updateTabGroupTreeDataAndCurrentSessionData() {
+async function updateTabGroupTreeDataAndCurrentSessionData(timeout?: number) {
   // @maybe
   const debounceTabGroupTreeDataUpdates = await getStorageData<boolean>(
     sessionStorageKeys.debounceTabGroupTreeDataUpdates,
@@ -953,7 +948,7 @@ async function updateTabGroupTreeDataAndCurrentSessionData() {
           sessionStorageKeys.debounceTabGroupTreeDataUpdates,
           false,
         );
-      }, tabGroupTreeDataUpdateDebounceTimeout),
+      }, timeout ?? tabGroupTreeDataUpdateDebounceTimeout),
     );
   } else {
     clearTimeout(tabGroupTreeDataUpdateTimeoutId);
@@ -965,7 +960,7 @@ async function updateTabGroupTreeDataAndCurrentSessionData() {
           false,
         );
         applyUpdates();
-      }, tabGroupTreeDataUpdateDebounceTimeout),
+      }, timeout ?? tabGroupTreeDataUpdateDebounceTimeout),
     );
   }
 }
@@ -980,27 +975,16 @@ subscribeToMessage(
 
 chrome.commands.onCommand.addListener(async (command, tab) => {
   // @maybe
-  if (command === commands.openTabPage) {
-    if (
-      tab?.id &&
-      tab.url ===
-        `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}`
-    ) {
-      await chrome.tabs.remove(tab.id);
-    } else {
-      const [error] = await withError(
-        setStorageData<AntecedentTabInfo>(
-          sessionStorageKeys.antecedentTabInfo,
-          {
-            precedentTabId: tab?.id,
-          },
-        ),
-      );
-      if (error) {
-        // @handle
-      }
-      await chrome.tabs.create({ url: sessionManagerPathName });
-    }
+  if (command === commands.toggleAction) {
+    const panelBehaviour = await chrome.sidePanel.getPanelBehavior();
+    const openPanelOnActionClick = !panelBehaviour.openPanelOnActionClick;
+    await chrome.sidePanel.setPanelBehavior({
+      openPanelOnActionClick,
+    });
+    await setStorageData<boolean>(
+      localStorageKeys.openPanelOnActionClick,
+      openPanelOnActionClick,
+    );
   } else if (command === commands.closeAllSessionWindows) {
     await closeAllSessionWindows();
   } else if (command === commands.exitCurrentSession) {

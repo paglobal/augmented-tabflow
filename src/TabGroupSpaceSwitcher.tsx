@@ -2,10 +2,10 @@ import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { currentTabGroupSpaceIndex, tabGroups } from "./sessionService";
 import { tabGroupColors } from "./utils";
-import { debounce, setStorageData } from "../sharedUtils";
+import { executeAndBounceOff, setStorageData } from "../sharedUtils";
 import { sessionStorageKeys } from "../constants";
 
-export const cycleTabGroupSpaces = debounce(
+export const cycleTabGroupSpaces = executeAndBounceOff(
   async (cycleTo?: "prev" | "next") => {
     const _currentTabGroupSpaceIndex = currentTabGroupSpaceIndex();
     if (cycleTo === "prev") {
@@ -20,7 +20,7 @@ export const cycleTabGroupSpaces = debounce(
       );
     }
   },
-  50,
+  200,
 );
 
 export function TabGroupSpaceSwitcher() {
@@ -33,17 +33,29 @@ export function TabGroupSpaceSwitcher() {
     default: "var(--sl-color-neutral-0)";
   };
 
-  const fadedDiv = (backgroundColor: string) => {
+  const centerDiv = (backgroundColor: string) => {
     return html`
       <div
         style=${styleMap({
-          opacity: "0.2",
-          height: "1.5rem",
-          width: "1.25rem",
+          height: "1.75rem",
+          width: "1.5rem",
           borderRadius: "var(--sl-input-border-radius-small)",
           backgroundColor,
         })}
       ></div>
+    `;
+  };
+
+  const switcherButton = (cycleTo: "next" | "prev", title: string) => {
+    return html`
+      <sl-button
+        title=${title}
+        class=${`switcher-button ${cycleTo}`}
+        size="small"
+        @click=${async () => {
+          cycleTabGroupSpaces(cycleTo, 50);
+        }}
+      ></sl-button>
     `;
   };
 
@@ -79,10 +91,18 @@ export function TabGroupSpaceSwitcher() {
       <style>
         sl-button.switcher-button::part(base) {
           border-width: 0rem;
-          --sl-input-height-small: 1.75rem;
-          width: 1.5rem;
-          background-color: ${currentTabGroupSpaceColor};
+          --sl-input-height-small: 1.5rem;
+          width: 1.25rem;
           transition: transform 0.1s ease;
+          opacity: 0.7;
+        }
+
+        sl-button.switcher-button.next::part(base) {
+          background-color: ${nextTabGroupSpaceColor};
+        }
+
+        sl-button.switcher-button.prev::part(base) {
+          background-color: ${previousTabGroupSpaceColor};
         }
 
         sl-button.switcher-button::part(base):hover {
@@ -94,16 +114,9 @@ export function TabGroupSpaceSwitcher() {
           filter: brightness(1);
         }
       </style>
-      ${fadedDiv(previousTabGroupSpaceColor)}
-      <sl-button
-        title="Next Tab Group Space"
-        class="switcher-button"
-        size="small"
-        @click=${async () => {
-          cycleTabGroupSpaces("next");
-        }}
-      ></sl-button>
-      ${fadedDiv(nextTabGroupSpaceColor)}
+      ${switcherButton("prev", "Previous Tab Group Space")}
+      ${centerDiv(currentTabGroupSpaceColor)}
+      ${switcherButton("next", "Next Tab Group Space")}
     </div>`;
   };
 }

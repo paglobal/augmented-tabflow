@@ -18,7 +18,9 @@ import {
   newTabNavigatedTabId,
   navigationBoxPathName,
   AntecedentTabInfo,
+  sessionManagerPathName,
 } from "./constants";
+import { BaseTabGroupObjectArray } from "./src/sessionService";
 
 export async function getStorageData<T = unknown>(
   key: SyncStorageKey | SessionStorageKey | LocalStorageKey,
@@ -267,6 +269,25 @@ export function debounce<T>(callback: (args?: T) => void, timeout: number) {
     timeoutId = setTimeout(() => {
       callback(args);
     }, newTimeout ?? timeout);
+  };
+}
+
+export function executeAndBounceOff<T>(
+  callback: (args?: T) => void,
+  timeout: number,
+) {
+  let timeoutId: number | undefined | NodeJS.Timeout;
+  let bounceOff: boolean = false;
+
+  return (args?: T, newTimeout?: number) => {
+    if (!bounceOff) {
+      callback(args);
+      bounceOff = true;
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        bounceOff = false;
+      }, newTimeout ?? timeout);
+    }
   };
 }
 

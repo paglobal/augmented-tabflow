@@ -76,6 +76,7 @@ export const localStorageKeys = {
   fullscreen: "local-3",
   ungroupedTabGroupCollapsed: "local-4",
   pinnedTabGroupCollapsed: "local-5",
+  openPanelOnActionClick: "local-6",
 } as const satisfies Record<string, LocalStorageKey>;
 
 export type TabGroupType = `tabGroup-${number}`;
@@ -137,7 +138,7 @@ export const helpPathName = "/help.html";
 
 export const protocolsEligibleForEncoding = ["https:", "http:"];
 
-export const onInstalledPage =
+export const homePage =
   "https://paglobal.online/pages/projects/augmented-tabflow.html";
 
 export const recentUpdateListPage = "/recentUpdates.html";
@@ -145,25 +146,34 @@ export const recentUpdateListPage = "/recentUpdates.html";
 export const extensiveUpdateListPage =
   "https://paglobal.online/pages/posts/augmented-tabflow-changelog.html";
 
+export const keyboardShortcutsPage = "chrome://extensions/shortcuts";
+
+export const donationsPage =
+  "https://paglobal.online/pages/posts/donations.html";
+
+export const changeSidePanelPositionPage =
+  "chrome://settings/?search=side+panel+position";
+
 export const commands = {
-  openTabPage: "open-tab-page",
+  toggleAction: "toggle-action",
   closeAllSessionWindows: "close-all-session-windows",
   exitCurrentSession: "exit-current-session",
   editCurrentTabURL: "edit-current-tab-url",
   openNewTab: "open-new-tab",
   openNewWindow: "open-new-window",
+  openNewTabGroup: "open-new-tab-group",
 };
 
 // please don't modify!
 export const bookmarkerDetails = {
   title:
     "PLEASE DO NOT TOUCH! NOT UNLESS YOU ABSOLUTELY KNOW WHAT YOU'RE DOING OR JUST DON'T CARE!!!",
-  url: `chrome-extension://${chrome.runtime.id}${stubPagePathName}`,
+  url: chrome.runtime.getURL(stubPagePathName),
 };
 
 export const otherBookmarksBookmarkNodeTitle = "Other bookmarks";
 
-export const newTabNavigatedTabId = "NEW_TAB" as const;
+export const newTabNavigatedTabId = "NEW_TAB";
 
 export type CurrentlyNavigatedTabId =
   | chrome.tabs.Tab["id"]

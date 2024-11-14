@@ -1,55 +1,18 @@
 import { App } from "./src/App";
-import { setThemeMode, initApp } from "./src/utils";
-import {
-  createBookmarkNodeAndStoreId,
-  getStorageData,
-  sendMessage,
-  setStorageData,
-  withError,
-} from "./sharedUtils";
-import {
-  titles,
-  messageTypes,
-  localStorageKeys,
-  AntecedentTabInfo,
-  sessionStorageKeys,
-  sessionManagerPathName,
-} from "./constants";
+import { initApp } from "./src/utils";
+import { createBookmarkNodeAndStoreId, sendMessage } from "./sharedUtils";
+import { titles, messageTypes, localStorageKeys } from "./constants";
 import "./customElements";
 import { cycleTabGroupSpaces } from "./src/TabGroupSpaceSwitcher";
 
 initApp(App, async () => {
   // @error
-  const [error, currentTab] = await withError(chrome.tabs.getCurrent());
-  if (error) {
-    // @handle
-  }
-  if (currentTab) {
-    await chrome.sidePanel.setOptions({ enabled: false });
-    await chrome.sidePanel.setOptions({ enabled: true });
-  }
-  const [_error, antecedentTabInfo] = await withError(
-    getStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo),
-  );
-  if (_error) {
-    // @handle
-  }
-  const [__error] = await withError(
-    setStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo, {
-      id: currentTab?.id,
-      precedentTabId: antecedentTabInfo?.precedentTabId,
-    }),
-  );
-  if (__error) {
-    // @handle
-  }
-  const tabPages = await chrome.tabs.query({
-    url: `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}`,
-  });
-  for (const tabPage of tabPages) {
-    if (tabPage.id && tabPage.id !== currentTab?.id) {
-      await chrome.tabs.remove(tabPage.id);
-    }
+  const popupContext = (
+    await chrome.runtime.getContexts({ contextTypes: ["POPUP"] })
+  )[0];
+  if (popupContext) {
+    document.documentElement.style.minWidth = "400px";
+    document.documentElement.style.minHeight = "600px";
   }
   document.addEventListener(
     "wheel",
@@ -65,7 +28,7 @@ initApp(App, async () => {
         }
       }
     },
-    { passive: true },
+    { passive: false },
   );
   await createBookmarkNodeAndStoreId(
     localStorageKeys.rootBookmarkNodeId,

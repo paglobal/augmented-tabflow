@@ -128,10 +128,6 @@ export function initApp(
           `var(--sl-color-${baseAccentColor}-${shade})`,
         );
       }
-      document.documentElement.style.setProperty(
-        "--sl-input-focus-ring-color",
-        "var(--sl-color-primary-200)",
-      );
     });
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       setThemeMode("dark");

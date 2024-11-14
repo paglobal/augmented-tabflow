@@ -11,8 +11,6 @@ import {
   tlds,
   newTabNavigatedTabId,
   AntecedentTabInfo,
-  sessionManagerPathName,
-  navigationBoxPathName,
 } from "../constants";
 import { notify, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
@@ -45,7 +43,7 @@ export const [tabGroupTreeData, setTabGroupTreeData] =
 export const [currentTabGroupSpaceIndex, setCurrentTabGroupSpaceIndex] =
   adaptState<number>(0);
 
-type BaseTabGroupObjectArray = Array<
+export type BaseTabGroupObjectArray = Array<
   { color: chrome.tabGroups.TabGroup["color"] | "sky" } | undefined
 >;
 
@@ -59,28 +57,8 @@ export const currentTabGroupSpaceColor = adaptMemo(() => {
 
 updateTabGroupTreeData();
 
-async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
-  // @error
-  if (tabGroupTreeData === undefined) {
-    tabGroupTreeData =
-      (await getStorageData<TabGroupTreeData>(
-        sessionStorageKeys.tabGroupTreeData,
-      )) ?? [];
-  }
-  const currentWindowId = (await chrome.windows.getCurrent()).id;
-  tabGroupTreeData.forEach((tabGroup) => {
-    if (!tabGroup.windowId) {
-      tabGroup.tabs = tabGroup.tabs.filter(
-        (tab) => !(tab.windowId !== currentWindowId),
-      );
-    }
-  });
-  tabGroupTreeData = tabGroupTreeData.filter(
-    (tabGroup) =>
-      !(tabGroup.windowId && tabGroup.windowId !== currentWindowId) &&
-      tabGroup.tabs.length,
-  );
-  let _currentTabGroupSpaceIndex =
+export async function getTabGroupSpacePrerequisiteData() {
+  let currentTabGroupSpaceIndex =
     (await getStorageData<number>(
       sessionStorageKeys.currentTabGroupSpaceIndex,
     )) ?? 0;
@@ -99,59 +77,70 @@ async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
       false;
     }
   });
-  if (_currentTabGroupSpaceIndex < 0) {
+  if (currentTabGroupSpaceIndex < 0) {
     await setStorageData<number>(
       sessionStorageKeys.currentTabGroupSpaceIndex,
       tabGroups.length - 1,
     );
-    _currentTabGroupSpaceIndex = tabGroups.length - 1;
-  } else if (_currentTabGroupSpaceIndex > tabGroups.length - 1) {
+    currentTabGroupSpaceIndex = tabGroups.length - 1;
+  } else if (currentTabGroupSpaceIndex > tabGroups.length - 1) {
     await setStorageData<number>(
       sessionStorageKeys.currentTabGroupSpaceIndex,
       0,
     );
-    _currentTabGroupSpaceIndex = 0;
+    currentTabGroupSpaceIndex = 0;
   }
+
+  return [currentTabGroupSpaceIndex, tabGroups] as const;
+}
+
+export async function extractWindowTabGroupTreeData(
+  tabGroupTreeData: TabGroupTreeData,
+  windowId: chrome.windows.Window["id"],
+) {
+  if (windowId !== undefined) {
+    tabGroupTreeData.forEach((tabGroup) => {
+      if (!tabGroup.windowId) {
+        tabGroup.tabs = tabGroup.tabs.filter(
+          (tab) => !(tab.windowId !== windowId),
+        );
+      }
+    });
+    tabGroupTreeData = tabGroupTreeData.filter(
+      (tabGroup) =>
+        !(tabGroup.windowId && tabGroup.windowId !== windowId) &&
+        tabGroup.tabs.length,
+    );
+  }
+  const [currentTabGroupSpaceIndex, tabGroups] =
+    await getTabGroupSpacePrerequisiteData();
   tabGroupTreeData = tabGroupTreeData.filter(
     (tabGroup) =>
-      tabGroups[_currentTabGroupSpaceIndex]?.color === "sky" ||
+      tabGroups[currentTabGroupSpaceIndex]?.color === "sky" ||
       tabGroup.id === chrome.tabGroups.TAB_GROUP_ID_NONE ||
-      tabGroup.color === tabGroups[_currentTabGroupSpaceIndex]?.color,
+      tabGroup.color === tabGroups[currentTabGroupSpaceIndex]?.color,
   );
-  const activeTab = (
-    await chrome.tabs.query({ active: true, currentWindow: true })
-  )[0];
-  if (
-    activeTab.url !==
-      `chrome-extension://${chrome.runtime.id}${sessionManagerPathName}` &&
-    activeTab.url !==
-      `chrome-extension://${chrome.runtime.id}${navigationBoxPathName}`
-  ) {
-    if (_currentTabGroupSpaceIndex !== currentTabGroupSpaceIndex()) {
-      let activeTab: chrome.tabs.Tab | undefined;
-      for (const tabGroup of tabGroupTreeData) {
-        for (const tab of tabGroup.tabs) {
-          if (tab.active) {
-            activeTab = tab;
-          }
-        }
-      }
-      if (!activeTab) {
-        for (const tabGroup of tabGroupTreeData) {
-          if (tabGroup.id !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
-            const firstTabInTabGroup = tabGroup.tabs[0];
-            if (firstTabInTabGroup.id && !firstTabInTabGroup.active) {
-              await chrome.tabs.update(firstTabInTabGroup.id, { active: true });
-            }
-            break;
-          }
-        }
-      }
-    }
+
+  return { currentTabGroupSpaceIndex, tabGroups, tabGroupTreeData };
+}
+
+async function updateTabGroupTreeData(tabGroupTreeData?: TabGroupTreeData) {
+  // @error
+  if (tabGroupTreeData === undefined) {
+    tabGroupTreeData =
+      (await getStorageData<TabGroupTreeData>(
+        sessionStorageKeys.tabGroupTreeData,
+      )) ?? [];
   }
-  setTabGroupTreeData(tabGroupTreeData);
-  setCurrentTabGroupSpaceIndex(_currentTabGroupSpaceIndex);
+  const currentWindowId = (await chrome.windows.getCurrent()).id;
+  const {
+    tabGroupTreeData: _tabGroupTreeData,
+    currentTabGroupSpaceIndex,
+    tabGroups,
+  } = await extractWindowTabGroupTreeData(tabGroupTreeData, currentWindowId);
+  setCurrentTabGroupSpaceIndex(currentTabGroupSpaceIndex);
   setTabGroups(tabGroups);
+  setTabGroupTreeData(_tabGroupTreeData);
 }
 
 subscribeToStorageData<TabGroupTreeData>(
@@ -234,11 +223,9 @@ export async function closeTabGroup(tabGroup: TabGroupTreeData[number]) {
 
 export async function activateTab(tab: chrome.tabs.Tab) {
   // @maybe
-  // focus tab window first if it's not already in focus
-  if (tab.windowId !== chrome.windows.WINDOW_ID_CURRENT) {
-    await chrome.windows.update(tab.windowId, { focused: true });
+  if (tab.id) {
+    await chrome.tabs.update(tab.id, { active: true });
   }
-  await chrome.tabs.update(tab.id as number, { active: true });
 }
 
 export async function createTabGroup(tab?: chrome.tabs.Tab) {
@@ -249,11 +236,11 @@ export async function createTabGroup(tab?: chrome.tabs.Tab) {
       //@handle
     }
     tab = await openNavigationBox({
-      active: true,
+      active: false,
       precedentTabId: currentTab?.id,
     });
   }
-  if (tab && tab.id) {
+  if (tab?.id) {
     const tabGroupId = await chrome.tabs.group({
       tabIds: tab.id,
       createProperties: {
@@ -267,6 +254,7 @@ export async function createTabGroup(tab?: chrome.tabs.Tab) {
         color: _currentTabGroupSpaceColor,
       });
     }
+    await chrome.tabs.update(tab.id, { active: true });
   }
 }
 

@@ -14,13 +14,14 @@ body,
   --sl-font-serif: system-ui, serif;
   --sl-font-mono: system-ui, monospace;
   font-family: system-ui;
+  --sl-input-focus-ring-color: var(--sl-color-primary-200);
 }
 
 html,
 body,
 #app {
   background: var(--sl-color-neutral-0);
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 @media only screen and (max-width: 350px) {

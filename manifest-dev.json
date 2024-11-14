@@ -28,18 +28,19 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Augmented Tabflow"
+    "default_title": "Augmented Tabflow",
+    "default_popup": "sessionManager.html"
   },
   "side_panel": {
     "default_path": "sessionManager.html"
   },
   "commands": {
     "_execute_action": {
-      "suggested_key": "Alt+T"
+      "suggested_key": "Alt+A"
     },
-    "open-tab-page": {
-      "suggested_key": "Alt+A",
-      "description": "Open Augmented Tabflow tab page"
+    "toggle-action": {
+      "suggested_key": "Alt+T",
+      "description": "Toggle between side panel and popup as default extension action"
     },
     "close-all-session-windows": {
       "suggested_key": "Alt+W",
@@ -57,6 +58,9 @@
     },
     "open-new-window": {
       "description": "Open new window"
+    },
+    "open-new-tab-group": {
+      "description": "Open new tab group"
     }
   }
 }

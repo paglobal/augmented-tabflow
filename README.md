@@ -11,8 +11,11 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
-- add donate button at the bottom of `recentUpdates` page
-- create `updateAvailable` page and open it when update is available
+- stop reinitting of pinned tabs and remove pinned tab group bookmark node
+- add shortcut for new tab group
+- create `updateAvailable` page, open it when update is available, and prevent escape from closing
+- check if newtaburls is necessary or detrimental
+- delete all `navigationBox` and `sessionManager` urls from history
 - add `Grouping Options` for tabs and tab groups to reduce clutter
 
 ### Later
@@ -43,7 +46,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - organise imports
 - refine and organise user-facing text. look for anything in quotation marks like "Error!" and such. make use of full stops
 - capitalize all instances of `url`
-- change `setTimeouts` to `await wait()`
+- change `setTimeout`'s to `await wait()`
 -
 - add last icon(s) in toolbar for `Settings` and `Actions` or `Settings And Actions`
 - add all chrome internal pages to search suggestions
@@ -68,6 +71,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - look out for uses of typescript `as`'s in the codebase
 - add `| Undefined` to all `Array` types
 -
+- (maybe) create ui for editing commands
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - (maybe) reconcile newly opened session with last recorded session
 - (maybe) add splitscreen button for windows
@@ -76,7 +80,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) implement search for sessions and tabs (already implemented in browser for tabs)
 - (maybe) implement ability to sort sessions alphabetically or by date added
 - (maybe) implement action center and add new shortcuts
-- (maybe) add `Pop Out` button/shortcut on extension tab page
 - (maybe) implement manual theme switcher
 - (maybe) reduce minimum chrome version
 - (maybe, please be careful) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
@@ -86,27 +89,15 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Store Listing
 
-- advise users to always look out for updates and probably suggest how
-- remove old video
-- upload new video
-- attribute projects that made this project possible
+- (maybe) upload promo video
 - update screenshots. show some fullscreen, some with sessions, show some with split screen, some with tabs, etc
 - acknowledge that certain features are only supported and directly enabled by the extension (eg. fullscreen and splitscreen)
 - blends with your browser (light and dark modes)
 - document use with your favourite window manager
+- keyboard shortcuts
+- tab group spaces
+- use action popup or sidebar
 
 ### Help Page
 
-- document use with your favourite window manager
-- show help page on install
-- add donate button at a cool place
-- attribute projects that made this project possible
-- document the ability to modify keyboard shortcuts at the top
-- direct users where/how to change position of the chrome side panel
-- shortcuts include: Open sesssion view in side panel (Alt+T), Close all session windows (Alt+W), Exit current session (Alt+Q), Open new tab (Ctrl+T), Open new window (Ctrl+N), Edit current tab address (Ctrl+L), Open tab page (Alt+A)
-- document `Ctrl+Shift+A` shortcut
-- document double-click to close side panel
-- have button to open recent updates page
-- link to chrome keyboard shortcuts page and other necessary pages
-- document how pinned tabs persist accross both sessions and tab group spaces button ungrouped tabs persist across only tab group spaces
-- document swiping through tab group spaces
+- attribute projects that inspired this and ones that made this possible

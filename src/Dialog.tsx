@@ -15,6 +15,7 @@ export function Dialog(props: {
   onHide?: () => void;
   open?: boolean;
   preventClosing?: boolean;
+  preventClosingWithEscape?: boolean;
 }) {
   const bodyMargins = {
     top: props.noTopBodyMargin ? "0" : "1rem",
@@ -50,6 +51,9 @@ export function Dialog(props: {
       @sl-hide=${props.onHide}
       @sl-request-close=${(e: SlRequestCloseEvent) => {
         if (props.preventClosing && e.detail.source === "overlay") {
+          e.preventDefault();
+        }
+        if (props.preventClosingWithEscape) {
           e.preventDefault();
         }
       }}

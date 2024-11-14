@@ -11,28 +11,30 @@ import {
 import { Dialog } from "./src/Dialog";
 import { createRef } from "lit/directives/ref.js";
 import { SlDialog } from "@shoelace-style/shoelace";
-import { extensiveUpdateListPage, helpPathName } from "./constants";
+import {
+  donationsPage,
+  extensiveUpdateListPage,
+  helpPathName,
+} from "./constants";
 
 function RecentUpdates() {
   return () => html`
     ${infoListStyles()} ${infoHeader("Recent Updates", true)}
     ${infoHeader("0.9.0 to 0.12.0")} ${infoList(`
-- new updates page
-- new help page
-- persist session on extension updates
-- ungrouped tab groups imported from other sessions now import as regular tab group with the title "Ungrouped"
-- implemented tab group spaces
-- fixed slight hover issue with favicons
-- fixed false loading states
-- fixed false favicons
-- fixed problem with pages loaded with file protocol and possibly other protocols
-- implemented navigation box
-- access to sessions across devices
-- better support for fullscreening
-- you can now edit tabs from the sidebar directly
-- double-click to close side panel
-- create recent updates extension page
-- added session manager tab page
+- Added a new recent updates page.
+- Changed help dialog to help page.
+- Sessions now persist on extension updates.
+- Ungrouped tab groups imported from other sessions now import as regular tab groups with the title "Ungrouped".
+- Implemented tab group spaces to improve organization within sessions.
+- Fixed slight hover issue with favicons.
+- Fixed showing of certain false loading states pertaining to tabs.
+- Fixed issue with stale favicons showing instead of current ones.
+- Fixed problem with pages loaded with file protocol and possibly other protocols.
+- Implemented navigation box.
+- Implemented better support for fullscreening in order to encourage hiding on horizontal tab strip.
+- Tabs can now be edited directly from the sidebar. 
+- Tabs can now be double-clicked on to activate them and close the sidebar in the process.
+- Added action popup.
 `)} ${infoHeader("0.8.1")} ${infoList(`
 - Fixed an issue with restoring pinned tabs.
 - Fixed an issue with the height of dialogs that occurs when the sidepanel is expanded beyond a certain width.`)} ${infoHeader(
@@ -41,14 +43,16 @@ function RecentUpdates() {
     ${infoList(`
 - Added a changelog page.
 - Added more information to the help dialog.`)} ${infoButton(
-      "Check out extensive list of updates here",
+      "Extensive Update List",
       async () => {
         await chrome.tabs.create({ url: extensiveUpdateListPage });
       },
     )}
-    <br />
     ${infoButton("Help", async () => {
       await chrome.tabs.create({ url: helpPathName });
+    })}
+    ${infoButton("Donate", async () => {
+      await chrome.tabs.create({ url: donationsPage });
     })}
   `;
 }
@@ -88,8 +92,9 @@ function App() {
                 label="Recent Updates"
                 ref={recentUpdatesDialogRef}
                 noTopBodyMargin
-                open={true}
-                preventClosing={true}
+                open
+                preventClosing
+                preventClosingWithEscape
               >
                 <RecentUpdates />
               </Dialog>
