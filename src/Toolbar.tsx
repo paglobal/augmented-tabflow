@@ -1,7 +1,6 @@
 import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import {
-  createTabGroup,
   currentSessionData,
   currentSessionDataNotAvailable,
 } from "./sessionService";
@@ -14,7 +13,7 @@ import {
   deleteSessionDialogRef,
   importTabGroupFromSessionTreeDialogRef,
 } from "./App";
-import { openNavigationBox, withError } from "../sharedUtils";
+import { createTabGroup, openNavigationBox, withError } from "../sharedUtils";
 import { helpPathName } from "../constants";
 
 export function Toolbar() {

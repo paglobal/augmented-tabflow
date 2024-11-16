@@ -11,12 +11,11 @@ import {
   tabGroupTypes,
   titles,
   localStorageKeys,
-  bookmarkerDetails,
   AntecedentTabInfo,
-  sessionManagerPathName,
   navigationBoxPathName,
   sessionStorageBackupInfoArray,
   helpPathName,
+  updateAvailablePathName,
 } from "./constants";
 import {
   type TabGroupTreeData,
@@ -30,6 +29,7 @@ import {
   openNavigationBox,
   withError,
   subscribeToStorageData,
+  createTabGroup,
 } from "./sharedUtils";
 
 function backupSessionStorageDataToLocalStorage() {
@@ -62,6 +62,33 @@ async function restoreSessionStorageDataFromLocalStorage() {
 }
 
 backupSessionStorageDataToLocalStorage();
+
+async function initialize() {
+  const fullscreen = await getStorageData<boolean>(localStorageKeys.fullscreen);
+  const sessionWindows = await chrome.windows.getAll({
+    windowTypes: ["normal"],
+  });
+  sessionWindows.forEach(async (sessionWindow) => {
+    if (sessionWindow.id) {
+      const newState = fullscreen ? "fullscreen" : sessionWindow.state;
+      await chrome.windows.update(sessionWindow.id, { state: newState });
+    }
+  });
+  const openPanelOnActionClick = await getStorageData<boolean>(
+    localStorageKeys.openPanelOnActionClick,
+  );
+  await chrome.sidePanel.setPanelBehavior({
+    openPanelOnActionClick: openPanelOnActionClick ?? true,
+  });
+}
+
+initialize();
+
+chrome.runtime.onUpdateAvailable.addListener(async (details) => {
+  await chrome.tabs.create({
+    url: updateAvailablePathName + `?version=${details.version}`,
+  });
+});
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   // @error
@@ -610,9 +637,7 @@ async function getTabGroupTreeData() {
       windowType: "normal",
     })
   ).filter(
-    (tab) =>
-      tab.url !== chrome.runtime.getURL(sessionManagerPathName) &&
-      tab.url !== chrome.runtime.getURL(navigationBoxPathName),
+    (tab) => !tab.url?.startsWith(chrome.runtime.getURL(navigationBoxPathName)),
   );
   for (const tab of tabs) {
     if (tab.status === "loading") {
@@ -665,9 +690,7 @@ async function getTabGroupTreeData() {
       pinned: false,
     })
   ).filter(
-    (tab) =>
-      tab.url !== chrome.runtime.getURL(sessionManagerPathName) &&
-      tab.url !== chrome.runtime.getURL(navigationBoxPathName),
+    (tab) => !tab.url?.startsWith(chrome.runtime.getURL(navigationBoxPathName)),
   );
   ungroupedTabs.forEach((tab) => {
     let url: URL | undefined;
@@ -705,9 +728,7 @@ async function getTabGroupTreeData() {
       pinned: true,
     })
   ).filter(
-    (tab) =>
-      tab.url !== chrome.runtime.getURL(sessionManagerPathName) &&
-      tab.url !== chrome.runtime.getURL(navigationBoxPathName),
+    (tab) => !tab.url?.startsWith(chrome.runtime.getURL(navigationBoxPathName)),
   );
   pinnedTabs.forEach((tab) => {
     let url: URL | undefined;
@@ -801,47 +822,6 @@ async function updateCurrentSessionData() {
   );
 }
 
-async function reinitializePinnedTabs() {
-  // @maybe
-  await setStorageData(sessionStorageKeys.sessionLoading, true);
-  const oldPinnedTabs = await chrome.tabs.query({ pinned: true });
-  for (const tab of oldPinnedTabs) {
-    try {
-      await setStorageData(sessionStorageKeys.currentlyRemovedTabId, tab.id);
-      await chrome.tabs.remove(tab.id!);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  const pinnedTabGroupBookmarkNodeId = await getStorageData<
-    chrome.bookmarks.BookmarkTreeNode["id"]
-  >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
-  if (pinnedTabGroupBookmarkNodeId) {
-    const pinnedTabGroupBookmarkNodeChildren =
-      await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
-    for (const tabData of pinnedTabGroupBookmarkNodeChildren) {
-      if (
-        tabData.title === bookmarkerDetails.title &&
-        tabData.url === bookmarkerDetails.url
-      ) {
-        continue;
-      }
-      const url = encodeTabDataAsUrl({
-        title: tabData.title,
-        url: tabData.url || "",
-      });
-      await chrome.tabs.create({
-        url,
-        pinned: true,
-        active: false,
-      });
-    }
-  } else {
-    // @error
-  }
-  await setStorageData(sessionStorageKeys.sessionLoading, false);
-}
-
 async function removeSessionFolderFromDefaultBookmarkSuggestion() {
   const bookmarkNodeId = (await chrome.bookmarks.create({})).id;
   await chrome.bookmarks.remove(bookmarkNodeId);
@@ -850,73 +830,10 @@ async function removeSessionFolderFromDefaultBookmarkSuggestion() {
 async function applyUpdates() {
   // @maybe
   navigator.locks.request(lockNames.applyUpdates, async () => {
-    const startup = await getStorageData<boolean>(sessionStorageKeys.startup);
-    if (startup === undefined) {
-      await reinitializePinnedTabs();
-      const fullscreen = await getStorageData<boolean>(
-        localStorageKeys.fullscreen,
-      );
-      const sessionWindows = await chrome.windows.getAll({
-        windowTypes: ["normal"],
-      });
-      sessionWindows.forEach(async (sessionWindow) => {
-        if (sessionWindow.id) {
-          const newState = fullscreen ? "fullscreen" : sessionWindow.state;
-          await chrome.windows.update(sessionWindow.id, { state: newState });
-        }
-      });
-      const openPanelOnActionClick = await getStorageData<boolean>(
-        localStorageKeys.openPanelOnActionClick,
-      );
-      await chrome.sidePanel.setPanelBehavior({
-        openPanelOnActionClick: openPanelOnActionClick ?? true,
-      });
-      await setStorageData(sessionStorageKeys.startup, false);
-    } else {
-      const pinnedTabGroupBookmarkNodeId = await getStorageData<
-        chrome.bookmarks.BookmarkTreeNode["id"]
-      >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
-      if (pinnedTabGroupBookmarkNodeId) {
-        const pinnedTabGroupBookmarkNodeChildren =
-          await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
-        const pinnedTabGroupBookmarkNodeChildrenLength =
-          pinnedTabGroupBookmarkNodeChildren.filter(
-            (bookmarkNode) =>
-              !bookmarkNode.url?.startsWith(
-                `chrome-extension://${chrome.runtime.id}`,
-              ),
-          ).length;
-        const pinnedTabGroupBookmarkLength = await getStorageData<number>(
-          sessionStorageKeys.pinnedTabGroupBookmarkLength,
-        );
-        if (
-          pinnedTabGroupBookmarkNodeChildrenLength !==
-          pinnedTabGroupBookmarkLength
-        ) {
-          await reinitializePinnedTabs();
-        }
-      }
-    }
     const tabGroupTreeData = await getTabGroupTreeData();
     await setStorageData(sessionStorageKeys.tabGroupTreeData, tabGroupTreeData);
     await updateCurrentSessionData();
     await removeSessionFolderFromDefaultBookmarkSuggestion();
-    const pinnedTabGroupBookmarkNodeId = await getStorageData<
-      chrome.bookmarks.BookmarkTreeNode["id"]
-    >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
-    if (pinnedTabGroupBookmarkNodeId) {
-      const pinnedTabGroupBookmarkNodeChildren =
-        await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
-      await setStorageData(
-        sessionStorageKeys.pinnedTabGroupBookmarkLength,
-        pinnedTabGroupBookmarkNodeChildren.filter(
-          (bookmarkNode) =>
-            !bookmarkNode.url?.startsWith(
-              `chrome-extension://${chrome.runtime.id}`,
-            ),
-        ).length,
-      );
-    }
     const sessionLoading = await getStorageData<boolean>(
       sessionStorageKeys.sessionLoading,
     );
@@ -997,11 +914,16 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     }
   } else if (command === commands.editCurrentTabURL) {
     if (tab?.id) {
-      openNavigationBox({ navigatedTabId: tab.id, precedentTabId: tab.id });
+      await openNavigationBox({
+        navigatedTabId: tab.id,
+        precedentTabId: tab.id,
+      });
     }
   } else if (command === commands.openNewTab) {
-    openNavigationBox({ precedentTabId: tab?.id });
+    await openNavigationBox({ precedentTabId: tab?.id });
   } else if (command === commands.openNewWindow) {
-    openNavigationBox({ newWindow: true, precedentTabId: tab?.id });
+    await openNavigationBox({ newWindow: true, precedentTabId: tab?.id });
+  } else if (command === commands.openNewTabGroup) {
+    await createTabGroup();
   }
 });

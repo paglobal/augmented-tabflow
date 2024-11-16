@@ -43,8 +43,12 @@ export const [tabGroupTreeData, setTabGroupTreeData] =
 export const [currentTabGroupSpaceIndex, setCurrentTabGroupSpaceIndex] =
   adaptState<number>(0);
 
+export type BaseTabGroupObjectColor =
+  | chrome.tabGroups.TabGroup["color"]
+  | "sky";
+
 export type BaseTabGroupObjectArray = Array<
-  { color: chrome.tabGroups.TabGroup["color"] | "sky" } | undefined
+  { color: BaseTabGroupObjectColor } | undefined
 >;
 
 export const [tabGroups, setTabGroups] = adaptState<BaseTabGroupObjectArray>(
@@ -224,36 +228,6 @@ export async function closeTabGroup(tabGroup: TabGroupTreeData[number]) {
 export async function activateTab(tab: chrome.tabs.Tab) {
   // @maybe
   if (tab.id) {
-    await chrome.tabs.update(tab.id, { active: true });
-  }
-}
-
-export async function createTabGroup(tab?: chrome.tabs.Tab) {
-  // @maybe
-  if (!tab) {
-    const [error, currentTab] = await withError(chrome.tabs.getCurrent());
-    if (error) {
-      //@handle
-    }
-    tab = await openNavigationBox({
-      active: false,
-      precedentTabId: currentTab?.id,
-    });
-  }
-  if (tab?.id) {
-    const tabGroupId = await chrome.tabs.group({
-      tabIds: tab.id,
-      createProperties: {
-        windowId: tab.windowId,
-      },
-    });
-    await chrome.tabGroups.move(tabGroupId, { index: -1 });
-    const _currentTabGroupSpaceColor = currentTabGroupSpaceColor();
-    if (_currentTabGroupSpaceColor && _currentTabGroupSpaceColor !== "sky") {
-      await chrome.tabGroups.update(tabGroupId, {
-        color: _currentTabGroupSpaceColor,
-      });
-    }
     await chrome.tabs.update(tab.id, { active: true });
   }
 }

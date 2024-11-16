@@ -20,7 +20,7 @@ import {
 function RecentUpdates() {
   return () => html`
     ${infoListStyles()} ${infoHeader("Recent Updates", true)}
-    ${infoHeader("0.9.0 to 0.12.0")} ${infoList(`
+    ${infoHeader("0.9.0 to 0.13.0")} ${infoList(`
 - Added a new recent updates page.
 - Changed help dialog to help page.
 - Sessions now persist on extension updates.
@@ -35,6 +35,7 @@ function RecentUpdates() {
 - Tabs can now be edited directly from the sidebar. 
 - Tabs can now be double-clicked on to activate them and close the sidebar in the process.
 - Added action popup.
+- Fixed issues with pinned tabs
 `)} ${infoHeader("0.8.1")} ${infoList(`
 - Fixed an issue with restoring pinned tabs.
 - Fixed an issue with the height of dialogs that occurs when the sidepanel is expanded beyond a certain width.`)} ${infoHeader(

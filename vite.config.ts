@@ -12,6 +12,7 @@ export default defineConfig({
         navigationBox: resolve(__dirname, "navigationBox.html"),
         recentUpdates: resolve(__dirname, "recentUpdates.html"),
         help: resolve(__dirname, "help.html"),
+        updateAvailable: resolve(__dirname, "updateAvailable.html"),
       },
       output: {
         entryFileNames: "[name].js",

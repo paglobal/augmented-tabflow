@@ -2,8 +2,8 @@ import { html } from "lit";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import { TreeItem } from "./TreeItem";
-import { TabGroupTreeData } from "../sharedUtils";
-import { activateTab, createTabGroup } from "./sessionService";
+import { TabGroupTreeData, createTabGroup } from "../sharedUtils";
+import { activateTab } from "./sessionService";
 import {
   moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,
@@ -271,8 +271,9 @@ export function TabTreeItem(props: {
                 <TreeItemColorPatchOrIcon
                   pageUrl={tab.url}
                   showSpinner={
-                    tab.status === "loading" &&
-                    !newTabUrls.includes(tab.url ?? "")
+                    (tab.status === "loading" &&
+                      !newTabUrls.includes(tab.url ?? "")) ||
+                    tab.pendingUrl
                       ? true
                       : false
                   }

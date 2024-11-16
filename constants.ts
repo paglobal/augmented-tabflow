@@ -21,11 +21,9 @@ export const sessionStorageKeys = {
   currentlyRemovedTabId: "session-9",
   stubTabId: "session-10",
   removingOldSessionTabs: "session-11",
-  startup: "session-12",
-  currentlyNavigatedTabId: "session-13",
-  antecedentTabInfo: "session-14",
-  currentTabGroupSpaceIndex: "session-15",
-  pinnedTabGroupBookmarkLength: "session-16",
+  currentlyNavigatedTabId: "session-12",
+  antecedentTabInfo: "session-13",
+  currentTabGroupSpaceIndex: "session-14",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export const sessionStorageBackupInfoArray: Array<{
@@ -45,7 +43,6 @@ export const sessionStorageBackupInfoArray: Array<{
     restoreIfSessionLoading: true,
   },
   { key: sessionStorageKeys.sessionLoading, restoreIfSessionLoading: true },
-  { key: sessionStorageKeys.startup, restoreIfSessionLoading: true },
   {
     key: sessionStorageKeys.currentlyNavigatedTabId,
     restoreIfSessionLoading: true,
@@ -55,18 +52,7 @@ export const sessionStorageBackupInfoArray: Array<{
     key: sessionStorageKeys.currentTabGroupSpaceIndex,
     restoreIfSessionLoading: true,
   },
-  {
-    key: sessionStorageKeys.pinnedTabGroupBookmarkLength,
-    restoreIfSessionLoading: true,
-  },
 ];
-
-export type SyncStorageKey = `sync-${number}`;
-
-export const syncStorageKeys = {
-  rootBookmarkNodeId: "sync-1",
-  pinnedTabGroupBookmarkNodeId: "sync-2",
-} as const satisfies Record<string, SyncStorageKey>;
 
 export type LocalStorageKey = `local-${number}` | `local-${SessionStorageKey}`;
 
@@ -132,9 +118,9 @@ export const stubPagePathName = "/stubPage.html";
 
 export const navigationBoxPathName = "/navigationBox.html";
 
-export const sessionManagerPathName = "/sessionManager.html";
-
 export const helpPathName = "/help.html";
+
+export const updateAvailablePathName = "/updateAvailable.html";
 
 export const protocolsEligibleForEncoding = ["https:", "http:"];
 

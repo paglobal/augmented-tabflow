@@ -14,6 +14,11 @@ import {
 } from "./constants";
 import { getStorageData, setStorageData, wait, withError } from "./sharedUtils";
 import { initApp } from "./src/utils";
+import {
+  BaseTabGroupObjectColor,
+  currentTabGroupSpaceColor,
+} from "./src/sessionService";
+import { adaptSyncEffect } from "promethium-js";
 
 function App() {
   return () =>
@@ -78,6 +83,30 @@ initApp(App, async () => {
   );
   if (__error) {
     // @handle
+  }
+  if (currentTab?.id) {
+    const params = new URLSearchParams(document.location.search);
+    const group = params.get("group");
+    if (group) {
+      const tabGroupId = await chrome.tabs.group({
+        tabIds: currentTab.id,
+        createProperties: {
+          windowId: currentTab.windowId,
+        },
+      });
+      await chrome.tabGroups.move(tabGroupId, { index: -1 });
+      adaptSyncEffect(() => {
+        const _currentTabGroupSpaceColor = currentTabGroupSpaceColor();
+        if (
+          _currentTabGroupSpaceColor &&
+          _currentTabGroupSpaceColor !== "sky"
+        ) {
+          chrome.tabGroups.update(tabGroupId, {
+            color: _currentTabGroupSpaceColor,
+          });
+        }
+      });
+    }
   }
   document.addEventListener("visibilitychange", async () => {
     if (document.hidden) {

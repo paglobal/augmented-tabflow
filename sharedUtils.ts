@@ -1,5 +1,4 @@
 import {
-  SyncStorageKey,
   SessionStorageKey,
   TabGroupType,
   AreaName,
@@ -11,19 +10,16 @@ import {
   protocolsEligibleForEncoding,
   LocalStorageKey,
   localStorageKeys,
-  syncStorageKeys,
   bookmarkerDetails,
   otherBookmarksBookmarkNodeTitle,
   CurrentlyNavigatedTabId,
   newTabNavigatedTabId,
   navigationBoxPathName,
   AntecedentTabInfo,
-  sessionManagerPathName,
 } from "./constants";
-import { BaseTabGroupObjectArray } from "./src/sessionService";
 
 export async function getStorageData<T = unknown>(
-  key: SyncStorageKey | SessionStorageKey | LocalStorageKey,
+  key: SessionStorageKey | LocalStorageKey,
 ) {
   const areaName = key.split("-")[0] as AreaName;
 
@@ -31,7 +27,7 @@ export async function getStorageData<T = unknown>(
 }
 
 export async function setStorageData<T = unknown>(
-  key: SyncStorageKey | SessionStorageKey | LocalStorageKey,
+  key: SessionStorageKey | LocalStorageKey,
   value: T,
 ) {
   const areaName = key.split("-")[0] as AreaName;
@@ -39,14 +35,14 @@ export async function setStorageData<T = unknown>(
 }
 
 export async function removeStorageData(
-  key: SyncStorageKey | SessionStorageKey | LocalStorageKey,
+  key: SessionStorageKey | LocalStorageKey,
 ) {
   const areaName = key.split("-")[0] as AreaName;
   chrome.storage[areaName].remove(key);
 }
 
 export async function subscribeToStorageData<T = unknown>(
-  key: SyncStorageKey | SessionStorageKey | LocalStorageKey,
+  key: SessionStorageKey | LocalStorageKey,
   fn: (changes: { newValue: T | undefined; oldValue: T | undefined }) => void,
 ) {
   chrome.storage.onChanged.addListener((changes, areaName) => {
@@ -67,36 +63,59 @@ export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
   tabs: chrome.tabs.Tab[];
 })[];
 
+async function reinitializePinnedTabs() {
+  // @maybe
+  await setStorageData(sessionStorageKeys.sessionLoading, true);
+  const oldPinnedTabs = await chrome.tabs.query({ pinned: true });
+  for (const tab of oldPinnedTabs) {
+    try {
+      await setStorageData(sessionStorageKeys.currentlyRemovedTabId, tab.id);
+      await chrome.tabs.remove(tab.id!);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  const pinnedTabGroupBookmarkNodeId = await getStorageData<
+    chrome.bookmarks.BookmarkTreeNode["id"]
+  >(localStorageKeys.pinnedTabGroupBookmarkNodeId);
+  if (pinnedTabGroupBookmarkNodeId) {
+    const pinnedTabGroupBookmarkNodeChildren =
+      await chrome.bookmarks.getChildren(pinnedTabGroupBookmarkNodeId);
+    for (const tabData of pinnedTabGroupBookmarkNodeChildren) {
+      if (
+        tabData.title === bookmarkerDetails.title &&
+        tabData.url === bookmarkerDetails.url
+      ) {
+        continue;
+      }
+      const url = encodeTabDataAsUrl({
+        title: tabData.title,
+        url: tabData.url || "",
+      });
+      await chrome.tabs.create({
+        url,
+        pinned: true,
+        active: false,
+      });
+    }
+  } else {
+    // @error
+  }
+  await setStorageData(sessionStorageKeys.sessionLoading, false);
+}
+
 export async function createBookmarkNodeAndStoreId(
   localStorageKey: LocalStorageKey,
   bookmarkNodeTitle: string,
 ) {
   await navigator.locks.request(lockNames.createBookmarkNode, async () => {
     try {
+      // get `Other Bookmarks` folder id
       const bookmarkTree = await chrome.bookmarks.getTree();
       const otherBookmarksBookmarkNodeId = bookmarkTree[0].children?.find(
         (bookmark) => bookmark.title === otherBookmarksBookmarkNodeTitle,
       )?.id;
-      const syncRootBookmarkNodeId = await getStorageData<
-        chrome.bookmarks.BookmarkTreeNode["id"]
-      >(syncStorageKeys.rootBookmarkNodeId);
-      const syncPinnedTabGroupBookmarkNodeId = await getStorageData<
-        chrome.bookmarks.BookmarkTreeNode["id"]
-      >(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
-      if (syncRootBookmarkNodeId) {
-        await setStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
-          localStorageKeys.rootBookmarkNodeId,
-          syncRootBookmarkNodeId,
-        );
-        await removeStorageData(syncStorageKeys.rootBookmarkNodeId);
-      }
-      if (syncPinnedTabGroupBookmarkNodeId) {
-        await setStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
-          localStorageKeys.pinnedTabGroupBookmarkNodeId,
-          syncPinnedTabGroupBookmarkNodeId,
-        );
-        await removeStorageData(syncStorageKeys.pinnedTabGroupBookmarkNodeId);
-      }
+      // get stored id of bookmark node and it's parent id if it's the pinned bookmarks folder
       const bookmarkNodeId =
         await getStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
           localStorageKey,
@@ -109,6 +128,7 @@ export async function createBookmarkNodeAndStoreId(
       } else {
         parentId = otherBookmarksBookmarkNodeId;
       }
+      // try to get bookmark node by id
       try {
         const bookmarkNode = (await chrome.bookmarks.get(bookmarkNodeId!))[0];
         // this isn't even necessary because `chrome.bookmarks.get` will error if our bookmark id is invalid...but just in case
@@ -116,17 +136,19 @@ export async function createBookmarkNodeAndStoreId(
           const bookmarkNodeId = (
             await chrome.bookmarks.create({
               title: bookmarkNodeTitle,
-              parentId: parentId,
+              parentId,
             })
           ).id;
           await setStorageData(localStorageKey, bookmarkNodeId);
         }
+        // if unsuccessful, create new bookmark node and store id
       } catch (error) {
         const bookmarkNodeId = (
           await chrome.bookmarks.create({ title: bookmarkNodeTitle, parentId })
         ).id;
         await setStorageData(localStorageKey, bookmarkNodeId);
       }
+      // insert bookmarker in bookmark node and dedupe bookmark node contents
       const _bookmarkNodeId =
         await getStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
           localStorageKey,
@@ -156,6 +178,13 @@ export async function createBookmarkNodeAndStoreId(
           eligibleBookmarkNodes as Array<chrome.bookmarks.BookmarkTreeNode>,
           _bookmarkNodeId,
         );
+        // reinitialize pinned tabs if the pinned bookmark node contents have changed
+        if (
+          eligibleBookmarkNodes[1] &&
+          localStorageKey === localStorageKeys.pinnedTabGroupBookmarkNodeId
+        ) {
+          await reinitializePinnedTabs();
+        }
         const bookmarkers: Array<chrome.bookmarks.BookmarkTreeNode> = (
           await chrome.bookmarks.getChildren(_bookmarkNodeId)
         ).filter(
@@ -356,6 +385,7 @@ export async function openNavigationBox<
     newWindow?: boolean;
     navigatedTabId?: chrome.tabs.Tab["id"];
     precedentTabId: chrome.tabs.Tab["id"];
+    group?: boolean;
   },
 >(
   options: T,
@@ -386,11 +416,29 @@ export async function openNavigationBox<
       : chrome.tabs.Tab | undefined;
   } else {
     return (await chrome.tabs.create({
-      url: navigationBoxPathName,
+      url: `${navigationBoxPathName}${options?.group ? "?group=true" : ""}`,
       active: options?.active,
       pinned: options?.pinned,
     })) as T["newWindow"] extends true
       ? chrome.windows.Window | undefined
       : chrome.tabs.Tab | undefined;
+  }
+}
+
+export async function createTabGroup(tab?: chrome.tabs.Tab) {
+  // @maybe
+  if (!tab) {
+    const [error, currentTab] = await withError(chrome.tabs.getCurrent());
+    if (error) {
+      //@handle
+    }
+    tab = await openNavigationBox({
+      active: false,
+      precedentTabId: currentTab?.id,
+      group: true,
+    });
+  }
+  if (tab?.id) {
+    await chrome.tabs.update(tab.id, { active: true });
   }
 }

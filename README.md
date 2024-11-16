@@ -11,10 +11,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
-- stop reinitting of pinned tabs and remove pinned tab group bookmark node
-- add shortcut for new tab group
-- create `updateAvailable` page, open it when update is available, and prevent escape from closing
-- check if newtaburls is necessary or detrimental
 - delete all `navigationBox` and `sessionManager` urls from history
 - add `Grouping Options` for tabs and tab groups to reduce clutter
 
@@ -55,6 +51,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - collapse tree items in export dialog when done with exporting tab or tab group
 - make session trees and other dialog trees react to the necessary app state changes
 -
+- litter the code with comments and ui alerts
+- check if newtaburls is necessary or detrimental
 - implement `pathNameToUrl` utility
 - check `migrateAndDedupe` function
 - use `updateComplete` instead of `setTimeout` for waiting for components to change their state
@@ -71,6 +69,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - look out for uses of typescript `as`'s in the codebase
 - add `| Undefined` to all `Array` types
 -
+- (maybe) add message for creating bookmark nodes
 - (maybe) create ui for editing commands
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - (maybe) reconcile newly opened session with last recorded session
@@ -97,7 +96,3 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - keyboard shortcuts
 - tab group spaces
 - use action popup or sidebar
-
-### Help Page
-
-- attribute projects that inspired this and ones that made this possible

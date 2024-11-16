@@ -23,9 +23,6 @@ import {
 function Help() {
   return () => html`
     ${infoListStyles()} ${infoHeader("Help", true)}
-    ${infoButton("Keyboard Shortcuts", async () => {
-      await chrome.tabs.create({ url: keyboardShortcutsPage });
-    })}
     ${infoButton("Change Side Panel Position", async () => {
       await chrome.tabs.create({ url: changeSidePanelPositionPage });
     })}
@@ -47,7 +44,10 @@ function Help() {
 - Open new window - Ctrl+N
 - Edit current tab URL - Ctrl+L
 - Open new tab group - Ctrl+G
-`)} ${infoHeader("General information and tips")} ${infoList(`
+`)} ${infoButton("Edit Keyboard Shortcuts", async () => {
+      await chrome.tabs.create({ url: keyboardShortcutsPage });
+    })}
+    ${infoHeader("General information and tips")} ${infoList(`
 - This extension allows you to save your sessions as bookmarks that are automatically
   updated anytime you make a change to your current active saved session.
 - You can use the side panel or the action popup for interacting with tabs, tab groups and sessions.
@@ -69,6 +69,9 @@ function Help() {
   contents.
 - Please don't modify any session's bookmark folder while that session is
   active.
+- Please make sure to use other bookmark folders or your reading list to share pages with your
+  mobile phone browser in order to avoid modifying the contents of the "${titles.rootBookmarkNode}"
+  folder.
 - There are many buttons in the UI that allow you to perform many
   functions. Hover over any of them to find out what they do.
 - Please don't close the side panel or session manager page while an action you initiated is in
@@ -78,23 +81,42 @@ function Help() {
   All Session Windows" button when you're done with a session to ensure
   that you don't mistakenly remove any tabs or windows from your current
   session.
-- Pinned tabs are not specific to any session as so stay open throughout
-  all sessions, even unsaved ones.
-- Please make sure to use other bookmark folders or your reading list to share pages with your
-  mobile phone browser in order to avoid modifying the contents of the "${titles.rootBookmarkNode}"
-  folder.
 - Tab group spaces are used to aggregate tab groups of similar colors.
 - Switch between them with the tab group space buttons below or by swiping left and right with two fingers.
 - Ungrouped tabs persist between tab group spaces but pinned tabs persist between both tab group spaces and sessions.
 - Double-click on any tab to activate the tab and close the side panel in the process.
+- If you switch to a new device, you might want to wait a bit for your bookmarks to sync up and restart your browser.
 - The rest is pretty intuitive. You'll figure it out.
 - I hope you enjoy this extension. Go forth and be productive!
-`)}
+`)} ${infoHeader(
+      "Projects that either inspired this extension or tremendously helped in its development",
+      true,
+    )}
+    ${infoButton("Lit", async () => {
+      await chrome.tabs.create({ url: "https://lit.dev/" });
+    })}
+    ${infoButton("Shoelace", async () => {
+      await chrome.tabs.create({ url: "https://shoelace.style/" });
+    })}
+    ${infoButton("Pragmatic drag and drop", async () => {
+      await chrome.tabs.create({
+        url: "https://atlassian.design/components/pragmatic-drag-and-drop/about",
+      });
+    })}
+    ${infoButton("Fuzzysort", async () => {
+      await chrome.tabs.create({ url: "https://github.com/farzher/fuzzysort" });
+    })}
+    ${infoButton("PromethiumJS", async () => {
+      await chrome.tabs.create({ url: "https://promethium.js.org/" });
+    })}
+    ${infoButton("Arc Browser", async () => {
+      await chrome.tabs.create({ url: "https://arc.net/" });
+    })}
   `;
 }
 
 function App() {
-  const recentUpdatesDialogRef = createRef<SlDialog>();
+  const helpDialogRef = createRef<SlDialog>();
 
   return () =>
     html`<div
@@ -126,7 +148,7 @@ function App() {
             ${(
               <Dialog
                 label="Recent Updates"
-                ref={recentUpdatesDialogRef}
+                ref={helpDialogRef}
                 noTopBodyMargin
                 open
                 preventClosing
