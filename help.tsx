@@ -35,7 +35,7 @@ function Help() {
     ${infoButton("Homepage", async () => {
       await chrome.tabs.create({ url: homePage });
     })}
-    ${infoHeader("Recommended shortcuts")} ${infoList(`
+    ${infoHeader("Recommended keyboard shortcuts")} ${infoList(`
 - Open sesssion manager - Alt+A
 - Toggle between side panel and popup as default extension action - Alt+T
 - Close all session windows - Ctrl+Shift+W
@@ -51,6 +51,7 @@ function Help() {
 - This extension allows you to save your sessions as bookmarks that are automatically
   updated anytime you make a change to your current active saved session.
 - You can use the side panel or the action popup for interacting with tabs, tab groups and sessions.
+- Go full screen at any point in time to hide horizontal tabs. Full screen state is preserved for restoration and subsequent application to new windows.
 - If you're experiencing problems editing tab groups, you might want to update
   to the latest version of Chrome.
 - Sessions normally consist of all tabs from all "normal" windows (no
@@ -81,8 +82,7 @@ function Help() {
   All Session Windows" button when you're done with a session to ensure
   that you don't mistakenly remove any tabs or windows from your current
   session.
-- Tab group spaces are used to aggregate tab groups of similar colors.
-- Switch between them with the tab group space buttons below or by swiping left and right with two fingers.
+- Tab group spaces are used to aggregate tab groups of similar colors. Switch between them with the tab group space buttons below or by swiping left and right with two fingers.
 - Ungrouped tabs persist between tab group spaces but pinned tabs persist between both tab group spaces and sessions.
 - Double-click on any tab to activate the tab and close the side panel in the process.
 - If you switch to a new device, you might want to wait a bit for your bookmarks to sync up and restart your browser.

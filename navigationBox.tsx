@@ -14,10 +14,7 @@ import {
 } from "./constants";
 import { getStorageData, setStorageData, wait, withError } from "./sharedUtils";
 import { initApp } from "./src/utils";
-import {
-  BaseTabGroupObjectColor,
-  currentTabGroupSpaceColor,
-} from "./src/sessionService";
+import { currentTabGroupSpaceColor } from "./src/sessionService";
 import { adaptSyncEffect } from "promethium-js";
 
 function App() {

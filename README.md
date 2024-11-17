@@ -11,6 +11,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
+- reduce flashes when closing session windows
+- add shortcut for open new tab in current tab group
 - delete all `navigationBox` and `sessionManager` urls from history
 - add `Grouping Options` for tabs and tab groups to reduce clutter
 
@@ -85,14 +87,3 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) implement internationalization
 -
 - try updating the tld list from time to time
-
-### Store Listing
-
-- (maybe) upload promo video
-- update screenshots. show some fullscreen, some with sessions, show some with split screen, some with tabs, etc
-- acknowledge that certain features are only supported and directly enabled by the extension (eg. fullscreen and splitscreen)
-- blends with your browser (light and dark modes)
-- document use with your favourite window manager
-- keyboard shortcuts
-- tab group spaces
-- use action popup or sidebar
