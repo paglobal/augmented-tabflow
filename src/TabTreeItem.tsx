@@ -2,8 +2,8 @@ import { html } from "lit";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { TreeItemColorPatchOrIcon } from "./TreeItemColorPatchOrIcon";
 import { TreeItem } from "./TreeItem";
-import { TabGroupTreeData, createTabGroup } from "../sharedUtils";
-import { activateTab } from "./sessionService";
+import { TabGroupTreeData } from "../sharedUtils";
+import { activateTab, createTabGroup } from "./sessionService";
 import {
   moveOrCopyTabToSessionTreeDialogRef,
   sessionWindowsTreeDialogRef,

@@ -29,7 +29,6 @@ import {
   openNavigationBox,
   withError,
   subscribeToStorageData,
-  createTabGroup,
 } from "./sharedUtils";
 
 function backupSessionStorageDataToLocalStorage() {
@@ -889,6 +888,22 @@ subscribeToMessage(
     await updateTabGroupTreeDataAndCurrentSessionData();
   },
 );
+
+async function createTabGroup() {
+  // @maybe
+  const [error, currentTab] = await withError(chrome.tabs.getCurrent());
+  if (error) {
+    //@handle
+  }
+  const tab = await openNavigationBox({
+    active: false,
+    precedentTabId: currentTab?.id,
+    group: true,
+  });
+  if (tab?.id) {
+    await chrome.tabs.update(tab.id, { active: true });
+  }
+}
 
 chrome.commands.onCommand.addListener(async (command, tab) => {
   // @maybe

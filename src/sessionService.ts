@@ -163,6 +163,40 @@ subscribeToStorageData(
   },
 );
 
+export async function createTabGroup(tab?: chrome.tabs.Tab) {
+  // @maybe
+  if (!tab) {
+    const [error, currentTab] = await withError(chrome.tabs.getCurrent());
+    if (error) {
+      //@handle
+    }
+    tab = await openNavigationBox({
+      active: false,
+      precedentTabId: currentTab?.id,
+      group: true,
+    });
+  } else {
+    if (tab.id) {
+      const tabGroupId = await chrome.tabs.group({
+        tabIds: tab.id,
+        createProperties: {
+          windowId: tab.windowId,
+        },
+      });
+      await chrome.tabGroups.move(tabGroupId, { index: -1 });
+      const _currentTabGroupSpaceColor = currentTabGroupSpaceColor();
+      if (_currentTabGroupSpaceColor && _currentTabGroupSpaceColor !== "sky") {
+        chrome.tabGroups.update(tabGroupId, {
+          color: _currentTabGroupSpaceColor,
+        });
+      }
+    }
+  }
+  if (tab?.id) {
+    await chrome.tabs.update(tab.id, { active: true });
+  }
+}
+
 export async function expandTabGroup(tabGroup: TabGroupTreeData[number]) {
   // @maybe
   if (tabGroup.type === tabGroupTypes.ungrouped) {

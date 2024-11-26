@@ -17,7 +17,6 @@ import {
   navigationBoxPathName,
   AntecedentTabInfo,
 } from "./constants";
-import { currentTabGroupSpaceColor } from "./src/sessionService";
 
 export async function getStorageData<T = unknown>(
   key: SessionStorageKey | LocalStorageKey,
@@ -423,39 +422,5 @@ export async function openNavigationBox<
     })) as T["newWindow"] extends true
       ? chrome.windows.Window | undefined
       : chrome.tabs.Tab | undefined;
-  }
-}
-
-export async function createTabGroup(tab?: chrome.tabs.Tab) {
-  // @maybe
-  if (!tab) {
-    const [error, currentTab] = await withError(chrome.tabs.getCurrent());
-    if (error) {
-      //@handle
-    }
-    tab = await openNavigationBox({
-      active: false,
-      precedentTabId: currentTab?.id,
-      group: true,
-    });
-  } else {
-    if (tab.id) {
-      const tabGroupId = await chrome.tabs.group({
-        tabIds: tab.id,
-        createProperties: {
-          windowId: tab.windowId,
-        },
-      });
-      await chrome.tabGroups.move(tabGroupId, { index: -1 });
-      const _currentTabGroupSpaceColor = currentTabGroupSpaceColor();
-      if (_currentTabGroupSpaceColor && _currentTabGroupSpaceColor !== "sky") {
-        chrome.tabGroups.update(tabGroupId, {
-          color: _currentTabGroupSpaceColor,
-        });
-      }
-    }
-  }
-  if (tab?.id) {
-    await chrome.tabs.update(tab.id, { active: true });
   }
 }

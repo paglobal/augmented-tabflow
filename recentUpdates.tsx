@@ -20,7 +20,10 @@ import {
 function RecentUpdates() {
   return () => html`
     ${infoListStyles()} ${infoHeader("Recent Updates", true)}
-    ${infoHeader("0.9.0 to 0.13.0")} ${infoList(`
+    ${infoHeader("0.13.1")} ${infoList(`
+- Fixed issue with extension service worker.`)} ${infoHeader("0.9.0 to 0.13.0")}
+    ${infoList(`
+- Added updates available page.
 - Added a new recent updates page.
 - Changed help dialog to help page.
 - Sessions now persist on extension updates.

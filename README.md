@@ -11,10 +11,26 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
+- navigation box opens new tab when form is submitted empty
+- check if newtaburls is necessary or detrimental
+- fix wheel event volatility
+- fix wheel event overfiring
+- switch to session on save for current session
+- reconcile newly opened session with last recorded session
+- look into passive mode for wheel event
+- focus `sky` tab group space when active tab is not in current tab group space
+- try scrolling active tab into view on first render
+- do initting in `onStartup` instead of raw in background script
+- don't unpin tabs after changing url
+- implement "check for updates" feature
+- check issue with not restoring session state on update
+- don't track fullscreen state
+- add shortcut for full screen mode
 - reduce flashes when closing session windows
 - add shortcut for open new tab in current tab group
 - delete all `navigationBox` and `sessionManager` urls from history
 - add `Grouping Options` for tabs and tab groups to reduce clutter
+- implement shortcut for moving to previous tab
 
 ### Later
 
@@ -30,8 +46,9 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - support moving pinned and ungrouped tab groups to new windows
 -
 - implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks` and/or `Reading List`
-- Use the `Move Or Copy Tab To Session` dialog
+- implement a feature to view reading list
 - Show whether or not the tab was successfully added to or is already on `Reading List`
+- Use the `Move Or Copy Tab To Session` dialog
 - consider adding button to "look inside" tab groups and import individual tabs
 -
 - break large files into smaller files (look at `NavigateDialog.tsx` and `tabGroupTreeContent.tsx`)
@@ -54,7 +71,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - make session trees and other dialog trees react to the necessary app state changes
 -
 - litter the code with comments and ui alerts
-- check if newtaburls is necessary or detrimental
 - implement `pathNameToUrl` utility
 - check `migrateAndDedupe` function
 - use `updateComplete` instead of `setTimeout` for waiting for components to change their state
@@ -71,10 +87,10 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - look out for uses of typescript `as`'s in the codebase
 - add `| Undefined` to all `Array` types
 -
+- (maybe) move all ungrouped tabs to the end always
 - (maybe) add message for creating bookmark nodes
 - (maybe) create ui for editing commands
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
-- (maybe) reconcile newly opened session with last recorded session
 - (maybe) add splitscreen button for windows
 - (maybe) limit number of toasts to be show at a time
 - (maybe) add option for showing more options for tabs and tab groups
