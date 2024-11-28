@@ -10,7 +10,7 @@ import {
   setCurrentMovedOrCopiedTabOrTabGroup,
   setCurrentlyEjectedTabOrTabGroup,
 } from "./App";
-import { lockNames, newTabUrls, tabGroupTypes } from "../constants";
+import { lockNames, tabGroupTypes } from "../constants";
 import { notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
   navigateDialogRef,
@@ -100,22 +100,22 @@ export function TabTreeItem(props: {
               } else if (tabGroup.type === tabGroupTypes.pinned) {
                 await chrome.tabs.update(
                   source.data.id as NonNullable<chrome.tabs.Tab["id"]>,
-                  { pinned: true },
+                  { pinned: true }
                 );
               } else {
                 await chrome.tabs.ungroup(
-                  source.data.id as NonNullable<chrome.tabs.Tab["id"]>,
+                  source.data.id as NonNullable<chrome.tabs.Tab["id"]>
                 );
                 await chrome.tabs.update(
                   source.data.id as NonNullable<chrome.tabs.Tab["id"]>,
-                  { pinned: false },
+                  { pinned: false }
                 );
               }
               await chrome.tabs.move(
                 source.data.id as NonNullable<chrome.tabs.Tab["id"]>,
                 {
                   index,
-                },
+                }
               );
             });
           },
@@ -271,11 +271,7 @@ export function TabTreeItem(props: {
                 <TreeItemColorPatchOrIcon
                   pageUrl={tab.url}
                   showSpinner={
-                    (tab.status === "loading" &&
-                      !newTabUrls.includes(tab.url ?? "")) ||
-                    tab.pendingUrl
-                      ? true
-                      : false
+                    tab.status === "loading" || tab.pendingUrl ? true : false
                   }
                 />
               }

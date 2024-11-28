@@ -1,6 +1,6 @@
 import { App } from "./src/App";
 import { initApp } from "./src/utils";
-import { createBookmarkNodeAndStoreId, sendMessage } from "./sharedUtils";
+import { sendMessage } from "./sharedUtils";
 import { titles, messageTypes, localStorageKeys } from "./constants";
 import "./customElements";
 import { cycleTabGroupSpaces } from "./src/TabGroupSpaceSwitcher";
@@ -24,20 +24,15 @@ initApp(App, async () => {
         if (e.deltaX > 0) {
           cycleTabGroupSpaces("next");
         } else if (e.deltaX < 0) {
-          cycleTabGroupSpaces("prev");
+          cycleTabGroupSpaces("previous");
         }
       }
     },
-    { passive: false },
+    { passive: false }
   );
-  await createBookmarkNodeAndStoreId(
-    localStorageKeys.rootBookmarkNodeId,
-    titles.rootBookmarkNode,
-  );
-  await createBookmarkNodeAndStoreId(
-    localStorageKeys.pinnedTabGroupBookmarkNodeId,
-    titles.pinnedTabGroup,
-  );
+  await sendMessage({
+    type: messageTypes.initializeBookmarkNodes,
+  });
   await sendMessage({
     type: messageTypes.updateTabGroupTreeDataAndCurrentSessionData,
   });

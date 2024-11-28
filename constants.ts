@@ -24,6 +24,7 @@ export const sessionStorageKeys = {
   currentlyNavigatedTabId: "session-12",
   antecedentTabInfo: "session-13",
   currentTabGroupSpaceIndex: "session-14",
+  fullscreen: "session-15",
 } as const satisfies Record<string, SessionStorageKey>;
 
 export const sessionStorageBackupInfoArray: Array<{
@@ -59,10 +60,9 @@ export type LocalStorageKey = `local-${number}` | `local-${SessionStorageKey}`;
 export const localStorageKeys = {
   rootBookmarkNodeId: "local-1",
   pinnedTabGroupBookmarkNodeId: "local-2",
-  fullscreen: "local-3",
-  ungroupedTabGroupCollapsed: "local-4",
-  pinnedTabGroupCollapsed: "local-5",
-  openPanelOnActionClick: "local-6",
+  ungroupedTabGroupCollapsed: "local-3",
+  pinnedTabGroupCollapsed: "local-4",
+  openPanelOnActionClick: "local-5",
 } as const satisfies Record<string, LocalStorageKey>;
 
 export type TabGroupType = `tabGroup-${number}`;
@@ -77,7 +77,7 @@ type LockName = `lock-${number}`;
 
 export const lockNames = {
   applyUpdates: "lock-1",
-  createBookmarkNode: "lock-2",
+  initializeBookmarkNodes: "lock-2",
   removingOldSessionTabs: "lock-3",
 } as const satisfies Record<string, LockName>;
 
@@ -87,8 +87,6 @@ export const titles = {
   ungroupedTabGroup: "Ungrouped",
   unsavedSession: "Unsaved Session",
 };
-
-export const newTabUrls = ["chrome://newtab/", "chrome://new-tab-page/"];
 
 export const tabGroupColorList = [
   "grey",
@@ -110,6 +108,7 @@ export const messageTypes = {
   moveTabOrTabGroupToWindow: "message-3",
   closeAllSessionWindows: "message-4",
   updateTabGroupTreeDataAndCurrentSessionData: "message-5",
+  initializeBookmarkNodes: "message-6",
 } as const satisfies Record<string, MessageType>;
 
 export const tabGroupTreeDataUpdateDebounceTimeout = 100;

@@ -6,21 +6,21 @@ import { executeAndBounceOff, setStorageData } from "../sharedUtils";
 import { sessionStorageKeys } from "../constants";
 
 export const cycleTabGroupSpaces = executeAndBounceOff(
-  async (cycleTo?: "prev" | "next") => {
+  async (cycleTo?: "previous" | "next") => {
     const _currentTabGroupSpaceIndex = currentTabGroupSpaceIndex();
-    if (cycleTo === "prev") {
+    if (cycleTo === "previous") {
       await setStorageData<number>(
         sessionStorageKeys.currentTabGroupSpaceIndex,
-        _currentTabGroupSpaceIndex - 1,
+        _currentTabGroupSpaceIndex - 1
       );
     } else {
       await setStorageData<number>(
         sessionStorageKeys.currentTabGroupSpaceIndex,
-        _currentTabGroupSpaceIndex + 1,
+        _currentTabGroupSpaceIndex + 1
       );
     }
   },
-  200,
+  200
 );
 
 export function TabGroupSpaceSwitcher() {
@@ -46,7 +46,7 @@ export function TabGroupSpaceSwitcher() {
     `;
   };
 
-  const switcherButton = (cycleTo: "next" | "prev", title: string) => {
+  const switcherButton = (cycleTo: "next" | "previous", title: string) => {
     return html`
       <sl-button
         title=${title}
@@ -101,7 +101,7 @@ export function TabGroupSpaceSwitcher() {
           background-color: ${nextTabGroupSpaceColor};
         }
 
-        sl-button.switcher-button.prev::part(base) {
+        sl-button.switcher-button.previous::part(base) {
           background-color: ${previousTabGroupSpaceColor};
         }
 
@@ -114,7 +114,7 @@ export function TabGroupSpaceSwitcher() {
           filter: brightness(1);
         }
       </style>
-      ${switcherButton("prev", "Previous Tab Group Space")}
+      ${switcherButton("previous", "Previous Tab Group Space")}
       ${centerDiv(currentTabGroupSpaceColor)}
       ${switcherButton("next", "Next Tab Group Space")}
     </div>`;

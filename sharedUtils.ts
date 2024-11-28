@@ -5,13 +5,11 @@ import {
   tabGroupTypes,
   sessionStorageKeys,
   MessageType,
-  lockNames,
   stubPagePathName,
   protocolsEligibleForEncoding,
   LocalStorageKey,
   localStorageKeys,
   bookmarkerDetails,
-  otherBookmarksBookmarkNodeTitle,
   CurrentlyNavigatedTabId,
   newTabNavigatedTabId,
   navigationBoxPathName,
@@ -19,7 +17,7 @@ import {
 } from "./constants";
 
 export async function getStorageData<T = unknown>(
-  key: SessionStorageKey | LocalStorageKey,
+  key: SessionStorageKey | LocalStorageKey
 ) {
   const areaName = key.split("-")[0] as AreaName;
 
@@ -28,14 +26,14 @@ export async function getStorageData<T = unknown>(
 
 export async function setStorageData<T = unknown>(
   key: SessionStorageKey | LocalStorageKey,
-  value: T,
+  value: T
 ) {
   const areaName = key.split("-")[0] as AreaName;
   chrome.storage[areaName].set({ [key]: value });
 }
 
 export async function removeStorageData(
-  key: SessionStorageKey | LocalStorageKey,
+  key: SessionStorageKey | LocalStorageKey
 ) {
   const areaName = key.split("-")[0] as AreaName;
   chrome.storage[areaName].remove(key);
@@ -43,7 +41,7 @@ export async function removeStorageData(
 
 export async function subscribeToStorageData<T = unknown>(
   key: SessionStorageKey | LocalStorageKey,
-  fn: (changes: { newValue: T | undefined; oldValue: T | undefined }) => void,
+  fn: (changes: { newValue: T | undefined; oldValue: T | undefined }) => void
 ) {
   chrome.storage.onChanged.addListener((changes, areaName) => {
     const keyAreaName = key.split("-")[0] as AreaName;
@@ -104,107 +102,9 @@ async function reinitializePinnedTabs() {
   await setStorageData(sessionStorageKeys.sessionLoading, false);
 }
 
-export async function createBookmarkNodeAndStoreId(
-  localStorageKey: LocalStorageKey,
-  bookmarkNodeTitle: string,
-) {
-  await navigator.locks.request(lockNames.createBookmarkNode, async () => {
-    try {
-      // get `Other Bookmarks` folder id
-      const bookmarkTree = await chrome.bookmarks.getTree();
-      const otherBookmarksBookmarkNodeId = bookmarkTree[0].children?.find(
-        (bookmark) => bookmark.title === otherBookmarksBookmarkNodeTitle,
-      )?.id;
-      // get stored id of bookmark node and it's parent id if it's the pinned bookmarks folder
-      const bookmarkNodeId =
-        await getStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
-          localStorageKey,
-        );
-      let parentId: chrome.bookmarks.BookmarkTreeNode["id"] | undefined;
-      if (localStorageKey === localStorageKeys.pinnedTabGroupBookmarkNodeId) {
-        parentId = await getStorageData<
-          chrome.bookmarks.BookmarkTreeNode["id"]
-        >(localStorageKeys.rootBookmarkNodeId);
-      } else {
-        parentId = otherBookmarksBookmarkNodeId;
-      }
-      // try to get bookmark node by id
-      try {
-        const bookmarkNode = (await chrome.bookmarks.get(bookmarkNodeId!))[0];
-        // this isn't even necessary because `chrome.bookmarks.get` will error if our bookmark id is invalid...but just in case
-        if (!bookmarkNode && parentId) {
-          const bookmarkNodeId = (
-            await chrome.bookmarks.create({
-              title: bookmarkNodeTitle,
-              parentId,
-            })
-          ).id;
-          await setStorageData(localStorageKey, bookmarkNodeId);
-        }
-        // if unsuccessful, create new bookmark node and store id
-      } catch (error) {
-        const bookmarkNodeId = (
-          await chrome.bookmarks.create({ title: bookmarkNodeTitle, parentId })
-        ).id;
-        await setStorageData(localStorageKey, bookmarkNodeId);
-      }
-      // insert bookmarker in bookmark node and dedupe bookmark node contents
-      const _bookmarkNodeId =
-        await getStorageData<chrome.bookmarks.BookmarkTreeNode["id"]>(
-          localStorageKey,
-        );
-      if (_bookmarkNodeId && parentId) {
-        await insertBookmarker(_bookmarkNodeId);
-        const eligibleBookmarkNodes = (
-          await Promise.all(
-            (await chrome.bookmarks.getChildren(parentId)).map(
-              async (bookmarkNode) => {
-                const bookmarkNodeChildren = await chrome.bookmarks.getChildren(
-                  bookmarkNode.id,
-                );
-
-                return bookmarkNodeChildren.some(
-                  (bookmarkNode) =>
-                    bookmarkNode.title === bookmarkerDetails.title &&
-                    bookmarkNode.url === bookmarkerDetails.url,
-                )
-                  ? bookmarkNode
-                  : false;
-              },
-            ),
-          )
-        ).filter(Boolean);
-        await migrateAndDedupe(
-          eligibleBookmarkNodes as Array<chrome.bookmarks.BookmarkTreeNode>,
-          _bookmarkNodeId,
-        );
-        // reinitialize pinned tabs if the pinned bookmark node contents have changed
-        if (
-          eligibleBookmarkNodes[1] &&
-          localStorageKey === localStorageKeys.pinnedTabGroupBookmarkNodeId
-        ) {
-          await reinitializePinnedTabs();
-        }
-        const bookmarkers: Array<chrome.bookmarks.BookmarkTreeNode> = (
-          await chrome.bookmarks.getChildren(_bookmarkNodeId)
-        ).filter(
-          (bookmarkNode) =>
-            bookmarkNode.title === bookmarkerDetails.title &&
-            bookmarkNode.url === bookmarkerDetails.url,
-        );
-        if (bookmarkers[0].id) {
-          await migrateAndDedupe(bookmarkers, bookmarkers[0].id);
-        }
-      }
-    } catch (error) {
-      // no error handling here. we'll do that in the sidepanel ui
-    }
-  });
-}
-
 export async function sendMessage(
   message: { type: MessageType; data?: any },
-  fn?: (response: any) => void,
+  fn?: (response: any) => void
 ) {
   chrome.runtime.sendMessage(
     {
@@ -212,7 +112,7 @@ export async function sendMessage(
       data: message.data,
     },
     // @ts-ignore. looks like `chrome.runtime.sendMessage` was typed incorrectly
-    fn,
+    fn
   );
 }
 
@@ -221,8 +121,8 @@ export function subscribeToMessage(
   fn: (
     data: any,
     sender: chrome.runtime.MessageSender,
-    sendResponse: (response: any) => void,
-  ) => void,
+    sendResponse: (response: any) => void
+  ) => void
 ) {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message?.type && message.type === messageType) {
@@ -237,11 +137,11 @@ export function subscribeToMessage(
 }
 
 export async function saveCurrentSessionDataIntoBookmarkNode(
-  bookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"],
+  bookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"]
 ) {
   const tabGroupTreeData =
     (await getStorageData<TabGroupTreeData>(
-      sessionStorageKeys.tabGroupTreeData,
+      sessionStorageKeys.tabGroupTreeData
     )) ?? [];
   for (const tabGroup of tabGroupTreeData) {
     if (tabGroup.type === tabGroupTypes.pinned) {
@@ -281,7 +181,7 @@ export function encodeTabDataAsUrl(options: {
   const urlFromUrl = new URL(options.url);
   if (protocolsEligibleForEncoding.includes(urlFromUrl.protocol)) {
     return `${stubPagePathName}?title=${encodeURIComponent(
-      options.title ?? "",
+      options.title ?? ""
     )}&url=${encodeURIComponent(options.url ?? "")}${
       options.active ? "&active=true" : ""
     }`;
@@ -303,7 +203,7 @@ export function debounce<T>(callback: (args?: T) => void, timeout: number) {
 
 export function executeAndBounceOff<T>(
   callback: (args?: T) => void,
-  timeout: number,
+  timeout: number
 ) {
   let timeoutId: number | undefined | NodeJS.Timeout;
   let bounceOff: boolean = false;
@@ -321,7 +221,7 @@ export function executeAndBounceOff<T>(
 }
 
 export async function insertBookmarker(
-  bookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"],
+  bookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"]
 ) {
   // @maybe the error shouldn't be handled here
   try {
@@ -338,14 +238,14 @@ export async function insertBookmarker(
 
 export async function migrateAndDedupe(
   bookmarkNodes: Array<chrome.bookmarks.BookmarkTreeNode>,
-  masterBookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"],
+  masterBookmarkNodeId: chrome.bookmarks.BookmarkTreeNode["id"]
 ) {
   // @maybe the error shouldn't be handled here
   try {
     for (const bookmarkNode of bookmarkNodes) {
       if (bookmarkNode.id !== masterBookmarkNodeId) {
         const bookmarkNodeChildren = await chrome.bookmarks.getChildren(
-          bookmarkNode.id,
+          bookmarkNode.id
         );
         for (const bookmarkNode of bookmarkNodeChildren) {
           await chrome.bookmarks.move(bookmarkNode.id, {
@@ -367,7 +267,7 @@ export function wait(timeout?: number) {
 }
 
 export async function withError<T>(
-  promise: Promise<T>,
+  promise: Promise<T>
 ): Promise<[undefined, T] | [Error]> {
   return promise
     .then((data) => {
@@ -386,9 +286,9 @@ export async function openNavigationBox<
     navigatedTabId?: chrome.tabs.Tab["id"];
     precedentTabId: chrome.tabs.Tab["id"];
     group?: boolean;
-  },
+  }
 >(
-  options: T,
+  options: T
 ): Promise<
   T["newWindow"] extends true
     ? chrome.windows.Window | undefined
@@ -397,14 +297,14 @@ export async function openNavigationBox<
   const [error] = await withError(
     setStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo, {
       precedentTabId: options.precedentTabId,
-    }),
+    })
   );
   if (error) {
     // @handle
   }
   await setStorageData<CurrentlyNavigatedTabId>(
     sessionStorageKeys.currentlyNavigatedTabId,
-    options?.navigatedTabId ?? newTabNavigatedTabId,
+    options?.navigatedTabId ?? newTabNavigatedTabId
   );
   if (options?.newWindow) {
     return (await chrome.windows.create({

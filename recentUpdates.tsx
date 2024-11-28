@@ -20,7 +20,12 @@ import {
 function RecentUpdates() {
   return () => html`
     ${infoListStyles()} ${infoHeader("Recent Updates", true)}
-    ${infoHeader("0.13.1")} ${infoList(`
+    ${infoHeader("0.13.2")} ${infoList(`
+- Full screen state is no longer persisted between browser restarts.
+- Pinned tabs are no longer automatically re-initialized.`)} ${infoHeader(
+      "0.13.1"
+    )}
+    ${infoList(`
 - Fixed issue with extension service worker.`)} ${infoHeader("0.9.0 to 0.13.0")}
     ${infoList(`
 - Added updates available page.
@@ -42,7 +47,7 @@ function RecentUpdates() {
 `)} ${infoHeader("0.8.1")} ${infoList(`
 - Fixed an issue with restoring pinned tabs.
 - Fixed an issue with the height of dialogs that occurs when the sidepanel is expanded beyond a certain width.`)} ${infoHeader(
-      "0.8.0",
+      "0.8.0"
     )}
     ${infoList(`
 - Added a changelog page.
@@ -50,7 +55,7 @@ function RecentUpdates() {
       "Extensive Update List",
       async () => {
         await chrome.tabs.create({ url: extensiveUpdateListPage });
-      },
+      }
     )}
     ${infoButton("Help", async () => {
       await chrome.tabs.create({ url: helpPathName });

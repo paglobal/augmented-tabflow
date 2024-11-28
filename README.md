@@ -11,35 +11,25 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
-- don't back up pinned tabs
-- vscode: go to diagnostics and open source control shortcuts
-- prev vs previous
-- don't update bookmarks on tab title update
-- use message for creating bookmark nodes in service worker
-- put in measures to not close the entire page when re-initting tabs
 - navigation box opens new tab when form is submitted empty (take advantage of this to allow opening new tab page)
-- check if newtaburls is necessary or detrimental
-- fix wheel event volatility
-- fix wheel event overfiring
-- switch to session on save for current session
-- reconcile newly opened session with last recorded session
-- look into passive mode for wheel event
-- focus `sky` tab group space when active tab is not in current tab group space
 - try scrolling active tab into view on first render
-- do initting in `onStartup` instead of raw in background script (particularly full screen aspect)
 - don't unpin tabs after changing url
-- implement "check for updates" feature
 - check issue with not restoring session state on update
-- don't track fullscreen state
+- implement "check for updates" feature
 - add shortcut for full screen mode
+-
 - reduce flashes when closing session windows
-- add shortcut for open new tab in current tab group
+- focus `sky` tab group space when active tab is not in current tab group space
+- keep track of new pinned tabs and ask user if which pinned tabs they want to open and close instead of just reinitting them
+- switch to session on save
+- reconcile newly opened session with last recorded session
 - delete all `navigationBox` and `sessionManager` urls from history
 - add `Grouping Options` for tabs and tab groups to reduce clutter
 - implement shortcut for moving to previous tab
 
 ### Later
 
+- add shortcut for open new tab in current tab group
 - add window manipulation options through action buttons (eg. support moving whole windows)
 - fix slight color change issue on tree item text hover
 - always aggregate all `Ungrouped` tab group data after importing or exporting
@@ -93,6 +83,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - look out for uses of typescript `as`'s in the codebase
 - add `| Undefined` to all `Array` types
 -
+- (maybe) don't update bookmarks on tab title update
 - (maybe) move all ungrouped tabs to the end always
 - (maybe) create ui for editing commands
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
