@@ -11,7 +11,13 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
-- navigation box opens new tab when form is submitted empty
+- don't back up pinned tabs
+- vscode: go to diagnostics and open source control shortcuts
+- prev vs previous
+- don't update bookmarks on tab title update
+- use message for creating bookmark nodes in service worker
+- put in measures to not close the entire page when re-initting tabs
+- navigation box opens new tab when form is submitted empty (take advantage of this to allow opening new tab page)
 - check if newtaburls is necessary or detrimental
 - fix wheel event volatility
 - fix wheel event overfiring
@@ -20,7 +26,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - look into passive mode for wheel event
 - focus `sky` tab group space when active tab is not in current tab group space
 - try scrolling active tab into view on first render
-- do initting in `onStartup` instead of raw in background script
+- do initting in `onStartup` instead of raw in background script (particularly full screen aspect)
 - don't unpin tabs after changing url
 - implement "check for updates" feature
 - check issue with not restoring session state on update
@@ -88,7 +94,6 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - add `| Undefined` to all `Array` types
 -
 - (maybe) move all ungrouped tabs to the end always
-- (maybe) add message for creating bookmark nodes
 - (maybe) create ui for editing commands
 - (maybe) create utils for try catch notify (separate ones for service worker and async content fns with fallbacks)
 - (maybe) add splitscreen button for windows
