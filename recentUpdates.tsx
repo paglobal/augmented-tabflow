@@ -20,7 +20,9 @@ import {
 function RecentUpdates() {
   return () => html`
     ${infoListStyles()} ${infoHeader("Recent Updates", true)}
-    ${infoHeader("0.13.2")} ${infoList(`
+    ${infoHeader("0.14.0")} ${infoList(`
+- Fixed minor issues with navigating using the extension navigation box.
+- Active tab is always focused when side panel or action popup is opened.
 - Full screen state is no longer persisted between browser restarts.
 - Pinned tabs are no longer automatically re-initialized.`)} ${infoHeader(
       "0.13.1"

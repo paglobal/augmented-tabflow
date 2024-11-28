@@ -67,7 +67,7 @@ initApp(App, async () => {
     // @handle
   }
   const [_error, antecedentTabInfo] = await withError(
-    getStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo),
+    getStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo)
   );
   if (_error) {
     // @handle
@@ -76,7 +76,7 @@ initApp(App, async () => {
     setStorageData<AntecedentTabInfo>(sessionStorageKeys.antecedentTabInfo, {
       id: currentTab?.id,
       precedentTabId: antecedentTabInfo?.precedentTabId,
-    }),
+    })
   );
   if (__error) {
     // @handle
@@ -110,15 +110,12 @@ initApp(App, async () => {
       close();
     }
   });
-  window.addEventListener("blur", async () => {
-    close();
-  });
   const currentlyNavigatedTabId = await getStorageData<CurrentlyNavigatedTabId>(
-    sessionStorageKeys.currentlyNavigatedTabId,
+    sessionStorageKeys.currentlyNavigatedTabId
   );
   if (typeof currentlyNavigatedTabId === "number") {
     const currentlyNavigatedTab = await chrome.tabs.get(
-      currentlyNavigatedTabId,
+      currentlyNavigatedTabId
     );
     setCurrentlyNavigatedTabId(currentlyNavigatedTabId);
     if (navigateInputRef.value) {

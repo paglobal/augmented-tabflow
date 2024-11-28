@@ -11,6 +11,7 @@ import {
   Edge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { SlTreeItem, SlButtonGroup } from "@shoelace-style/shoelace";
+import { focusActiveTab, setFocusActiveTab } from "./sessionService";
 
 type DraggableOptions = Parameters<typeof draggable>[0];
 type DropTargetOptions = Parameters<typeof dropTargetForElements>[0];
@@ -18,6 +19,7 @@ type DropTargetOptions = Parameters<typeof dropTargetForElements>[0];
 export function TreeItem(props: {
   children: PromethiumNode;
   tooltipContent: string;
+  scrollIntoView?: boolean;
   actionButtons?: PromethiumNode;
   expanded?: boolean;
   selected?: boolean;
@@ -32,6 +34,13 @@ export function TreeItem(props: {
   const [dragging, setDragging] = adaptState(false);
   const treeItemRef = createRef<SlTreeItem>();
   const buttonGroupRef = createRef<SlButtonGroup>();
+
+  adaptEffect(() => {
+    if (props.scrollIntoView && focusActiveTab()) {
+      treeItemRef.value?.scrollIntoView();
+      setFocusActiveTab(false);
+    }
+  }, []);
 
   adaptEffect(() => {
     if (
@@ -90,7 +99,7 @@ export function TreeItem(props: {
 
       return combine(
         draggable(props.draggableOptions as DraggableOptions),
-        dropTargetForElements(props.dropTargetOptions as DropTargetOptions),
+        dropTargetForElements(props.dropTargetOptions as DropTargetOptions)
       );
     }
   }, []);

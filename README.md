@@ -11,15 +11,12 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
-- navigation box opens new tab when form is submitted empty (take advantage of this to allow opening new tab page)
-- try scrolling active tab into view on first render
-- don't unpin tabs after changing url
-- check issue with not restoring session state on update
+- press center button to switch to active tab group space
+- implement swiping to change tab group space and document it by adding the ff to help page: `or by swiping left and right with two fingers`
+- implement alert for when bookmark nodes can't be found
 - implement "check for updates" feature
-- add shortcut for full screen mode
--
+- check issue with not restoring session state on update
 - reduce flashes when closing session windows
-- focus `sky` tab group space when active tab is not in current tab group space
 - keep track of new pinned tabs and ask user if which pinned tabs they want to open and close instead of just reinitting them
 - switch to session on save
 - reconcile newly opened session with last recorded session

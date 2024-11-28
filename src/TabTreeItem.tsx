@@ -26,6 +26,7 @@ export function TabTreeItem(props: {
     const { tab, tabGroup } = props;
     return (
       <TreeItem
+        scrollIntoView={tab.active}
         tooltipContent={tab.title as string}
         selected={tab.active}
         onSelect={async (e: MouseEvent) => {

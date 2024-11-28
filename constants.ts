@@ -63,6 +63,7 @@ export const localStorageKeys = {
   ungroupedTabGroupCollapsed: "local-3",
   pinnedTabGroupCollapsed: "local-4",
   openPanelOnActionClick: "local-5",
+  openPanelOnActionClick_1: "local-6",
 } as const satisfies Record<string, LocalStorageKey>;
 
 export type TabGroupType = `tabGroup-${number}`;
@@ -147,6 +148,7 @@ export const commands = {
   openNewTab: "open-new-tab",
   openNewWindow: "open-new-window",
   openNewTabGroup: "open-new-tab-group",
+  toggleFullscreen: "toggle-fullscreen",
 };
 
 // please don't modify!

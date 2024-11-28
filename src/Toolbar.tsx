@@ -41,7 +41,7 @@ export function Toolbar() {
             // @handled
             try {
               const [error, currentTab] = await withError(
-                chrome.tabs.getCurrent(),
+                chrome.tabs.getCurrent()
               );
               if (error) {
                 //@handle
@@ -73,7 +73,7 @@ export function Toolbar() {
             // @handled
             try {
               const [error, currentTab] = await withError(
-                chrome.tabs.getCurrent(),
+                chrome.tabs.getCurrent()
               );
               if (error) {
                 //@handle
@@ -163,21 +163,18 @@ export function Toolbar() {
             `}
         <sl-icon-button
           name="aspect-ratio"
-          title="Toggle Fullscreen"
+          title="Toggle Full Screen"
           @click=${async () => {
             // @handled
             try {
               const currentWindow = await chrome.windows.getCurrent();
               if (currentWindow.id) {
-                if (currentWindow.state === "fullscreen") {
-                  await chrome.windows.update(currentWindow.id, {
-                    state: "maximized",
-                  });
-                } else {
-                  await chrome.windows.update(currentWindow.id, {
-                    state: "fullscreen",
-                  });
-                }
+                await chrome.windows.update(currentWindow.id, {
+                  state:
+                    currentWindow.state === "fullscreen"
+                      ? "maximized"
+                      : "fullscreen",
+                });
               }
             } catch (error) {
               console.error(error);

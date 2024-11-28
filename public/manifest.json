@@ -43,11 +43,9 @@
       "description": "Toggle between side panel and popup as default extension action"
     },
     "close-all-session-windows": {
-      "suggested_key": "Alt+W",
       "description": "Close all session windows"
     },
     "exit-current-session": {
-      "suggested_key": "Alt+Q",
       "description": "Exit current session"
     },
     "edit-current-tab-url": {
@@ -61,6 +59,10 @@
     },
     "open-new-tab-group": {
       "description": "Open new tab group"
+    },
+    "toggle-fullscreen": {
+      "suggested_key": "Alt+F",
+      "description": "Toggle full screen"
     }
   }
 }

@@ -187,11 +187,16 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
 chrome.runtime.onStartup.addListener(async () => {
   // @error
+  // TODO: remove after a while
+  const openPanelOnActionClick_1 = await getStorageData<boolean>(
+    localStorageKeys.openPanelOnActionClick_1
+  );
   const openPanelOnActionClick = await getStorageData<boolean>(
     localStorageKeys.openPanelOnActionClick
   );
   await chrome.sidePanel.setPanelBehavior({
-    openPanelOnActionClick: openPanelOnActionClick ?? true,
+    openPanelOnActionClick:
+      openPanelOnActionClick_1 ?? openPanelOnActionClick ?? true,
   });
   await initializeBookmarkNodes();
   await updateTabGroupTreeDataAndCurrentSessionData();
@@ -1007,6 +1012,7 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
       await openNavigationBox({
         navigatedTabId: tab.id,
         precedentTabId: tab.id,
+        pinned: tab.pinned,
       });
     }
   } else if (command === commands.openNewTab) {
@@ -1015,5 +1021,14 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     await openNavigationBox({ newWindow: true, precedentTabId: tab?.id });
   } else if (command === commands.openNewTabGroup) {
     await createTabGroup();
+  } else if (command === commands.toggleFullscreen) {
+    if (tab?.windowId) {
+      const fullscreen = await getStorageData<boolean>(
+        sessionStorageKeys.fullscreen
+      );
+      await chrome.windows.update(tab?.windowId, {
+        state: fullscreen ? "maximized" : "fullscreen",
+      });
+    }
   }
 });

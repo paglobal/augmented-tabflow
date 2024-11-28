@@ -82,7 +82,7 @@ function Help() {
   All Session Windows" button when you're done with a session to ensure
   that you don't mistakenly remove any tabs or windows from your current
   session.
-- Tab group spaces are used to aggregate tab groups of similar colors. Switch between them with the tab group space buttons below or by swiping left and right with two fingers.
+- Tab group spaces are used to aggregate tab groups of similar colors. Switch between them with the tab group space buttons below.
 - Ungrouped tabs persist between tab group spaces but pinned tabs persist between both tab group spaces and sessions.
 - Double-click on any tab to activate the tab and close the side panel in the process.
 - If you switch to a new device, you might want to wait a bit for your bookmarks to sync up and restart your browser.
@@ -90,7 +90,7 @@ function Help() {
 - I hope you enjoy this extension. Go forth and be productive!
 `)} ${infoHeader(
       "Projects that either inspired this extension or tremendously helped in its development",
-      true,
+      true
     )}
     ${infoButton("Lit", async () => {
       await chrome.tabs.create({ url: "https://lit.dev/" });
