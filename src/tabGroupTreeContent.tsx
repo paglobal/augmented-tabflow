@@ -63,7 +63,7 @@ export async function sessionViewSessionWindowsTreeContent() {
             )}`}
           </TreeItem>
         );
-      })
+      }),
     );
 
     if (sessionWindowsTreeContent.length) {
@@ -91,7 +91,7 @@ export async function tabGroupTreeContent() {
       (tabGroup) => tabGroup.id,
       (tabGroup) => {
         return <TabGroupTreeItem tabGroup={tabGroup} />;
-      }
+      },
     )}
     ${_sessionViewSessionWindowsTreeContent}
   `;

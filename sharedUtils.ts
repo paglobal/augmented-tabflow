@@ -61,7 +61,7 @@ export type TabGroupTreeData = (chrome.tabGroups.TabGroup & {
   tabs: chrome.tabs.Tab[];
 })[];
 
-async function reinitializePinnedTabs() {
+export async function reinitializePinnedTabs() {
   // @maybe
   await setStorageData(sessionStorageKeys.sessionLoading, true);
   const oldPinnedTabs = await chrome.tabs.query({ pinned: true });

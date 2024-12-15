@@ -63,7 +63,6 @@ export const localStorageKeys = {
   ungroupedTabGroupCollapsed: "local-3",
   pinnedTabGroupCollapsed: "local-4",
   openPanelOnActionClick: "local-5",
-  openPanelOnActionClick_1: "local-6",
 } as const satisfies Record<string, LocalStorageKey>;
 
 export type TabGroupType = `tabGroup-${number}`;

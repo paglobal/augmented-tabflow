@@ -11,21 +11,24 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
+- revamp session saving to enable proper syncing
+- implement `navigationBox` with popup
+- reinit pinned tabs on startup
+- ask user to re-opened new session material
+- opening the navigation box should affect the `antecedentTabInfo` more subtly
 - press center button to switch to active tab group space
 - implement swiping to change tab group space and document it by adding the ff to help page: `or by swiping left and right with two fingers`
 - implement alert for when bookmark nodes can't be found
-- implement "check for updates" feature
-- check issue with not restoring session state on update
-- reduce flashes when closing session windows
-- keep track of new pinned tabs and ask user if which pinned tabs they want to open and close instead of just reinitting them
 - switch to session on save
-- reconcile newly opened session with last recorded session
-- delete all `navigationBox` and `sessionManager` urls from history
-- add `Grouping Options` for tabs and tab groups to reduce clutter
 - implement shortcut for moving to previous tab
 
 ### Later
 
+- add `Grouping Options` for tabs and tab groups to reduce clutter
+- reconcile newly opened session with last recorded session
+- add overflow for navigation box
+- reduce flashes when closing session windows
+- implement tab history stack
 - add shortcut for open new tab in current tab group
 - add window manipulation options through action buttons (eg. support moving whole windows)
 - fix slight color change issue on tree item text hover
@@ -64,6 +67,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - make session trees and other dialog trees react to the necessary app state changes
 -
 - litter the code with comments and ui alerts
+- optimize for performance
 - implement `pathNameToUrl` utility
 - check `migrateAndDedupe` function
 - use `updateComplete` instead of `setTimeout` for waiting for components to change their state
@@ -80,6 +84,8 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - look out for uses of typescript `as`'s in the codebase
 - add `| Undefined` to all `Array` types
 -
+- (maybe) implement "check for updates" feature
+- (maybe) revisit not updating session data on title change of tab
 - (maybe) don't update bookmarks on tab title update
 - (maybe) move all ungrouped tabs to the end always
 - (maybe) create ui for editing commands

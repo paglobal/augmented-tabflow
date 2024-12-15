@@ -32,6 +32,7 @@ import {
   withError,
   subscribeToStorageData,
   migrateAndDedupe,
+  reinitializePinnedTabs,
 } from "./sharedUtils";
 
 for (const sessionStorageBackupInfo of sessionStorageBackupInfoArray) {
@@ -187,16 +188,12 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
 chrome.runtime.onStartup.addListener(async () => {
   // @error
-  // TODO: remove after a while
-  const openPanelOnActionClick_1 = await getStorageData<boolean>(
-    localStorageKeys.openPanelOnActionClick_1
-  );
+  await reinitializePinnedTabs();
   const openPanelOnActionClick = await getStorageData<boolean>(
     localStorageKeys.openPanelOnActionClick
   );
   await chrome.sidePanel.setPanelBehavior({
-    openPanelOnActionClick:
-      openPanelOnActionClick_1 ?? openPanelOnActionClick ?? true,
+    openPanelOnActionClick: openPanelOnActionClick ?? true,
   });
   await initializeBookmarkNodes();
   await updateTabGroupTreeDataAndCurrentSessionData();
@@ -386,12 +383,7 @@ chrome.tabs.onReplaced.addListener(async () => {
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo) => {
   // @error
-  if (
-    changeInfo.title ||
-    changeInfo.url ||
-    changeInfo.groupId ||
-    changeInfo.pinned
-  ) {
+  if (changeInfo.url || changeInfo.groupId || changeInfo.pinned) {
     await setStorageData(
       sessionStorageKeys.readyToUpdateCurrentSessionData,
       true
