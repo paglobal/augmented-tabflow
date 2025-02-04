@@ -11,25 +11,33 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
+- fix bug with moving ungrouped tab groups
+- fix html rendering in navigation box. render as text content instead
+- show loading spinner on `unloaded` too
+- reduce toast time
+- don't close tabs individually, close windows instead
+- don't open chrome extension tabs
+- reinit pinned tabs on startup / try discarding them instead
 - revamp session saving to enable proper syncing
-- implement `navigationBox` with popup
-- reinit pinned tabs on startup
-- ask user to re-opened new session material
+- implement `navigationBox` with popup window
+- ask user to re-open new session material
 - opening the navigation box should affect the `antecedentTabInfo` more subtly
+- maximize `navigationBox`
 - press center button to switch to active tab group space
 - implement swiping to change tab group space and document it by adding the ff to help page: `or by swiping left and right with two fingers`
 - implement alert for when bookmark nodes can't be found
 - switch to session on save
 - implement shortcut for moving to previous tab
+- add shortcut for open new tab in current tab group
 
 ### Later
 
+- collapse all tab groups button
 - add `Grouping Options` for tabs and tab groups to reduce clutter
 - reconcile newly opened session with last recorded session
 - add overflow for navigation box
 - reduce flashes when closing session windows
 - implement tab history stack
-- add shortcut for open new tab in current tab group
 - add window manipulation options through action buttons (eg. support moving whole windows)
 - fix slight color change issue on tree item text hover
 - always aggregate all `Ungrouped` tab group data after importing or exporting
