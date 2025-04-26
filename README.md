@@ -11,24 +11,27 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
-- fix bug with moving ungrouped tab groups
+- open only one instance of session manager at a time
+- work around protocol bug with semicolons in search terms
+- fix bug with moving ungrouped tab groups, i.e, they sometimes don't appear
+- fix bug with entire session contents disappearing on close, etc
 - fix html rendering in navigation box. render as text content instead
 - show loading spinner on `unloaded` too
-- reduce toast time
+- reduce toast time and store most recent notifications
 - don't close tabs individually, close windows instead
-- don't open chrome extension tabs
-- reinit pinned tabs on startup / try discarding them instead
-- revamp session saving to enable proper syncing
-- implement `navigationBox` with popup window
-- ask user to re-open new session material
-- opening the navigation box should affect the `antecedentTabInfo` more subtly
+- don't save chrome extension tabs
+- reinit pinned tabs on startup / try discarding them instead / check to see if they're already there before reiniting them
+- revamp session saving to enable proper syncing (no more going to be a major revamp. just dedupe tab groups and tabs whenever session tabs change)
+- implement `navigationBox` with popup window (maybe not)
+- opening the navigation box should affect the `antecedentTabInfo` more subtly / add shortcut for open new tab in current tab group (make use of tab referrer option)
 - maximize `navigationBox`
 - press center button to switch to active tab group space
 - implement swiping to change tab group space and document it by adding the ff to help page: `or by swiping left and right with two fingers`
 - implement alert for when bookmark nodes can't be found
-- switch to session on save
+- switch to new session on save
+- implement overwrite session with current unsaved session feature
 - implement shortcut for moving to previous tab
-- add shortcut for open new tab in current tab group
+- ask user to re-open new session material (it's unclear what I mean here but I'm keeping it just in case I vaguely remember and this drives it home)
 
 ### Later
 
