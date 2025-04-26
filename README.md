@@ -51,13 +51,13 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - load all stub pages on startup to ensure that correct icons and titles are shown in chrome tab strip
 - implement recently closed tab groups feature
 - support moving pinned and ungrouped tab groups to new windows
-
+-
 - implement a feature to export tab or tab group to any arbitrary bookmark folder in `Other Bookmarks` and/or `Reading List`
 - implement a feature to view reading list
 - Show whether or not the tab was successfully added to or is already on `Reading List`
 - Use the `Move Or Copy Tab To Session` dialog
 - consider adding button to "look inside" tab groups and import individual tabs
-
+-
 - break large files into smaller files (look at `NavigateDialog.tsx` and `tabGroupTreeContent.tsx`)
 - use `Array<T>` to type arrays
 - use `await` anywhere it makes sense. don't use `async-await` in array filter functions though
@@ -69,14 +69,14 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - refine and organise user-facing text. look for anything in quotation marks like "Error!" and such. make use of full stops
 - capitalize all instances of `url`
 - change `setTimeout`'s to `await wait()`
-
+-
 - add last icon(s) in toolbar for `Settings` and `Actions` or `Settings And Actions`
 - add all chrome internal pages to search suggestions
 - use ctrl+click for alternate click behaviour eg. copy instead of move
 - implement group select and bulk actions for various functionality
 - collapse tree items in export dialog when done with exporting tab or tab group
 - make session trees and other dialog trees react to the necessary app state changes
-
+-
 - litter the code with comments and ui alerts
 - optimize for performance
 - implement `pathNameToUrl` utility
@@ -94,7 +94,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - look out for instances of typescript `!`'s in the codebase
 - look out for uses of typescript `as`'s in the codebase
 - add `| Undefined` to all `Array` types
-
+-
 - (maybe) implement "check for updates" feature
 - (maybe) revisit not updating session data on title change of tab
 - (maybe) don't update bookmarks on tab title update
@@ -111,5 +111,5 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 - (maybe) reduce minimum chrome version
 - (maybe, please be careful) delete unneeded icons. be sure not to break anything. look for instances of `icon` and `sl-icon` element with `name="<icon-name>"`
 - (maybe) implement internationalization
-
+-
 - try updating the tld list from time to time
