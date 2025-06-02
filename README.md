@@ -11,6 +11,11 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
+- add tab suspension features
+- remove navigation box from history and history stack
+- for closing tab groups, move them to a new window and close the window
+- for "Close ALl Session Windows", just deactivate any active sessions and close all windows
+- implement backups for sessions
 - open only one instance of session manager at a time
 - work around protocol bug with semicolons in search terms
 - fix bug with moving ungrouped tab groups, i.e, they sometimes don't appear
