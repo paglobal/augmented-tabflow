@@ -11,6 +11,13 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
+- have keyboard shortcut for moving between the most recently focused pinned tab and back, probably
+- document Alt+E for opening options menu and selecting from closed tab groups
+- document Alt+Shift+P for creating new tab groups
+- document Alt+Shift+W for closing groups and Alt+Shift+C for new tabs in groups
+- have a discarded tabs tab and hide discarded tabs from the main views
+- don't be continuously altering bookmarks when not inside a bookmarks session
+- don't open new navigation dialog when the current tab is a navigation dialog (that is, one being used to edit the url of another page)
 - add tab suspension features
 - remove navigation box from history and history stack
 - for closing tab groups, move them to a new window and close the window

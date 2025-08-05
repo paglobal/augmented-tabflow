@@ -10,7 +10,6 @@ import { Dialog } from "./Dialog";
 import { SessionSwitcher } from "./SessionSwitcher";
 import { DialogForm } from "./DialogForm";
 import { Tree } from "./Tree";
-import { NavigateDialog } from "./NavigateDialog";
 import { tabGroupColors, notifyWithErrorMessageAndReloadButton } from "./utils";
 import {
   createSession,
@@ -26,6 +25,7 @@ import { TabGroupTreeData } from "../sharedUtils";
 import { importTabGroupFromSessionTreeContent } from "./importTabGroupFromSessionTreeContent";
 import promiseWithOneTimeFallback from "./promiseWithOneTimeFallback";
 import { SessionView } from "./SessionView";
+import { NavigateDialog } from "./NavigateDialog";
 
 // disable animations for all tree items
 setDefaultAnimation("tree-item.expand", null);
@@ -103,7 +103,10 @@ export function App() {
                   fullWidth
                   noTopBodyMargin
                 >
-                  <Tree contentFn={sessionsTreeContent} />
+                  <Tree
+                    contentFn={sessionsTreeContent}
+                    errorFn={notifyWithErrorMessageAndReloadButton}
+                  />
                 </Dialog>
                 <Dialog
                   label="Move To Window"
@@ -118,6 +121,7 @@ export function App() {
                         fallbackTreeContent(),
                       )
                     }
+                    errorFn={notifyWithErrorMessageAndReloadButton}
                   />
                 </Dialog>
                 <Dialog
@@ -133,6 +137,7 @@ export function App() {
                         fallbackTreeContent(),
                       )
                     }
+                    errorFn={notifyWithErrorMessageAndReloadButton}
                   />
                 </Dialog>
                 <Dialog
@@ -148,6 +153,7 @@ export function App() {
                         fallbackTreeContent(),
                       )
                     }
+                    errorFn={notifyWithErrorMessageAndReloadButton}
                   />
                 </Dialog>
                 <Dialog
@@ -163,6 +169,7 @@ export function App() {
                         fallbackTreeContent(),
                       )
                     }
+                    errorFn={notifyWithErrorMessageAndReloadButton}
                   />
                 </Dialog>
                 <DialogForm
@@ -181,6 +188,7 @@ export function App() {
                       notifyWithErrorMessageAndReloadButton();
                     }
                   }}
+                  errorFn={notifyWithErrorMessageAndReloadButton}
                 >
                   {html`
                     <sl-input
@@ -232,6 +240,7 @@ export function App() {
                       notifyWithErrorMessageAndReloadButton();
                     }
                   }}
+                  errorFn={notifyWithErrorMessageAndReloadButton}
                 >
                   {html`
                     <sl-input
@@ -254,6 +263,7 @@ export function App() {
                       notifyWithErrorMessageAndReloadButton();
                     }
                   }}
+                  errorFn={notifyWithErrorMessageAndReloadButton}
                 >
                   {html`
                     <sl-input
@@ -282,6 +292,7 @@ export function App() {
                       notifyWithErrorMessageAndReloadButton();
                     }
                   }}
+                  errorFn={notifyWithErrorMessageAndReloadButton}
                 >
                   {html`
                     <sl-input

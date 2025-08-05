@@ -1,4 +1,3 @@
-import { html } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { PromethiumNode, adaptEffect, adaptState } from "promethium-js";
 import { createRef, ref } from "lit/directives/ref.js";
@@ -99,7 +98,7 @@ export function TreeItem(props: {
 
       return combine(
         draggable(props.draggableOptions as DraggableOptions),
-        dropTargetForElements(props.dropTargetOptions as DropTargetOptions)
+        dropTargetForElements(props.dropTargetOptions as DropTargetOptions),
       );
     }
   }, []);
@@ -124,27 +123,27 @@ export function TreeItem(props: {
         }
       : {};
 
-    return html`
+    return (
       <sl-tree-item
-        ${ref(treeItemRef)}
-        title=${props.tooltipContent}
-        style=${styleMap({
+        use:ref={ref(treeItemRef)}
+        title={props.tooltipContent}
+        $attr:style={styleMap({
           overflow: "hidden",
           whiteSpace: "noWrap",
           position: "relative",
           opacity: dragging() ? 0.5 : 1,
           ...draggedOverStyles,
         })}
-        ?expanded=${props.expanded}
-        ?selected=${props.selected}
-        @sl-expand=${props.onExpand}
-        @sl-collapse=${props.onCollapse}
-        @click=${props.onSelect}
-        @dblclick=${props.onDoubleClick}
+        bool:expanded={props.expanded}
+        bool:selected={props.selected}
+        on:sl-expand={props.onExpand}
+        on:sl-collapse={props.onCollapse}
+        on:click={props.onSelect}
+        on:dblclick={props.onDoubleClick}
       >
         <div
           class="actions-container"
-          style=${styleMap({
+          $attr:style={styleMap({
             position: "absolute",
             top: 0,
             right: 0,
@@ -154,17 +153,17 @@ export function TreeItem(props: {
           })}
         >
           <sl-button-group
-            ${ref(buttonGroupRef)}
+            use:ref={ref(buttonGroupRef)}
             label="Actions"
-            style=${styleMap({
+            $attr:style={styleMap({
               padding: "0 0.4rem",
             })}
           >
-            ${props.actionButtons}
+            {props.actionButtons}
           </sl-button-group>
         </div>
-        ${props.children}
+        {props.children}
       </sl-tree-item>
-    `;
+    );
   };
 }
