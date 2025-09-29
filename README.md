@@ -11,6 +11,7 @@ GitHub Repository for the [Augmented Tabflow](https://chromewebstore.google.com/
 
 ### Now
 
+- update shoelace to web awesome
 - have keyboard shortcut for moving between the most recently focused pinned tab and back, probably
 - document Alt+E for opening options menu and selecting from closed tab groups
 - document Alt+Shift+P for creating new tab groups
